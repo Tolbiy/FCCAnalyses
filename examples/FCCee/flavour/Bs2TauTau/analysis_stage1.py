@@ -11,7 +11,11 @@ processList_full = {
 }
 
 processList_test = {
-    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.001},
+    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.005},
+    'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.005},
+    'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.005},
+    'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.005},
+    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.001},
 }
 
 nCPUS       = 8
@@ -27,13 +31,13 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1/"
+outputDirEos   = "/afs/cern.ch/work/t/tomonnar/public/" #"/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1/"
 
 # if runBatch = False, save output locally
-outputDir   = "outputs/FCCee/flavor/Bs2TauTau/analysis_stage1/"
+outputDir   = "/afs/cern.ch/work/t/tomonnar/public/"
 
 
-
+includePaths = ["../../higgs/mass_xsec/functions.h"]
 
 #Mandatory: RDFanalysis class where the use defines the operations on the TTree
 class RDFanalysis():
@@ -218,7 +222,11 @@ class RDFanalysis():
                .Define("DV_d0",            "myUtils::get_trackd0(DV_tracks)")
                .Define("DV_z0",            "myUtils::get_trackz0(DV_tracks)")
 
-
+               .Define("EVT_missingEnergy", "FCCAnalyses::ZHfunctions::missingEnergy(91., RecoPartPIDAtVertex)")
+               .Define("EVT_missingEnergy_e", "ReconstructedParticle::get_e(EVT_missingEnergy)")
+               .Define("EVT_missingEnergy_px", "ReconstructedParticle::get_px(EVT_missingEnergy)")
+               .Define("EVT_missingEnergy_py", "ReconstructedParticle::get_py(EVT_missingEnergy)")
+               .Define("EVT_missingEnergy_pz", "ReconstructedParticle::get_pz(EVT_missingEnergy)")
 
                .Define("Tau23PiCandidates_mass",    "myUtils::getFCCAnalysesComposite_mass(Tau23PiCandidates)")
                .Define("Tau23PiCandidates_q",       "myUtils::getFCCAnalysesComposite_charge(Tau23PiCandidates)")
@@ -302,6 +310,8 @@ class RDFanalysis():
                 "EVT_NtracksPV", "EVT_NVertex", "EVT_NTau23Pi",
 
                 "EVT_dPV2DVmin","EVT_dPV2DVmax","EVT_dPV2DVave",
+
+                "EVT_missingEnergy_e","EVT_missingEnergy_px","EVT_missingEnergy_py","EVT_missingEnergy_pz",
 
                 "MC_Vertex_x", "MC_Vertex_y", "MC_Vertex_z",
                 "MC_Vertex_ntrk", "MC_Vertex_n",
