@@ -116,7 +116,13 @@
  "Tau23PiCandidates_d2PVT":         [0,6],
  "Tau23PiCandidates_d2TauVertices": [0,1.5],
  "Tau_px":                          [-40,40],
- "EVT_missingEnergy_x":             [0,91],
- "EVT_missingEnergy_y":             [0,91],
- "EVT_missingEnergy_z":             [0,91],
- "EVT_missingEnergy_e":             [0,91]}
+ "EVT_missingEnergy_px":            [-5,5],
+ "EVT_missingEnergy_py":            [-5,5],
+ "EVT_missingEnergy_pz":            [-5,5],
+ "EVT_missingEnergy_e":             [0,20],
+ "EVT_ThrustEmax_px":               [-46,46],
+ "EVT_ThrustEmax_py":               [-46,46],
+ "EVT_ThrustEmax_pz":               [-46,46],
+ "EVT_ThrustEmin_px":               [-46,46],
+ "EVT_ThrustEmin_py":               [-46,46],
+ "EVT_ThrustEmin_pz":               [-46,46]}

@@ -372,6 +372,28 @@ ROOT::VecOps::RVec<float>  getAxisEnergy::operator() (const ROOT::VecOps::RVec<f
   return result;
 }
 
+getAxisMomentum::getAxisMomentum(bool arg_pos){
+	_pos=arg_pos;
+}
+ROOT::VecOps::RVec<float>  getAxisMomentum::operator() (const ROOT::VecOps::RVec<float> & angle,
+	                                                                const ROOT::VecOps::RVec<float> & px,
+																																	const ROOT::VecOps::RVec<float> & py,
+                                                                  const ROOT::VecOps::RVec<float> & pz){
+  ROOT::VecOps::RVec<float> result={0.,0.,0.};
+  for (size_t i = 0; i < angle.size(); ++i) {
+    if (_pos==1 && angle[i]>0.){
+      result[0]+=px[i];
+      result[1]+=py[i];
+      result[2]+=pz[i];
+    }
+    if (_pos==0 && angle[i]<0.){
+      result[0]+=px[i];
+      result[1]+=py[i];
+      result[2]+=pz[i];
+    }
+  }
+  return result;
+}
 
 getAxisN::getAxisN(bool arg_pos){
 	_pos=arg_pos;

@@ -152,6 +152,18 @@ namespace Algorithms{
       bool _pos; /// Which hemisphere to select, false/0=cosTheta<0 true/1=cosTheta>0. Default=0
   };
 
+    /// Get the total momentum in a given hemisphere (defined by it's angle wrt to axis). Returns 3 values: px, py, pz
+  struct getAxisMomentum {
+  public:
+    getAxisMomentum(bool arg_pos=0);
+    ROOT::VecOps::RVec<float> operator() (const ROOT::VecOps::RVec<float> & angle,
+                                          const ROOT::VecOps::RVec<float> & px,
+                                          const ROOT::VecOps::RVec<float> & py,
+                                          const ROOT::VecOps::RVec<float> & pz);
+    private:
+      bool _pos; /// Which hemisphere to select, false/0=cosTheta<0 true/1=cosTheta>0. Default=0
+  };
+
 
   /// Get the number of particles in a given hemisphere (defined by it's angle wrt to axis). Returns 3 values: total, charged, neutral multiplicity
   struct getAxisN {

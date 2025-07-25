@@ -11,10 +11,10 @@ processList_full = {
 }
 
 processList_test = {
-    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.005},
-    'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.005},
-    'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.005},
-    'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.005},
+    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000001},
+    #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.005},
+    #'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.005},
+    #'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.005},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.001},
 }
 
@@ -183,6 +183,8 @@ class RDFanalysis():
                .Define("EVT_thrusthemis1_n",    "Algorithms::getAxisN(1)(RP_thrustangle, RP_charge)")
                .Define("EVT_thrusthemis0_e",    "Algorithms::getAxisEnergy(0)(RP_thrustangle, RP_charge, RP_e)")
                .Define("EVT_thrusthemis1_e",    "Algorithms::getAxisEnergy(1)(RP_thrustangle, RP_charge, RP_e)")
+               .Define("EVT_thrusthemis0_p",    "Algorithms::getAxisMomentum(0)(RP_thrustangle, RP_px, RP_py, RP_pz)")
+               .Define("EVT_thrusthemis1_p",    "Algorithms::getAxisMomentum(1)(RP_thrustangle, RP_px, RP_py, RP_pz)")
 
                .Define("EVT_ThrustEmax_E",         "EVT_thrusthemis0_e.at(0)")
                .Define("EVT_ThrustEmax_Echarged",  "EVT_thrusthemis0_e.at(1)")
@@ -190,6 +192,9 @@ class RDFanalysis():
                .Define("EVT_ThrustEmax_N",         "float(EVT_thrusthemis0_n.at(0))")
                .Define("EVT_ThrustEmax_Ncharged",  "float(EVT_thrusthemis0_n.at(1))")
                .Define("EVT_ThrustEmax_Nneutral",  "float(EVT_thrusthemis0_n.at(2))")
+               .Define("EVT_ThrustEmax_px",        "EVT_thrusthemis0_p.at(0)")
+               .Define("EVT_ThrustEmax_py",        "EVT_thrusthemis0_p.at(1)")
+               .Define("EVT_ThrustEmax_pz",        "EVT_thrusthemis0_p.at(2)")
 
                .Define("EVT_ThrustEmin_E",         "EVT_thrusthemis1_e.at(0)")
                .Define("EVT_ThrustEmin_Echarged",  "EVT_thrusthemis1_e.at(1)")
@@ -197,6 +202,9 @@ class RDFanalysis():
                .Define("EVT_ThrustEmin_N",         "float(EVT_thrusthemis1_n.at(0))")
                .Define("EVT_ThrustEmin_Ncharged",  "float(EVT_thrusthemis1_n.at(1))")
                .Define("EVT_ThrustEmin_Nneutral",  "float(EVT_thrusthemis1_n.at(2))")
+               .Define("EVT_ThrustEmin_px",        "EVT_thrusthemis1_p.at(0)")
+               .Define("EVT_ThrustEmin_py",        "EVT_thrusthemis1_p.at(1)")
+               .Define("EVT_ThrustEmin_pz",        "EVT_thrusthemis1_p.at(2)")
 
 
                .Define("Vertex_thrust_angle",   "myUtils::get_Vertex_thrusthemis_angle(VertexObject, RecoPartPIDAtVertex, EVT_thrust)")
@@ -300,6 +308,9 @@ class RDFanalysis():
                 "EVT_ThrustEmin_N",            "EVT_ThrustEmax_N",
                 "EVT_ThrustEmin_Ncharged",     "EVT_ThrustEmax_Ncharged",
                 "EVT_ThrustEmin_Nneutral",     "EVT_ThrustEmax_Nneutral",
+                "EVT_ThrustEmin_px",           "EVT_ThrustEmax_px",
+                "EVT_ThrustEmin_py",           "EVT_ThrustEmax_py",
+                "EVT_ThrustEmin_pz",           "EVT_ThrustEmax_pz",
                 "EVT_ThrustEmin_NDV",          "EVT_ThrustEmax_NDV",
                 "EVT_ThrustEmin_NTau23PiCand", "EVT_ThrustEmax_NTau23PiCand",
                 "EVT_Thrust_Mag",
