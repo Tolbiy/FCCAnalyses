@@ -528,5 +528,41 @@ ROOT::VecOps::RVec<int> TruthMatch_MC_RECO_Subset(ROOT::VecOps::RVec<int> reco_i
 }
 
 
+//Compute the opening angle between the TM muons
+float TM_ComputeOpeningAngle(ROOT::VecOps::RVec<float> px1,
+                             ROOT::VecOps::RVec<float> py1,
+                             ROOT::VecOps::RVec<float> pz1,
+                             ROOT::VecOps::RVec<float> px2,
+                             ROOT::VecOps::RVec<float> py2,
+                             ROOT::VecOps::RVec<float> pz2){
+    
+    if (px1.size() == 0 || px2.size() == 0){
+        return -2.0;
+    }
+    else{
+        return (px1[0]*px2[0] + py1[0]*py2[0] + pz1[0]*pz2[0])/sqrt(px1[0]*px1[0]+py1[0]*py1[0]+pz1[0]*pz1[0])/sqrt(px2[0]*px2[0]+py2[0]*py2[0]+pz2[0]*pz2[0]);
+    }
+}
+
+ROOT::VecOps::RVec<float> Muons_ComputeOpeningAngle(ROOT::VecOps::RVec<float> px,ROOT::VecOps::RVec<float> py,ROOT::VecOps::RVec<float> pz){
+
+    ROOT::VecOps::RVec<float> results;
+
+    if (px.size() < 2){
+        results.push_back(-2.0);
+        return results;
+    }
+    else{
+        
+        for (size_t i=0; i<px.size(); ++i){
+            for (size_t j=i+1; j<px.size(); ++j){
+                results.push_back((px[i]*px[j]+py[i]*py[j]+pz[i]*pz[j])/sqrt(px[i]*px[i]+py[i]*py[i]+pz[i]*pz[i])/sqrt(px[j]*px[j]+py[j]*py[j]+pz[j]*pz[j]));
+            }
+        }
+
+        return results;
+    }
+}
+
 }}
 #endif

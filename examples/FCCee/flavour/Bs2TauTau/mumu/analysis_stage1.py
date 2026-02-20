@@ -360,6 +360,7 @@ class RDFanalysis():
                .Define("muon_charge",      "ReconstructedParticle::get_charge(muons)")
                .Define("muon_PDG",         "ReconstructedParticle::get_type(muons)")
                .Define("muon_thrustangles",'Algorithms::getAxisCosTheta(EVT_thrust, muon_px, muon_py, muon_pz)')
+               .Define("muon_OpeningAngle","FCCAnalyses::ZHfunctions::Muons_ComputeOpeningAngle(muon_px,muon_py,muon_pz)")
 
                
                #####################################
@@ -385,6 +386,7 @@ class RDFanalysis():
                .Define("TM_muplus_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_muplus_ind,ReconstructedParticles))")
                .Define("TM_muplus_charge", "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_muplus_ind,ReconstructedParticles))")
                .Define("TM_muplus_PDG",    "ReconstructedParticle::get_type(ReconstructedParticle::get(TM_RECO_muplus_ind,ReconstructedParticles))")
+               .Define("TM_muplus_thrustangle","Algorithms::getAxisCosTheta(EVT_thrust, TM_muplus_px, TM_muplus_py, TM_muplus_pz)")
                
                .Define("TM_muminus_energy", "ReconstructedParticle::get_e(ReconstructedParticle::get(TM_RECO_muminus_ind,ReconstructedParticles))")
                .Define("TM_muminus_px",     "ReconstructedParticle::get_px(ReconstructedParticle::get(TM_RECO_muminus_ind,ReconstructedParticles))")
@@ -395,6 +397,9 @@ class RDFanalysis():
                .Define("TM_muminus_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_muminus_ind,ReconstructedParticles))")
                .Define("TM_muminus_charge", "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_muminus_ind,ReconstructedParticles))")
                .Define("TM_muminus_PDG",    "ReconstructedParticle::get_type(ReconstructedParticle::get(TM_RECO_muminus_ind,ReconstructedParticles))")
+               .Define("TM_muminus_thrustangle","Algorithms::getAxisCosTheta(EVT_thrust, TM_muminus_px, TM_muminus_py, TM_muminus_pz)")
+
+               .Define("TM_muons_OpeningAngle","FCCAnalyses::ZHfunctions::TM_ComputeOpeningAngle(TM_muplus_px,TM_muplus_py,TM_muplus_pz,TM_muminus_px,TM_muminus_py,TM_muminus_pz)")
 
                #.Define("RP_MC_index", "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, ReconstructedParticles)")
 
@@ -494,11 +499,12 @@ class RDFanalysis():
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
                 "recoEmiss_thrustangle",
 
-                "n_muons","muon_px","muon_py","muon_pz","muon_phi","muon_eta","muon_energy","muon_mass","muon_charge","muon_PDG","muon_thrustangles",
+                "n_muons","muon_px","muon_py","muon_pz","muon_phi","muon_eta","muon_energy","muon_mass","muon_charge","muon_PDG","muon_thrustangles","muon_OpeningAngle",
 
                 "TM_MC_muplus_ind","TM_MC_muminus_ind","TM_RECO_muplus_ind","TM_RECO_muminus_ind","n_TM_muplus","n_TM_muminus","n_TM_muons",
-                "TM_muplus_energy","TM_muplus_px","TM_muplus_py","TM_muplus_pz","TM_muplus_phi","TM_muplus_eta","TM_muplus_mass","TM_muplus_charge","TM_muplus_PDG",
-                "TM_muminus_energy","TM_muminus_px","TM_muminus_py","TM_muminus_pz","TM_muminus_phi","TM_muminus_eta","TM_muminus_mass","TM_muminus_charge","TM_muminus_PDG",
+                "TM_muplus_energy","TM_muplus_px","TM_muplus_py","TM_muplus_pz","TM_muplus_phi","TM_muplus_eta","TM_muplus_mass","TM_muplus_charge","TM_muplus_PDG","TM_muplus_thrustangle",
+                "TM_muminus_energy","TM_muminus_px","TM_muminus_py","TM_muminus_pz","TM_muminus_phi","TM_muminus_eta","TM_muminus_mass","TM_muminus_charge","TM_muminus_PDG","TM_muminus_thrustangle",
+                "TM_muons_OpeningAngle",
 
                 #"Selected","nevent"
                 #"n_TruthMatched_muplus","TruthMatched_muplus_px","TruthMatched_muplus_py","TruthMatched_muplus_pz","TruthMatched_muplus_phi","TruthMatched_muplus_eta","TruthMatched_muplus_energy","TruthMatched_muplus_mass","TruthMatched_muplus_charge","TruthMatched_muplus_PDG",
