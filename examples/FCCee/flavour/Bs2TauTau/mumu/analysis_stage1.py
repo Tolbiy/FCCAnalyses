@@ -29,7 +29,7 @@ processList_test = {
 }
 
 nCPUS       = 8
-runBatch    = False
+runBatch    = True
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -181,7 +181,7 @@ class RDFanalysis():
                #############################################
                #Only for signal to properly select the correct events
                
-               .Filter("n_genBs2TauTau_Tauminus_muon > 0 && n_genBs2TauTau_Tauplus_muon > 0") 
+               #.Filter("n_genBs2TauTau_Tauminus_muon > 0 && n_genBs2TauTau_Tauplus_muon > 0") 
                #.Define("nevent","rdfentry_")
 
                #############################################
@@ -360,7 +360,10 @@ class RDFanalysis():
                .Define("muon_charge",      "ReconstructedParticle::get_charge(muons)")
                .Define("muon_PDG",         "ReconstructedParticle::get_type(muons)")
                .Define("muon_thrustangles",'Algorithms::getAxisCosTheta(EVT_thrust, muon_px, muon_py, muon_pz)')
+               .Define("muon_thrustEmin_n","int result (0); for (size_t i=0; i<muon_thrustangles.size(); ++i){if (muon_thrustangles[i] > 0.0) ++result;} return result;")
+               .Define("muon_thrustEmax_n","int result (0); for (size_t i=0; i<muon_thrustangles.size(); ++i){if (muon_thrustangles[i] <= 0.0) ++result;} return result;")
                .Define("muon_OpeningAngle","FCCAnalyses::ZHfunctions::Muons_ComputeOpeningAngle(muon_px,muon_py,muon_pz)")
+               .Define("dimuon_ind", "FCCAnalyses::ZHfunctions::Muons_ID_SmallestOA(muon_OpeningAngle,n_muons)")
 
                
                #####################################
@@ -499,7 +502,7 @@ class RDFanalysis():
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
                 "recoEmiss_thrustangle",
 
-                "n_muons","muon_px","muon_py","muon_pz","muon_phi","muon_eta","muon_energy","muon_mass","muon_charge","muon_PDG","muon_thrustangles","muon_OpeningAngle",
+                "n_muons","muon_px","muon_py","muon_pz","muon_phi","muon_eta","muon_energy","muon_mass","muon_charge","muon_PDG","muon_thrustangles","muon_thrustEmin_n","muon_thrustEmax_n","muon_OpeningAngle","dimuon_ind",
 
                 "TM_MC_muplus_ind","TM_MC_muminus_ind","TM_RECO_muplus_ind","TM_RECO_muminus_ind","n_TM_muplus","n_TM_muminus","n_TM_muons",
                 "TM_muplus_energy","TM_muplus_px","TM_muplus_py","TM_muplus_pz","TM_muplus_phi","TM_muplus_eta","TM_muplus_mass","TM_muplus_charge","TM_muplus_PDG","TM_muplus_thrustangle",

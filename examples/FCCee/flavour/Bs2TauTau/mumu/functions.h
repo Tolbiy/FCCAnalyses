@@ -564,5 +564,59 @@ ROOT::VecOps::RVec<float> Muons_ComputeOpeningAngle(ROOT::VecOps::RVec<float> px
     }
 }
 
+
+//Select the smallest opening angle in the list to ID the di-muon system of interest
+float GetMin(ROOT::VecOps::RVec<float> list){
+    if (list.size() == 0) return -2.0;
+    else if (list.size() == 1) return list[0];
+    else{
+        float result (list[0]);
+        for (size_t i=1; i<list.size();++i){
+            if (result < list[i]) result = list[i];
+        }
+        return result;
+    }
+}
+
+//ID the two muons with smallest opening angle with their places index in the muon collection 
+ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n_muons){
+    
+    ROOT::VecOps::RVec<int> ind_list;
+    
+    //Not enough muon to compute an OA
+    if (OAs.size() == 0) ind_list.push_back(-1);
+    
+    //Only one pair of muon (obvious case)
+    else if (OAs.size() == 1) {
+        ind_list.push_back(0); 
+        ind_list.push_back(1);
+    }
+    
+    //Proceed to find min and return the corresponding ind that produced the min
+    else{
+
+        //Create the indices map
+        ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> map;
+        for (int i=0; i<n_muons; ++i){
+            for (int j=i+1; j<n_muons; ++j){
+                ROOT::VecOps::RVec<int> temp = {i,j};
+                map.push_back(temp);
+            }
+        }
+        
+        //find OA min and select corresponding muon indices through the map created previously
+        float min (OAs[0]);
+        ind_list = map[0];
+
+        for (size_t i=1; i<OAs.size();++i){
+            if (min < OAs[i]) {
+                min = OAs[i];
+                ind_list = map[i];
+            }
+        }
+    }
+    return ind_list;
+}
+
 }}
 #endif
