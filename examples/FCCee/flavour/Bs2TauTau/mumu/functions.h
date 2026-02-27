@@ -578,7 +578,8 @@ float GetMin(ROOT::VecOps::RVec<float> list){
     }
 }
 
-//ID the two muons with smallest opening angle with their places index in the muon collection 
+//ID the two muons with smallest opening angle with their places index in the muon collection
+//WARNING: If not enough muon to compute an OA, The OA list is pushed back with -2.0 and not empty, thus the first case never happens and other checks needs to be done
 ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n_muons){
     
     ROOT::VecOps::RVec<int> ind_list;
@@ -616,6 +617,28 @@ ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n
         }
     }
     return ind_list;
+}
+
+
+//Functions used to define the Stage 1 cut criteria (dimuon properties: Opening angle, hemisphere emission, charge)
+int Check_dimuon_Presence(ROOT::VecOps::RVec<float> muon_OAs){
+    if (muon_OAs.size() == 1 && std::abs(muon_OAs[0]+2.0) < 1e-4) return 0;
+    else return 1;
+}
+
+int Check_dimuon_SameSide(ROOT::VecOps::RVec<float> muon_OAs){
+    if (GetMin(muon_OAs) < 0.0) return 0;
+    else return 1;
+}
+
+int Check_dimuon_SigHemi(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<float> muon_thrustangles){
+    if (muon_thrustangles[dimuon_ind.at(0)] < 0.0 && muon_thrustangles[dimuon_ind.at(1)] < 0.0) return 0;
+    else return 1;
+}
+
+int Check_dimuon_Charges(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<int> muon_charges){
+    if (muon_charges[dimuon_ind.at(0)]*muon_charges[dimuon_ind.at(1)] > 0) return 0;
+    else return 1;
 }
 
 }}
