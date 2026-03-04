@@ -641,5 +641,140 @@ int Check_dimuon_Charges(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<
     else return 1;
 }
 
+//----------- Background studies -----------------
+
+//Finding the MC muons truth-matched to dimuon
+ROOT::VecOps::RVec<int> Finding_MC_dimuon(ROOT::VecOps::RVec<int> dimuon_ind,
+                                          ROOT::VecOps::RVec<int> reco_muon_ind,
+                                          ROOT::VecOps::RVec<int> reco_ind,
+                                          ROOT::VecOps::RVec<int> mc_ind){
+
+    ROOT::VecOps::RVec<int> results;
+    
+    for (size_t i=0;i<dimuon_ind.size();++i){
+        for (size_t j=0;j<reco_ind.size();++j){
+            if (reco_muon_ind.at(dimuon_ind.at(i)) == reco_ind.at(j)){ //the dimuon indices point in the reco muon subcollection 
+                results.push_back(mc_ind.at(j));
+            }
+        }
+    }
+    //Shouldn't happen in that direction but the truth-matching might fail
+    //Guaranteed two reco muon because of the cuts but no guarantee on the MC side although pretty sure that it should work
+    //The fast sim use a lot the MC info to produce RECO info thus not sure that it can produce ghost particles
+    //Add a check by checking the size of the MC_dimuon list because if truth-matching fails then it doesn't appear in the MCRecoAssociation lists, and thus not push_back'ed
+    return results;
+}
+
+//Explore the MC tree of the dimuon: Find the common ancestor of both muon (assume only one mother)
+int Find_MC_CommonAncestor(ROOT::VecOps::RVec<int> MC_dimuon_ind,
+                           ROOT::VecOps::RVec<edm4hep::MCParticleData> Particle,
+                           ROOT::VecOps::RVec<int> Parents_ind){
+
+    //Assume only one mother for all particle (actually checks it and use it as a termination condition (-1))
+    ROOT::VecOps::RVec<int> Parents_Mu1;
+    ROOT::VecOps::RVec<int> Parents_Mu2;
+
+    if (Particle.at(MC_dimuon_ind[0]).parents_begin+1 == Particle.at(MC_dimuon_ind[0]).parents_end){
+        Parents_Mu1.push_back(Parents_ind.at(Particle.at(MC_dimuon_ind[0]).parents_begin)); 
+        bool SingleParent1 (true);
+        do {
+            if (Particle.at(Parents_Mu1.back()).parents_begin+1 == Particle.at(Parents_Mu1.back()).parents_end){
+                Parents_Mu1.push_back(Parents_ind.at(Particle.at(Parents_Mu1.back()).parents_begin));
+            }
+            else {
+                Parents_Mu1.push_back(-1);
+                SingleParent1 = false;
+            }
+        } while(SingleParent1);
+    }
+    else Parents_Mu1.push_back(-1);
+         
+    if (Particle.at(MC_dimuon_ind[1]).parents_begin+1 == Particle.at(MC_dimuon_ind[1]).parents_end){
+        Parents_Mu2.push_back(Parents_ind.at(Particle.at(MC_dimuon_ind[1]).parents_begin)); 
+        bool SingleParent2 (true);
+        do {
+            if (Particle.at(Parents_Mu2.back()).parents_begin+1 == Particle.at(Parents_Mu2.back()).parents_end){
+                Parents_Mu2.push_back(Parents_ind.at(Particle.at(Parents_Mu2.back()).parents_begin));
+            }
+            else {
+                Parents_Mu2.push_back(-1);
+                SingleParent2 = false;
+            }
+        } while(SingleParent2);
+    }
+    else Parents_Mu2.push_back(-1);
+    
+
+    //Check who's the common ancestor, -1 == No common ancestor
+    int CommonAncestor (-1);
+    bool Found (false);
+    for (size_t i=0; i<Parents_Mu1.size(); ++i){
+        for (size_t j=0; j<Parents_Mu2.size(); ++j){
+            if (Parents_Mu1.at(i) == -1 or Parents_Mu2.at(j) == -1) continue;
+            if (Parents_Mu1.at(i) == Parents_Mu2.at(j)){
+                CommonAncestor = Parents_Mu1.at(i);
+                Found = true;
+                break;
+            }
+        }
+        if (Found) break;
+    }
+    return CommonAncestor;
+}
+
+
+//Reconstruct the whole decay chain from the common ancestor
+ROOT::VecOps::RVec<int> Find_MC_CommonAncestor_Daughters(int CA_ind,
+                                                         ROOT::VecOps::RVec<edm4hep::MCParticleData> Particle,
+                                                         ROOT::VecOps::RVec<int> Daughters_ind){
+
+    ROOT::VecOps::RVec<int> results;
+    
+    //Check if CA exists
+    if (CA_ind == -1){
+        results.push_back(-1);
+        return results;
+    }                                                       
+
+    else{
+        //Init with the decay of the common ancestor
+        results.push_back(CA_ind);
+        for (size_t k=Particle.at(CA_ind).daughters_begin; k<Particle.at(CA_ind).daughters_end; ++k) {
+            results.push_back(Daughters_ind.at(k));
+        }
+        results.push_back(-2); //Split subdecays
+
+        //Since the indices will not be unique in the list, keep track of those already read
+        ROOT::VecOps::RVec<int> bookkeeping;
+        bookkeeping.push_back(CA_ind);
+
+        int i (1); //Start after the common ancestor
+        do {
+            //First check if already scanned
+            bool InBook (false);
+            for (size_t m=0; m<bookkeeping.size(); ++m){
+                if (results.at(i) == bookkeeping.at(m)){ 
+                    InBook = true;
+                    break;
+                }
+            }
+
+            //Do the scan by adding first the mother, then the daughters, then the splitter
+            if (results.at(i)>0 && not InBook){
+                    results.push_back(results.at(i));
+                    bookkeeping.push_back(results.at(i));
+                    for (size_t j=Particle.at(results.at(i)).daughters_begin; j<Particle.at(results.at(i)).daughters_end; ++j){
+                        results.push_back(Daughters_ind.at(j));
+                    }
+                    results.push_back(-2);
+            }
+
+            ++i;
+        } while(i<results.size());
+        
+        return results;
+    }
+}
+
 }}
 #endif
