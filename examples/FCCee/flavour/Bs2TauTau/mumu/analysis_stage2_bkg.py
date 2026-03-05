@@ -446,10 +446,11 @@ class RDFanalysis():
                ###########################
                
                .Define("has_dimuon","FCCAnalyses::ZHfunctions::Check_dimuon_Presence(muon_OpeningAngle)")
-               .Define("has_dimuon_SameSide","FCCAnalyses::ZHfunctions::Check_dimuon_SameSide(muon_OpeningAngle)")
-               .Define("has_dimuon_SigHemi","FCCAnalyses::ZHfunctions::Check_dimuon_SigHemi(dimuon_ind, muon_thrustangles)")
-               .Define("has_dimuon_OppositeCharges","FCCAnalyses::ZHfunctions::Check_dimuon_Charges(dimuon_ind, muon_charge)")
-               .Filter("n_muons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dimuon > 0 && has_dimuon_SameSide > 0 && has_dimuon_OppositeCharges > 0 && has_dimuon_SigHemi")
+               .Define("has_dimuon_SameSide","FCCAnalyses::ZHfunctions::Check_dimuon_SameSide(muon_OpeningAngle,has_dimuon)")
+               .Define("has_dimuon_SigHemi","FCCAnalyses::ZHfunctions::Check_dimuon_SigHemi(dimuon_ind, muon_thrustangles,has_dimuon)")
+               .Define("has_dimuon_OppositeCharges","FCCAnalyses::ZHfunctions::Check_dimuon_Charges(dimuon_ind, muon_charge,has_dimuon)")
+               .Define("has_dimuon_Vertex","FCCAnalyses::ZHfunctions::Check_dimuon_Vertices(dimuon_ind,Muon0,muon_charge,VertexObject,has_dimuon)")
+               .Filter("n_muons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dimuon > 0 && has_dimuon_SameSide > 0 && has_dimuon_OppositeCharges > 0 && has_dimuon_SigHemi > 0 && has_dimuon_Vertex == 0")
 
                ############################
                ##   Background studies   ##
@@ -459,8 +460,7 @@ class RDFanalysis():
                .Define("n_MC_dimuon","MC_dimuon_ind.size()") #Check to see if the truth-matching in the RECO->MC direction can fail (== 2 -> ok else failed)
 
                .Define("MC_dimuon_CA_ind","FCCAnalyses::ZHfunctions::Find_MC_CommonAncestor(MC_dimuon_ind,Particle,Particle0)")
-               .Define("MC_dimuon_CADaughters_ind","FCCAnalyses::ZHfunctions::Find_MC_CommonAncestor_Daughters(MC_dimuon_CA_ind,Particle,Particle1)")
-               #.Define("MC_dimuon_CADaughters_PDG","ROOT::VecOps::RVec<int> PDGs; for(size_t i=0;i<MC_dimuon_CADaughters_ind.size();++i) {PDGs.push_back(Particle.at(MC_dimuon_CADaughters_ind.at(i)).PDG);} return PDGs;")
+               .Define("MC_dimuon_CADaughters_ind","FCCAnalyses::ZHfunctions::Find_MC_CommonAncestor_Daughters(MC_dimuon_CA_ind,Particle,Particle1)") #Always check the indices value before looking into the collection (-1 for failed searches)
 
            )
         return df2
@@ -532,14 +532,14 @@ class RDFanalysis():
                 "recoEmiss_thrustangle",
 
                 "n_muons","muon_px","muon_py","muon_pz","muon_phi","muon_eta","muon_energy","muon_mass","muon_charge","muon_PDG","muon_thrustangles","muon_thrustEmin_n","muon_thrustEmax_n","muon_OpeningAngle","dimuon_ind",
-                "has_dimuon","has_dimuon_SameSide","has_dimuon_SigHemi","has_dimuon_OppositeCharges",
+                "has_dimuon","has_dimuon_SameSide","has_dimuon_SigHemi","has_dimuon_OppositeCharges","has_dimuon_Vertex",
 
                 "TM_MC_muplus_ind","TM_MC_muminus_ind","TM_RECO_muplus_ind","TM_RECO_muminus_ind","n_TM_muplus","n_TM_muminus","n_TM_muons",
                 "TM_muplus_energy","TM_muplus_px","TM_muplus_py","TM_muplus_pz","TM_muplus_phi","TM_muplus_eta","TM_muplus_mass","TM_muplus_charge","TM_muplus_PDG","TM_muplus_thrustangle",
                 "TM_muminus_energy","TM_muminus_px","TM_muminus_py","TM_muminus_pz","TM_muminus_phi","TM_muminus_eta","TM_muminus_mass","TM_muminus_charge","TM_muminus_PDG","TM_muminus_thrustangle",
                 "TM_muons_OpeningAngle",
 
-                "MC_dimuon_ind","n_MC_dimuon","MC_dimuon_CA_ind","MC_dimuon_CADaughters_ind",#"MC_dimuon_CADaughters_PDG",
+                "MC_dimuon_ind","n_MC_dimuon","MC_dimuon_CA_ind","MC_dimuon_CADaughters_ind",
 
                 #"Selected","nevent"
                 #"n_TruthMatched_muplus","TruthMatched_muplus_px","TruthMatched_muplus_py","TruthMatched_muplus_pz","TruthMatched_muplus_phi","TruthMatched_muplus_eta","TruthMatched_muplus_energy","TruthMatched_muplus_mass","TruthMatched_muplus_charge","TruthMatched_muplus_PDG",

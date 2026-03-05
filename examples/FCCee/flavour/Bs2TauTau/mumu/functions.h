@@ -619,26 +619,58 @@ ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n
     return ind_list;
 }
 
-
 //Functions used to define the Stage 1 cut criteria (dimuon properties: Opening angle, hemisphere emission, charge)
 int Check_dimuon_Presence(ROOT::VecOps::RVec<float> muon_OAs){
     if (muon_OAs.size() == 1 && std::abs(muon_OAs[0]+2.0) < 1e-4) return 0;
     else return 1;
 }
 
-int Check_dimuon_SameSide(ROOT::VecOps::RVec<float> muon_OAs){
+int Check_dimuon_SameSide(ROOT::VecOps::RVec<float> muon_OAs, int has_dimuon){
+    if (has_dimuon < 1) return 0;
     if (GetMin(muon_OAs) < 0.0) return 0;
     else return 1;
 }
 
-int Check_dimuon_SigHemi(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<float> muon_thrustangles){
+int Check_dimuon_SigHemi(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<float> muon_thrustangles, int has_dimuon){
+    if (has_dimuon < 1) return 0;
     if (muon_thrustangles[dimuon_ind.at(0)] < 0.0 && muon_thrustangles[dimuon_ind.at(1)] < 0.0) return 0;
     else return 1;
 }
 
-int Check_dimuon_Charges(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<int> muon_charges){
+int Check_dimuon_Charges(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<int> muon_charges, int has_dimuon){
+    if (has_dimuon < 1) return 0;
     if (muon_charges[dimuon_ind.at(0)]*muon_charges[dimuon_ind.at(1)] > 0) return 0;
     else return 1;
+}
+
+//Check if muons have associated vertices (-1 == no dimuon, 0 == no vertex associated, 10 == only muminus has a vertex, 1 (01) == only muplus has a vertex, 11 == both have associated vertices)
+int Check_dimuon_Vertices(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec<int> muon_ind, ROOT::VecOps::RVec<int> muon_q, ROOT::VecOps::RVec<VertexingUtils::FCCAnalysesVertex> Vertices, int has_dimuon){
+    if (has_dimuon < 1) return -1;
+    
+    int muplus_ind;
+    int muminus_ind;
+
+    if (muon_q.at(dimuon_ind.at(0)) < 0){
+        muplus_ind = muon_ind.at(dimuon_ind.at(1));
+        muminus_ind = muon_ind.at(dimuon_ind.at(0));
+    }
+    else {
+        muplus_ind = muon_ind.at(dimuon_ind.at(0));
+        muminus_ind = muon_ind.at(dimuon_ind.at(1));
+    }
+
+    int muplus_hasVertex (0);
+    int muminus_hasVertex (0);
+
+    //Proceed with the full search among all particle coming from vertices
+    for (auto &p:Vertices){
+        for (auto &r:p.reco_ind){
+            if (r == muplus_ind) muplus_hasVertex = 1;
+            if (r == muminus_ind) muminus_hasVertex = 1;   
+        }
+    }
+
+    return 10*muminus_hasVertex + muplus_hasVertex; 
 }
 
 //----------- Background studies -----------------
@@ -773,7 +805,7 @@ ROOT::VecOps::RVec<int> Find_MC_CommonAncestor_Daughters(int CA_ind,
         } while(i<results.size());
         
         return results;
-    }
+    } //Output as Mother,Daughter1,Daughter2,-2,Mother1(Daughter1),Daughter11,Daughter12,-2,...
 }
 
 }}

@@ -2,12 +2,12 @@
 
 # list of samples to process
 processList_full = {
-    'p8_ee_Zbb_ecm91':{'chunks':10,'fraction':0.01},
-    'p8_ee_Zcc_ecm91':{'chunks':10,'fraction':0.01},
-    'p8_ee_Zss_ecm91':{'chunks':10,'fraction':0.01},
-    'p8_ee_Zud_ecm91':{'chunks':10,'fraction':0.01},
+    #'p8_ee_Zbb_ecm91':{'chunks':10,'fraction':0.01},
+    #'p8_ee_Zcc_ecm91':{'chunks':10,'fraction':0.01},
+    #'p8_ee_Zss_ecm91':{'chunks':10,'fraction':0.01},
+    #'p8_ee_Zud_ecm91':{'chunks':10,'fraction':0.01},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
-    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':20,'fraction':1},
+    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':20,'fraction':1},
 }
 
 #processList_full = {
@@ -20,16 +20,16 @@ processList_full = {
 #}
 
 processList_test = {
-    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
-    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.01},
-    'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
+    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.01},
+    #'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
 }
 
-nCPUS       = 1
-runBatch    = False
+nCPUS       = 8
+runBatch    = True
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -44,7 +44,7 @@ prodTag     = "FCCee/winter2023/IDEA/"
 outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_mumu_noFilter"
 
 # if runBatch = False, save output locally
-outputDir   = "../../../../../../../../../../../work/t/tomonnar/public/Bs2TauTau/mumu/eede/"
+outputDir   = "DummyRepo"
 #"fccanalysis_output/" To be used with runBatch = True
 
 includePaths = ["functions.h"]
@@ -186,7 +186,7 @@ class RDFanalysis():
                ##      Select Bs->Tau(->mu)Tau(->mu)      ##
                #############################################
                #Only for signal to properly select the correct events
-               #.Filter("n_genBs2TauTau_Tauminus_muon > 0 && n_genBs2TauTau_Tauplus_muon > 0")
+               .Filter("n_genBs2TauTau_Tauminus_muon > 0 && n_genBs2TauTau_Tauplus_muon > 0")
 
                #############################################
                ##              Build Reco Vertex          ##
@@ -199,7 +199,7 @@ class RDFanalysis():
                .Define("EVT_hasPV",    "myUtils::hasPV(VertexObject)")
                .Define("EVT_NtracksPV", "float(myUtils::get_PV_ntracks(VertexObject))")
                .Define("EVT_NVertex",   "float(VertexObject.size())")
-               #.Filter("EVT_hasPV==1")
+               .Filter("EVT_hasPV==1")
 
                #############################################
                ##         Full 3D missing energy          ##
@@ -367,17 +367,17 @@ class RDFanalysis():
                .Define("muon_thrustEmin_n","int result (0); for (size_t i=0; i<muon_thrustangles.size(); ++i){if (muon_thrustangles[i] > 0.0) ++result;} return result;")
                .Define("muon_thrustEmax_n","int result (0); for (size_t i=0; i<muon_thrustangles.size(); ++i){if (muon_thrustangles[i] <= 0.0) ++result;} return result;")
                .Define("muon_OpeningAngle","FCCAnalyses::ZHfunctions::Muons_ComputeOpeningAngle(muon_px,muon_py,muon_pz)")
-               .Define("dimuon_ind", "FCCAnalyses::ZHfunctions::Muons_ID_SmallestOA(muon_OpeningAngle,n_muons)")
-
-
-               #Check Stage1 cuts status (for background)
                .Define("has_dimuon","FCCAnalyses::ZHfunctions::Check_dimuon_Presence(muon_OpeningAngle)")
-               .Define("has_dimuon_SameSide","FCCAnalyses::ZHfunctions::Check_dimuon_SameSide(muon_OpeningAngle)")
-               .Define("has_dimuon_SigHemi","FCCAnalyses::ZHfunctions::Check_dimuon_SigHemi(dimuon_ind, muon_thrustangles)")
-               .Define("has_dimuon_OppositeCharges","FCCAnalyses::ZHfunctions::Check_dimuon_Charges(dimuon_ind, muon_charge)")
+               
+               #subslect the two muons with smallest opening angle (correctly selects the muon from Bs2TauTau) and check their properties
+               .Define("dimuon_ind", "FCCAnalyses::ZHfunctions::Muons_ID_SmallestOA(muon_OpeningAngle,n_muons)")
+               .Define("has_dimuon_SameSide","FCCAnalyses::ZHfunctions::Check_dimuon_SameSide(muon_OpeningAngle,has_dimuon)")
+               .Define("has_dimuon_SigHemi","FCCAnalyses::ZHfunctions::Check_dimuon_SigHemi(dimuon_ind, muon_thrustangles,has_dimuon)")
+               .Define("has_dimuon_OppositeCharges","FCCAnalyses::ZHfunctions::Check_dimuon_Charges(dimuon_ind, muon_charge,has_dimuon)")
+               .Define("has_dimuon_Vertex","FCCAnalyses::ZHfunctions::Check_dimuon_Vertices(dimuon_ind,Muon0,muon_charge,VertexObject,has_dimuon)")
 
-               .Define("nevent","rdfentry_")
-               .Define("Selected","if (n_muons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dimuon > 0 && has_dimuon_SameSide > 0 && has_dimuon_OppositeCharges > 0 && has_dimuon_SigHemi) return 1; else return 0;")
+               #.Define("nevent","rdfentry_")
+               #.Define("Selected","if (n_muons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dimuon > 0 && has_dimuon_SameSide > 0 && has_dimuon_OppositeCharges > 0 && has_dimuon_SigHemi) return 1; else return 0;")
 
                
                #####################################
@@ -517,14 +517,14 @@ class RDFanalysis():
                 "recoEmiss_thrustangle",
 
                 "n_muons","muon_px","muon_py","muon_pz","muon_phi","muon_eta","muon_energy","muon_mass","muon_charge","muon_PDG","muon_thrustangles","muon_thrustEmin_n","muon_thrustEmax_n","muon_OpeningAngle","dimuon_ind",
-                "has_dimuon","has_dimuon_SameSide","has_dimuon_SigHemi","has_dimuon_OppositeCharges",
+                "has_dimuon","has_dimuon_SameSide","has_dimuon_SigHemi","has_dimuon_OppositeCharges","has_dimuon_Vertex",
 
                 "TM_MC_muplus_ind","TM_MC_muminus_ind","TM_RECO_muplus_ind","TM_RECO_muminus_ind","n_TM_muplus","n_TM_muminus","n_TM_muons",
                 "TM_muplus_energy","TM_muplus_px","TM_muplus_py","TM_muplus_pz","TM_muplus_phi","TM_muplus_eta","TM_muplus_mass","TM_muplus_charge","TM_muplus_PDG","TM_muplus_thrustangle",
                 "TM_muminus_energy","TM_muminus_px","TM_muminus_py","TM_muminus_pz","TM_muminus_phi","TM_muminus_eta","TM_muminus_mass","TM_muminus_charge","TM_muminus_PDG","TM_muminus_thrustangle",
                 "TM_muons_OpeningAngle",
 
-                "Selected","nevent"
+                #"Selected","nevent"
                 #"n_TruthMatched_muplus","TruthMatched_muplus_px","TruthMatched_muplus_py","TruthMatched_muplus_pz","TruthMatched_muplus_phi","TruthMatched_muplus_eta","TruthMatched_muplus_energy","TruthMatched_muplus_mass","TruthMatched_muplus_charge","TruthMatched_muplus_PDG",
                 #"n_TruthMatched_muminus","TruthMatched_muminus_px","TruthMatched_muminus_py","TruthMatched_muminus_pz","TruthMatched_muminus_phi","TruthMatched_muminus_eta","TruthMatched_muminus_energy","TruthMatched_muminus_mass","TruthMatched_muminus_charge","TruthMatched_muminus_PDG",
                 #"n_TruthMatched_muons",             
