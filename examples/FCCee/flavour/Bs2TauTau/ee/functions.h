@@ -359,24 +359,24 @@ ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau(ROOT::VecOps::RVec
     return result; //Structure (genBs, genTauPlus, genTauMinus, Photon0, Photon1, ...)
 }
 
-//Get the exclusive Tau2MuNuNu Tau decay in the Bs2TauTau decays WARNING: PM = 1 GIVES TAU_MINUS WHILE -1 GIVES TAU_PLUS
-ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_Muons(ROOT::VecOps::RVec<edm4hep::MCParticleData> genBs2TauTau_list, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter, int pm){
+//Get the exclusive Tau2eNuNu Tau decay in the Bs2TauTau decays WARNING: PM = 1 GIVES TAU_MINUS WHILE -1 GIVES TAU_PLUS
+ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_Electrons(ROOT::VecOps::RVec<edm4hep::MCParticleData> genBs2TauTau_list, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter, int pm){
     ROOT::VecOps::RVec<edm4hep::MCParticleData> result;
     for (size_t i = 0; i < genBs2TauTau_list.size(); ++i){
         if (genBs2TauTau_list[i].PDG == pm*15){
-            ROOT::VecOps::RVec<int> Muons;
+            ROOT::VecOps::RVec<int> Electrons;
             ROOT::VecOps::RVec<int> Rem;
             for (size_t j = genBs2TauTau_list[i].daughters_begin; j < genBs2TauTau_list[i].daughters_end; ++j){
-                if (std::abs(in[daughter.at(j)].PDG) == 13){
-                    Muons.push_back(daughter.at(j));
+                if (std::abs(in[daughter.at(j)].PDG) == 11){
+                    Electrons.push_back(daughter.at(j));
                 }
                 else {
                     Rem.push_back(daughter.at(j));
                 }
             }
-            if (Muons.size() == 1){
-                for (size_t m = 0; m < Muons.size(); ++m){
-                    result.push_back(in.at(Muons[m]));
+            if (Electrons.size() == 1){
+                for (size_t m = 0; m < Electrons.size(); ++m){
+                    result.push_back(in.at(Electrons[m]));
                 }
                 for (size_t n = 0; n < Rem.size(); ++n){
                     result.push_back(in.at(Rem[n]));
@@ -384,7 +384,7 @@ ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_Muons(ROOT::VecOps
             }
         }
     }
-    return result; //Structure (muon, nu0, nu1, photon0, photon1, ...)
+    return result; //Structure (electron, nu0, nu1, photon0, photon1, ...)
 }
 
 
@@ -452,7 +452,6 @@ ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> Muon_TruthMatching2(ROOT:
 
 //Truth-matching is a bit different from MC identifiction since we only look at a subset of MC part that have been truth-matched to reco
 //Select the subset of MC part that are truth-matched involved in the decay of interest, disregard the charge for mothers while one can specify which type of particle it wants to keep at the end with charge taken into account
-//Warning might return duplicated MC indices that are present in the MCRecoAssociations, linked to DELPHES
 ROOT::VecOps::RVec<int> TruthMatch_MC_Mothers(ROOT::VecOps::RVec<int> mc_ind, 
                                               ROOT::VecOps::RVec<edm4hep::MCParticleData> mc_in, 
                                               ROOT::VecOps::RVec<int> mc_parents,
@@ -484,7 +483,7 @@ ROOT::VecOps::RVec<int> TruthMatch_MC_Mothers(ROOT::VecOps::RVec<int> mc_ind,
                 results.push_back(all_daughters.at(i));
             }
         }
-        return results;  
+        return results;
     }
 }
 
@@ -579,8 +578,7 @@ float GetMin(ROOT::VecOps::RVec<float> list){
     }
 }
 
-//ID the two muons with smallest opening angle with their places index in the muon collection
-//WARNING: If not enough muon to compute an OA, The OA list is pushed back with -2.0 and not empty, thus the first case never happens and other checks needs to be done
+//ID the two muons with smallest opening angle with their places index in the muon collection 
 ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n_muons){
     
     ROOT::VecOps::RVec<int> ind_list;
@@ -619,6 +617,7 @@ ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n
     }
     return ind_list;
 }
+
 
 //Functions used to define the Stage 1 cut criteria (dimuon properties: Opening angle, hemisphere emission, charge)
 int Check_dimuon_Presence(ROOT::VecOps::RVec<float> muon_OAs){
@@ -673,8 +672,6 @@ int Check_dimuon_Vertices(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RVec
 
     return 10*muminus_hasVertex + muplus_hasVertex; 
 }
-
-//----------- Background studies -----------------
 
 //Finding the MC muons truth-matched to dimuon
 ROOT::VecOps::RVec<int> Finding_MC_dimuon(ROOT::VecOps::RVec<int> dimuon_ind,
