@@ -415,7 +415,7 @@ class RDFanalysis():
                .Define("TM_electrons_OpeningAngle","FCCAnalyses::ZHfunctions::TM_ComputeOpeningAngle(TM_positron_px,TM_positron_py,TM_positron_pz,TM_electron_px,TM_electron_py,TM_electron_pz)")
 
                ############################
-               ##   Background studies   ##
+               ##   TM studies (dupli)   ##
                ############################
 
                #Filter before checking the MC decay tree
@@ -431,6 +431,15 @@ class RDFanalysis():
                .Define("Electroo","ROOT::VecOps::RVec<int> result; for(size_t i=0; i<Electron0.size(); ++i){result.push_back(Electron0.at(i));} return result;")
                .Alias("Photon0","Photon#0.index")
                .Define("Photoo","ROOT::VecOps::RVec<int> result; for(size_t i=0; i<Photon0.size(); ++i){result.push_back(Photon0.at(i));} return result;")
+
+               
+               .Define("TM_RECO_electronwithDuplicates_ind","FCCAnalyses::ZHfunctions::TruthMatch_MC_RECO(MCRecoAssociations0,TM_MC_electron_ind,MCRecoAssociations1)")
+               .Define("TM_RECO_positronwithDuplicates_ind","FCCAnalyses::ZHfunctions::TruthMatch_MC_RECO(MCRecoAssociations0,TM_MC_positron_ind,MCRecoAssociations1)")
+               
+               .Define("TM_positronwithDuplicates_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_positronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_electronwithDuplicates_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_electronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_positronwithDuplicates_charge",   "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_positronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_electronwithDuplicates_charge",   "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_electronwithDuplicates_ind,ReconstructedParticles))")
 
 
                #.Define("RP_MC_index", "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, ReconstructedParticles)")
@@ -541,7 +550,8 @@ class RDFanalysis():
 
                 "MC_dielectron_ind","n_MC_dielectron","MC_dielectron_CA_ind","MC_dielectron_CADaughters_ind",
 
-                "MCRecoAsso","MCRecoAssoo","Electroo","Photoo"
+                "MCRecoAsso","MCRecoAssoo","Electroo","Photoo",
+                "TM_RECO_electronwithDuplicates_ind","TM_RECO_positronwithDuplicates_ind","TM_electronwithDuplicates_mass","TM_positronwithDuplicates_mass","TM_positronwithDuplicates_charge","TM_electronwithDuplicates_charge"
 
                 #"nevent","Selected",
                 #"n_TruthMatched_muplus","TruthMatched_muplus_px","TruthMatched_muplus_py","TruthMatched_muplus_pz","TruthMatched_muplus_phi","TruthMatched_muplus_eta","TruthMatched_muplus_energy","TruthMatched_muplus_mass","TruthMatched_muplus_charge","TruthMatched_muplus_PDG",

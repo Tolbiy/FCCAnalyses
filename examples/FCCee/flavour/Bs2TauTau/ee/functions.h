@@ -515,7 +515,7 @@ ROOT::VecOps::RVec<int> TruthMatch_MC_RECO_Subset(ROOT::VecOps::RVec<int> reco_i
         }
     }
 
-    //Compare the MC and RECO indices position, if they are on the same line, save the reco index 
+    //Compare the MC and RECO indices position, if they are on the same line, save the reco index
     for (size_t i=0; i<Reco_list.size(); ++i){
         for (size_t j=0; j<Mc_list.size(); ++j){
             if (Mc_list.at(j) == Reco_list.at(i)){
@@ -527,6 +527,41 @@ ROOT::VecOps::RVec<int> TruthMatch_MC_RECO_Subset(ROOT::VecOps::RVec<int> reco_i
     return results;
 }
 
+//Modification of the previous function to study truth-matched RECO from ALL MC particles (TM MC ind duplications) 
+ROOT::VecOps::RVec<int> TruthMatch_MC_RECO(ROOT::VecOps::RVec<int> reco_ind,
+                                           ROOT::VecOps::RVec<int> mc_ind_subset,
+                                           ROOT::VecOps::RVec<int> mc_ind){
+
+    ROOT::VecOps::RVec<int> results;
+    ROOT::VecOps::RVec<int> ReadMCList;
+    ROOT::VecOps::RVec<int> Mc_list;
+
+    //Get the  indices (dupplication shows up as subMCind1->[MCind1,MCind2], subMCind2->[MCind1,MCind2]=>[MCind1,MCind2,MCind1,MCind2])
+    for (size_t i=0; i<mc_ind_subset.size(); ++i){
+        for (size_t j=0; j<mc_ind.size(); ++j){
+            if (mc_ind_subset.at(i) == mc_ind.at(j)){
+                Mc_list.push_back(j);
+            }
+        }
+    }
+
+    //Check duplication and returns unique indices
+    for (size_t j=0; j<Mc_list.size(); ++j){
+        bool New (true);
+        for (size_t k=0; k<ReadMCList.size(); ++k){
+            if (Mc_list.at(j) == ReadMCList.at(k)){ 
+                New = false;
+                break;
+            }
+        }
+        if (New){
+                results.push_back(reco_ind.at(Mc_list.at(j)));
+                ReadMCList.push_back(Mc_list.at(j));
+        }
+    }
+
+    return results;
+}
 
 //Compute the opening angle between the TM muons
 float TM_ComputeOpeningAngle(ROOT::VecOps::RVec<float> px1,
