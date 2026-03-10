@@ -28,7 +28,7 @@ processList_test = {
     #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
 }
 
-nCPUS       = 1
+nCPUS       = 8
 runBatch    = False
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
@@ -44,10 +44,24 @@ prodTag     = "FCCee/winter2023/IDEA/"
 outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_ee_noFilter"
 
 # if runBatch = False, save output locally
-outputDir   = "../../../../../../../../../../../work/t/tomonnar/public/Bs2TauTau/ee/eede"
+outputDir   = "DummyRepo"
 #"fccanalysis_output/" To be used with runBatch = True
 
 includePaths = ["functions.h"]
+
+import ROOT
+ROOT.gInterpreter.Declare('''
+    ROOT::VecOps::RVec<int> Find_Duplicates(ROOT::VecOps::RVec<int> TrueLepton_ind, ROOT::VecOps::RVec<int> AllLepton_ind){
+        ROOT::VecOps::RVec<int> results;
+
+        if (TrueLepton_ind.size() != 0 && AllLepton_ind.size() > 1){
+            if (TrueLepton_ind.at(0) == AllLepton_ind.at(0)) results.push_back(AllLepton_ind.at(1));
+            else results.push_back(AllLepton_ind.at(0));
+        }
+
+        return results;
+    }
+''')
 
 #Mandatory: RDFanalysis class where the use defines the operations on the TTree
 class RDFanalysis():
@@ -182,7 +196,7 @@ class RDFanalysis():
                #############################################
                #Only for signal to properly select the correct events
                #.Define("Selected","if (n_genBs2TauTau_Tauminus_electron > 0 && n_genBs2TauTau_Tauplus_electron > 0) return 1; else return 0;")
-               #.Filter("n_genBs2TauTau_Tauminus_electron > 0 && n_genBs2TauTau_Tauplus_electron > 0") 
+               .Filter("n_genBs2TauTau_Tauminus_electron > 0 && n_genBs2TauTau_Tauplus_electron > 0") 
 
                #############################################
                ##              Build Reco Vertex          ##
@@ -195,7 +209,7 @@ class RDFanalysis():
                .Define("EVT_hasPV",    "myUtils::hasPV(VertexObject)")
                .Define("EVT_NtracksPV", "float(myUtils::get_PV_ntracks(VertexObject))")
                .Define("EVT_NVertex",   "float(VertexObject.size())")
-               #.Filter("EVT_hasPV==1")
+               .Filter("EVT_hasPV==1")
 
                #############################################
                ##         Full 3D missing energy          ##
@@ -418,7 +432,7 @@ class RDFanalysis():
                ############################
 
                #Filter before checking the MC decay tree
-               #.Filter("n_electrons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dielectron > 0 && has_dielectron_SameSide > 0 && has_dielectron_OppositeCharges > 0 && has_dielectron_SigHemi > 0 && has_dielectron_Vertex == 0")
+               .Filter("n_electrons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dielectron > 0 && has_dielectron_SameSide > 0 && has_dielectron_OppositeCharges > 0 && has_dielectron_SigHemi > 0 && has_dielectron_Vertex == 0")
                .Define("MC_dielectron_ind","FCCAnalyses::ZHfunctions::Finding_MC_dimuon(dielectron_ind,Electron0,MCRecoAssociations0,MCRecoAssociations1)") #To be used with cuts, accessing out-of-scope ind otherwise
                .Define("n_MC_dielectron","if (MC_dielectron_ind.at(0) == -1) return 0; else return static_cast<int>(MC_dielectron_ind.size())") #Check to see if the truth-matching in the RECO->MC direction can fail (== 2 -> ok else failed)
 #
@@ -430,21 +444,24 @@ class RDFanalysis():
                #.Define("Electroo","ROOT::VecOps::RVec<int> result; for(size_t i=0; i<Electron0.size(); ++i){result.push_back(Electron0.at(i));} return result;")
                #.Alias("Photon0","Photon#0.index")
                #.Define("Photoo","ROOT::VecOps::RVec<int> result; for(size_t i=0; i<Photon0.size(); ++i){result.push_back(Photon0.at(i));} return result;")
-#
-               #
+
                .Define("TM_RECO_electronwithDuplicates_ind","FCCAnalyses::ZHfunctions::TruthMatch_MC_RECO(MCRecoAssociations0,TM_MC_electron_ind,MCRecoAssociations1)")
                .Define("TM_RECO_positronwithDuplicates_ind","FCCAnalyses::ZHfunctions::TruthMatch_MC_RECO(MCRecoAssociations0,TM_MC_positron_ind,MCRecoAssociations1)")
-               #
-               #.Define("TM_positronwithDuplicates_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_positronwithDuplicates_ind,ReconstructedParticles))")
-               #.Define("TM_electronwithDuplicates_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_electronwithDuplicates_ind,ReconstructedParticles))")
-               #.Define("TM_positronwithDuplicates_charge",   "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_positronwithDuplicates_ind,ReconstructedParticles))")
-               #.Define("TM_electronwithDuplicates_charge",   "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_electronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_RECO_positronwithDuplicates_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_positronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_RECO_electronwithDuplicates_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_RECO_electronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_RECO_positronwithDuplicates_charge",   "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_positronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_RECO_electronwithDuplicates_charge",   "ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_RECO_electronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_RECO_positronwithDuplicates_energy",   "ReconstructedParticle::get_e(ReconstructedParticle::get(TM_RECO_positronwithDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_RECO_electronwithDuplicates_energy",   "ReconstructedParticle::get_e(ReconstructedParticle::get(TM_RECO_electronwithDuplicates_ind,ReconstructedParticles))")
 
+               .Define("TM_RECO_positronDuplicates_ind", "Find_Duplicates(TM_RECO_positron_ind,TM_RECO_positronwithDuplicates_ind)")
+               .Define("TM_RECO_electronDuplicates_ind", "Find_Duplicates(TM_RECO_electron_ind,TM_RECO_electronwithDuplicates_ind)")               
+               .Filter("TM_RECO_positronDuplicates_ind.size() > 0 || TM_RECO_electronDuplicates_ind.size() > 0")
+               .Define("TM_RECO_positronDuplicates_energy",   "ReconstructedParticle::get_e(ReconstructedParticle::get(TM_RECO_positronDuplicates_ind,ReconstructedParticles))")
+               .Define("TM_RECO_electronDuplicates_energy",   "ReconstructedParticle::get_e(ReconstructedParticle::get(TM_RECO_electronDuplicates_ind,ReconstructedParticles))")
 
-
-
-               .Define("nevent","rdfentry_")
-               .Define("Selected","if (n_electrons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dielectron > 0 && has_dielectron_SameSide > 0 && has_dielectron_OppositeCharges > 0 && has_dielectron_SigHemi > 0 && has_dielectron_Vertex == 0 && EVT_hasPV==1 && n_genBs2TauTau_Tauminus_electron > 0 && n_genBs2TauTau_Tauplus_electron > 0 && n_TM_electrons > 2) return 1; else return 0;")
+               #.Define("nevent","rdfentry_")
+               #.Define("Selected","if (n_electrons > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dielectron > 0 && has_dielectron_SameSide > 0 && has_dielectron_OppositeCharges > 0 && has_dielectron_SigHemi > 0 && has_dielectron_Vertex == 0 && EVT_hasPV==1 && n_genBs2TauTau_Tauminus_electron > 0 && n_genBs2TauTau_Tauplus_electron > 0 && n_TM_electrons > 2) return 1; else return 0;")
 
 
                #.Define("RP_MC_index", "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0, MCRecoAssociations1, ReconstructedParticles)")
@@ -556,9 +573,10 @@ class RDFanalysis():
                 "MC_dielectron_ind","n_MC_dielectron",#"MC_dielectron_CA_ind","MC_dielectron_CADaughters_ind",
 #
                 #"MCRecoAsso","MCRecoAssoo","Electroo","Photoo",
-                "TM_RECO_electronwithDuplicates_ind","TM_RECO_positronwithDuplicates_ind",#"TM_electronwithDuplicates_mass","TM_positronwithDuplicates_mass","TM_positronwithDuplicates_charge","TM_electronwithDuplicates_charge",
-#
-                "nevent","Selected",
+                "TM_RECO_electronwithDuplicates_ind","TM_RECO_positronwithDuplicates_ind","TM_RECO_electronwithDuplicates_mass","TM_RECO_positronwithDuplicates_mass","TM_RECO_positronwithDuplicates_charge","TM_RECO_electronwithDuplicates_charge","TM_RECO_positronwithDuplicates_energy","TM_RECO_electronwithDuplicates_energy",
+                "TM_RECO_electronDuplicates_ind","TM_RECO_positronDuplicates_ind","TM_RECO_electronDuplicates_energy","TM_RECO_positronDuplicates_energy",               
+
+                #"nevent","Selected",
                 
                 #"n_TruthMatched_muplus","TruthMatched_muplus_px","TruthMatched_muplus_py","TruthMatched_muplus_pz","TruthMatched_muplus_phi","TruthMatched_muplus_eta","TruthMatched_muplus_energy","TruthMatched_muplus_mass","TruthMatched_muplus_charge","TruthMatched_muplus_PDG",
                 #"n_TruthMatched_muminus","TruthMatched_muminus_px","TruthMatched_muminus_py","TruthMatched_muminus_pz","TruthMatched_muminus_phi","TruthMatched_muminus_eta","TruthMatched_muminus_energy","TruthMatched_muminus_mass","TruthMatched_muminus_charge","TruthMatched_muminus_PDG",
