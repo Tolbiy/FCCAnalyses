@@ -618,8 +618,8 @@ ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n
     
     ROOT::VecOps::RVec<int> ind_list;
     
-    //Not enough muon to compute an OA
-    if (OAs.size() == 0) ind_list.push_back(-1);
+    //Not enough muon to compute an OA (== only 1 element and equal to -2)
+    if (std::abs(OAs.at(0) + 2.0) < 1e-4) ind_list.push_back(-1);
     
     //Only one pair of muon (obvious case)
     else if (OAs.size() == 1) {
@@ -715,11 +715,18 @@ ROOT::VecOps::RVec<int> Finding_MC_dimuon(ROOT::VecOps::RVec<int> dimuon_ind,
                                           ROOT::VecOps::RVec<int> mc_ind){
 
     ROOT::VecOps::RVec<int> results;
+
+    //Extended usage to events without dimuon                                        
+    if (dimuon_ind.size() < 2) {
+        results.push_back(-1);
+    }
     
-    for (size_t i=0;i<dimuon_ind.size();++i){
-        for (size_t j=0;j<reco_ind.size();++j){
-            if (reco_muon_ind.at(dimuon_ind.at(i)) == reco_ind.at(j)){ //the dimuon indices point in the reco muon subcollection 
-                results.push_back(mc_ind.at(j));
+    else {
+        for (size_t i=0;i<dimuon_ind.size();++i){
+            for (size_t j=0;j<reco_ind.size();++j){
+                if (reco_muon_ind.at(dimuon_ind.at(i)) == reco_ind.at(j)){ //the dimuon indices point in the reco muon subcollection 
+                    results.push_back(mc_ind.at(j));
+                }
             }
         }
     }
@@ -734,6 +741,10 @@ ROOT::VecOps::RVec<int> Finding_MC_dimuon(ROOT::VecOps::RVec<int> dimuon_ind,
 int Find_MC_CommonAncestor(ROOT::VecOps::RVec<int> MC_dimuon_ind,
                            ROOT::VecOps::RVec<edm4hep::MCParticleData> Particle,
                            ROOT::VecOps::RVec<int> Parents_ind){
+
+
+    if (MC_dimuon_ind.size() < 2) return -1; //Extended usage to events without dimuon
+
 
     //Assume only one mother for all particle (actually checks it and use it as a termination condition (-1))
     ROOT::VecOps::RVec<int> Parents_Mu1;

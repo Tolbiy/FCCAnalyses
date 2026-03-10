@@ -585,8 +585,8 @@ ROOT::VecOps::RVec<int> Muons_ID_SmallestOA(ROOT::VecOps::RVec<float> OAs, int n
     
     ROOT::VecOps::RVec<int> ind_list;
     
-    //Not enough muon to compute an OA
-    if (OAs.size() == 0) ind_list.push_back(-1);
+    //Not enough muon to compute an OA (== only 1 element and equal to -2)
+    if (std::abs(OAs.at(0) + 2.0) < 1e-4) ind_list.push_back(-1);
     
     //Only one pair of muon (obvious case)
     else if (OAs.size() == 1) {
@@ -684,10 +684,17 @@ ROOT::VecOps::RVec<int> Finding_MC_dimuon(ROOT::VecOps::RVec<int> dimuon_ind,
 
     ROOT::VecOps::RVec<int> results;
     
-    for (size_t i=0;i<dimuon_ind.size();++i){
-        for (size_t j=0;j<reco_ind.size();++j){
-            if (reco_muon_ind.at(dimuon_ind.at(i)) == reco_ind.at(j)){ //the dimuon indices point in the reco muon subcollection 
-                results.push_back(mc_ind.at(j));
+    //Extended usage to events without dimuon                                        
+    if (dimuon_ind.size() < 2) {
+        results.push_back(-1);
+    }
+
+    else {
+        for (size_t i=0;i<dimuon_ind.size();++i){
+            for (size_t j=0;j<reco_ind.size();++j){
+                if (reco_muon_ind.at(dimuon_ind.at(i)) == reco_ind.at(j)){ //the dimuon indices point in the reco muon subcollection 
+                    results.push_back(mc_ind.at(j));
+                }
             }
         }
     }

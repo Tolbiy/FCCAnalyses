@@ -456,7 +456,7 @@ class RDFanalysis():
                ##   Background studies   ##
                ############################
 
-               .Define("MC_dimuon_ind","FCCAnalyses::ZHfunctions::Finding_MC_dimuon(dimuon_ind,Muon0,MCRecoAssociations0,MCRecoAssociations1)")
+               .Define("MC_dimuon_ind","FCCAnalyses::ZHfunctions::Finding_MC_dimuon(dimuon_ind,Muon0,MCRecoAssociations0,MCRecoAssociations1)") #This function might not work as intended if the dimuon is made of muon not coming from Bs2TauTau (can happen by chance if 3 muon in sig hemi)
                .Define("n_MC_dimuon","MC_dimuon_ind.size()") #Check to see if the truth-matching in the RECO->MC direction can fail (== 2 -> ok else failed)
 
                .Define("MC_dimuon_CA_ind","FCCAnalyses::ZHfunctions::Find_MC_CommonAncestor(MC_dimuon_ind,Particle,Particle0)")
