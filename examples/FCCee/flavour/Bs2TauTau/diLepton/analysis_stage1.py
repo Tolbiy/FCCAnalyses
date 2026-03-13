@@ -29,7 +29,7 @@ processList_test = {
 }
 
 nCPUS       = 8
-runBatch    = True
+runBatch    = False
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -41,7 +41,7 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_noFilter"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts"
 
 # if runBatch = False, save output locally
 outputDir   = "DummyRepo"
@@ -358,6 +358,8 @@ class RDFanalysis():
                .Define("lepton_pz",     "ReconstructedParticle::get_pz(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
                .Define("lepton_phi",    "ReconstructedParticle::get_phi(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
                .Define("lepton_eta",    "ReconstructedParticle::get_eta(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("lepton_d0",     "ReconstructedParticle2Track::getRP2TRK_D0(ReconstructedParticle::get(Lepton0,ReconstructedParticles),EFlowTrack_1)")
+               .Define("lepton_z0",     "ReconstructedParticle2Track::getRP2TRK_Z0(ReconstructedParticle::get(Lepton0,ReconstructedParticles),EFlowTrack_1)")
                .Define("lepton_energy", "ReconstructedParticle::get_e(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
                .Define("lepton_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
                .Define("lepton_charge", "ReconstructedParticle::get_charge(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
@@ -379,7 +381,7 @@ class RDFanalysis():
                .Define("has_dilepton_Vertex","FCCAnalyses::ZHfunctions::Check_dilepton_Vertices(dilepton_ind,Lepton0,lepton_charge,VertexObject,has_dilepton)")
 
                #Stage 1 cuts
-               #.Filter("n_lepton > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dilepton > 0 && has_dilepton_SameSide > 0 && has_dilepton_SigHemi > 0 && has_dilepton_OppositeCharges > 0 && has_dilepton_Vertex == 0")
+               .Filter("n_lepton > 1 && EVT_ThrustEmin_E < 38 && recoEmiss_e > 10 && EVT_ThrustEmin_Eneutral < 10 && has_dilepton > 0 && has_dilepton_SameSide > 0 && has_dilepton_SigHemi > 0 && has_dilepton_OppositeCharges > 0 && has_dilepton_Vertex == 0")
                
                #####################################
                ##  lepton Perform Truth-Matching  ##
@@ -490,7 +492,7 @@ class RDFanalysis():
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
                 "recoEmiss_thrustangle",
 
-                "n_lepton","lepton_px","lepton_py","lepton_pz","lepton_phi","lepton_eta","lepton_energy","lepton_mass",
+                "n_lepton","lepton_px","lepton_py","lepton_pz","lepton_phi","lepton_eta","lepton_d0","lepton_z0","lepton_energy","lepton_mass",
                 "lepton_charge","lepton_PDG","lepton_thrustangles","lepton_thrustEmin_n","lepton_thrustEmax_n","lepton_OpeningAngle","dilepton_ind","dilepton_plus_ind","dilepton_minus_ind","dilepton_case",
                 "has_dilepton","has_dilepton_SameSide","has_dilepton_SigHemi","has_dilepton_OppositeCharges","has_dilepton_Vertex",
 
