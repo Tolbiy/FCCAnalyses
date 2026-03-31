@@ -2,10 +2,10 @@
 
 # list of samples to process
 processList_full = {
-    'p8_ee_Zbb_ecm91':{'chunks':100,'fraction':1},
-    'p8_ee_Zcc_ecm91':{'chunks':100,'fraction':1},
-    'p8_ee_Zss_ecm91':{'chunks':100,'fraction':1},
-    'p8_ee_Zud_ecm91':{'chunks':100,'fraction':1},
+    'p8_ee_Zbb_ecm91':{'chunks':10,'fraction':0.01},
+    'p8_ee_Zcc_ecm91':{'chunks':10,'fraction':0.01},
+    'p8_ee_Zss_ecm91':{'chunks':10,'fraction':0.01},
+    'p8_ee_Zud_ecm91':{'chunks':10,'fraction':0.01},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':20,'fraction':1},
 }
@@ -20,9 +20,9 @@ processList_full = {
 #}
 
 processList_test = {
-    #'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
+    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.01},
+    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.01},
     #'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
@@ -41,7 +41,7 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts_bkgStudies"
 
 # if runBatch = False, save output locally
 outputDir   = "DummyRepo"
@@ -342,6 +342,25 @@ class RDFanalysis():
                .Define("DV_d0",            "myUtils::get_trackd0(DV_tracks)")
                .Define("DV_z0",            "myUtils::get_trackz0(DV_tracks)")
 
+               ######################################
+               ## Additional K/L vertices searches ##
+               ######################################
+
+               .Define("Vertex_sighemi_mass","Vertex_mass [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_npart","Vertex_ntrk [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_x","Vertex_x [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_y","Vertex_y [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_z","Vertex_z [Vertex_thrusthemis_emin>0]")
+               
+               .Define("Vertex_sighemi_ind","ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result; for (size_t i=0; i<Vertex_ind.size(); ++i) {if (Vertex_thrusthemis_emin.at(i)>0) result.push_back(Vertex_ind.at(i));} return result;")
+               .Define("Vertex_sighemi_RECO_PDG","FCCAnalyses::ZHfunctions::GetPDG(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_charge","FCCAnalyses::ZHfunctions::GetCharge(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_energy","FCCAnalyses::ZHfunctions::GetEnergy(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_px","FCCAnalyses::ZHfunctions::GetPx(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_py","FCCAnalyses::ZHfunctions::GetPy(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_pz","FCCAnalyses::ZHfunctions::GetPz(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_p","FCCAnalyses::ZHfunctions::GetP(Vertex_sighemi_RECO_px,Vertex_sighemi_RECO_py,Vertex_sighemi_RECO_pz)")
+
 
                ##############################
                ##  Get electrons and muons ##
@@ -491,6 +510,9 @@ class RDFanalysis():
 
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
                 "recoEmiss_thrustangle",
+
+                "Vertex_sighemi_mass","Vertex_sighemi_npart","Vertex_sighemi_x","Vertex_sighemi_y","Vertex_sighemi_z",
+                "Vertex_sighemi_ind","Vertex_sighemi_RECO_charge","Vertex_sighemi_RECO_PDG","Vertex_sighemi_RECO_energy","Vertex_sighemi_RECO_px","Vertex_sighemi_RECO_py","Vertex_sighemi_RECO_pz","Vertex_sighemi_RECO_p",
 
                 "n_lepton","lepton_px","lepton_py","lepton_pz","lepton_phi","lepton_eta","lepton_d0","lepton_z0","lepton_energy","lepton_mass",
                 "lepton_charge","lepton_PDG","lepton_thrustangles","lepton_thrustEmin_n","lepton_thrustEmax_n","lepton_OpeningAngle","dilepton_ind","dilepton_plus_ind","dilepton_minus_ind","dilepton_case",

@@ -29,7 +29,7 @@ processList_test = {
 }
 
 nCPUS       = 8
-runBatch    = False
+runBatch    = True
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -41,7 +41,7 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts_bkgStudies"
 
 # if runBatch = False, save output locally
 outputDir   = "DummyRepo"
@@ -270,6 +270,7 @@ class RDFanalysis():
                .Define("RP_py",         "ReconstructedParticle::get_py(RecoPartPIDAtVertex)")
                .Define("RP_pz",         "ReconstructedParticle::get_pz(RecoPartPIDAtVertex)")
                .Define("RP_charge",     "ReconstructedParticle::get_charge(RecoPartPIDAtVertex)")
+               .Define("RP_mass",       "ReconstructedParticle::get_mass(RecoPartPIDAtVertex)")
 
                .Define("EVT_thrustNP",      'Algorithms::minimize_thrust("Minuit2","Migrad")(RP_px, RP_py, RP_pz)')
                .Define("RP_thrustangleNP",  'Algorithms::getAxisCosTheta(EVT_thrustNP, RP_px, RP_py, RP_pz)')
@@ -341,6 +342,25 @@ class RDFanalysis():
 
                .Define("DV_d0",            "myUtils::get_trackd0(DV_tracks)")
                .Define("DV_z0",            "myUtils::get_trackz0(DV_tracks)")
+
+               ######################################
+               ## Additional K/L vertices searches ##
+               ######################################
+
+               .Define("Vertex_sighemi_mass","Vertex_mass [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_npart","Vertex_ntrk [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_x","Vertex_x [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_y","Vertex_y [Vertex_thrusthemis_emin>0]")
+               .Define("Vertex_sighemi_z","Vertex_z [Vertex_thrusthemis_emin>0]")
+               
+               .Define("Vertex_sighemi_ind","ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result; for (size_t i=0; i<Vertex_ind.size(); ++i) {if (Vertex_thrusthemis_emin.at(i)>0) result.push_back(Vertex_ind.at(i));} return result;") ##Doesn't work for 2D array
+               .Define("Vertex_sighemi_RECO_PDG","FCCAnalyses::ZHfunctions::GetPDG(Vertex_sighemi_ind,RecoPartPIDAtVertex)") #the type field of RECO PID only has the fabs of PDG
+               .Define("Vertex_sighemi_RECO_charge","FCCAnalyses::ZHfunctions::GetCharge(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_energy","FCCAnalyses::ZHfunctions::GetEnergy(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_px","FCCAnalyses::ZHfunctions::GetPx(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_py","FCCAnalyses::ZHfunctions::GetPy(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_pz","FCCAnalyses::ZHfunctions::GetPz(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
+               .Define("Vertex_sighemi_RECO_p","FCCAnalyses::ZHfunctions::GetP(Vertex_sighemi_RECO_px,Vertex_sighemi_RECO_py,Vertex_sighemi_RECO_pz)")
 
 
                ##############################
@@ -491,6 +511,9 @@ class RDFanalysis():
 
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
                 "recoEmiss_thrustangle",
+
+                "Vertex_sighemi_mass","Vertex_sighemi_npart","Vertex_sighemi_x","Vertex_sighemi_y","Vertex_sighemi_z",
+                "Vertex_sighemi_ind","Vertex_sighemi_RECO_PDG","Vertex_sighemi_RECO_charge","Vertex_sighemi_RECO_energy","Vertex_sighemi_RECO_px","Vertex_sighemi_RECO_py","Vertex_sighemi_RECO_pz","Vertex_sighemi_RECO_p",
 
                 "n_lepton","lepton_px","lepton_py","lepton_pz","lepton_phi","lepton_eta","lepton_d0","lepton_z0","lepton_energy","lepton_mass",
                 "lepton_charge","lepton_PDG","lepton_thrustangles","lepton_thrustEmin_n","lepton_thrustEmax_n","lepton_OpeningAngle","dilepton_ind","dilepton_plus_ind","dilepton_minus_ind","dilepton_case",

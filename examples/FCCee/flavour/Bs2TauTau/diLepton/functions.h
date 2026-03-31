@@ -783,7 +783,110 @@ int Check_dilepton_Vertices(ROOT::VecOps::RVec<int> dimuon_ind, ROOT::VecOps::RV
     return 10*muminus_hasVertex + muplus_hasVertex; 
 }
 
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPDG(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
 
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+
+    for (size_t i=0; i<reco_ind.size(); ++i){
+        ROOT::VecOps::RVec<int> temp;
+        for (size_t j=0; j<reco_ind.at(i).size(); ++j){
+            temp.push_back(reco.at(reco_ind.at(i).at(j)).type);
+        }
+        result.push_back(temp);
+    }
+    return result;
+
+}
+
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetCharge(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+
+    for (size_t i=0; i<reco_ind.size(); ++i){
+        ROOT::VecOps::RVec<int> temp;
+        for (size_t j=0; j<reco_ind.at(i).size(); ++j){
+            temp.push_back(reco.at(reco_ind.at(i).at(j)).charge);
+        }
+        result.push_back(temp);
+    }
+    return result;
+
+}
+
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetEnergy(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+
+    for (size_t i=0; i<reco_ind.size(); ++i){
+        ROOT::VecOps::RVec<int> temp;
+        for (size_t j=0; j<reco_ind.at(i).size(); ++j){
+            temp.push_back(reco.at(reco_ind.at(i).at(j)).energy);
+        }
+        result.push_back(temp);
+    }
+    return result;
+
+}
+
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPx(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+
+    for (size_t i=0; i<reco_ind.size(); ++i){
+        ROOT::VecOps::RVec<int> temp;
+        for (size_t j=0; j<reco_ind.at(i).size(); ++j){
+            temp.push_back(reco.at(reco_ind.at(i).at(j)).momentum.x);
+        }
+        result.push_back(temp);
+    }
+    return result;
+
+}
+
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPy(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+
+    for (size_t i=0; i<reco_ind.size(); ++i){
+        ROOT::VecOps::RVec<int> temp;
+        for (size_t j=0; j<reco_ind.at(i).size(); ++j){
+            temp.push_back(reco.at(reco_ind.at(i).at(j)).momentum.y);
+        }
+        result.push_back(temp);
+    }
+    return result;
+
+}
+
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPz(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+
+    for (size_t i=0; i<reco_ind.size(); ++i){
+        ROOT::VecOps::RVec<int> temp;
+        for (size_t j=0; j<reco_ind.at(i).size(); ++j){
+            temp.push_back(reco.at(reco_ind.at(i).at(j)).momentum.z);
+        }
+        result.push_back(temp);
+    }
+    return result;
+
+}
+
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetP(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> px, ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> py, ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> pz){
+
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+
+    for (size_t i=0; i<px.size(); ++i){
+        ROOT::VecOps::RVec<int> temp;
+        for (size_t j=0; j<px.at(i).size(); ++j){
+            temp.push_back(sqrt(px.at(i).at(j)*px.at(i).at(j) + py.at(i).at(j)*py.at(i).at(j) + pz.at(i).at(j)*pz.at(i).at(j)));
+        }
+        result.push_back(temp);
+    }
+    return result;
+
+}
 
 //------------ BKG Studies --------------------------------------------------------------------------------------------
 
@@ -929,6 +1032,121 @@ ROOT::VecOps::RVec<int> Find_MC_CommonAncestor_Daughters(int CA_ind,
         
         return results;
     } //Output as Mother,Daughter1,Daughter2,-2,Mother1(Daughter1),Daughter11,Daughter12,-2,...
+}
+
+//Treat the no CA cases
+ROOT::VecOps::RVec<int> Find_MC_NoCommonAncestor_Daughters(int CA_ind, 
+                                                         ROOT::VecOps::RVec<int> dilep_ind, 
+                                                         ROOT::VecOps::RVec<edm4hep::MCParticleData> Particle,
+                                                         ROOT::VecOps::RVec<int> Mother_ind,
+                                                         int which_dilep){
+
+    ROOT::VecOps::RVec<int> results;
+
+    //Stops if hasCA or no dilep
+    if (CA_ind != -1 or dilep_ind.size() < 2){
+        results.push_back(-1);
+    }
+
+    else{
+        if (Particle.at(dilep_ind[which_dilep]).parents_begin+1 == Particle.at(dilep_ind[which_dilep]).parents_end){
+            results.push_back(Mother_ind.at(Particle.at(dilep_ind[which_dilep]).parents_begin)); 
+            bool SingleParent (true);
+            do {
+                if (Particle.at(results.back()).parents_begin+1 == Particle.at(results.back()).parents_end){
+                    results.push_back(Mother_ind.at(Particle.at(results.back()).parents_begin));
+                }
+                else {
+                    results.push_back(-2); //indicates the end
+                    SingleParent = false;
+                }
+            } while(SingleParent);
+        }
+        else results.push_back(-3); //either multiple parents from the start or no parents
+    }
+
+    return results;
+
+}
+
+ROOT::VecOps::RVec<int> Decay_Chain(ROOT::VecOps::RVec<int> Daughters_ind){
+    
+    ROOT::VecOps::RVec<int> result;
+
+    if (Daughters_ind.at(0) == -1){
+        result.push_back(-1);
+        return result;
+    }
+
+    int i (0);
+    do{ 
+        ROOT::VecOps::RVec<int> temp;
+        int j (0);
+        do {
+            temp.push_back(Daughters_ind.at(i+j));
+            ++j;
+        } while (Daughters_ind.at(i+j) != -2);
+        if (temp.size() > 2){
+            for (size_t k=0; k<temp.size(); ++k){
+                result.push_back(temp.at(k));
+            }
+            result.push_back(-2);
+        }
+        i = i+j+1;
+    } while (i < Daughters_ind.size());
+
+    return result;
+
+}
+
+ROOT::VecOps::RVec<int> Find_MuSubdecays(ROOT::VecOps::RVec<int> Decays, ROOT::VecOps::RVec<int> MC_PDG, int pm){
+    
+    ROOT::VecOps::RVec<int> results;
+    
+    //No Common Ancestor case (to be refined with the daughters ind)
+    if (Decays.at(0) == -1){
+        results.push_back(-1);
+    }
+    
+    else {
+        
+        int i (0);
+        do{ 
+            int j (0);
+            do {
+                if (MC_PDG.at(Decays.at(i+j)) == pm*(-13) || MC_PDG.at(Decays.at(i+j)) == pm*(-11)){ //Start a new loop to save the PDG values of the muon/electron mother and sister
+                    int k (0);
+                    do {
+                        results.push_back(MC_PDG.at(Decays.at(i+k)));
+                        ++k;
+                    } while (Decays.at(i+k) != -2);
+                    j=k-1; //skip the decay since already scanned
+                }
+                ++j;
+            } while (Decays.at(i+j) != -2);
+            i = i+j+1;
+        } while (i < Decays.size());
+    }
+    return results;
+}
+
+int Find_Categories(ROOT::VecOps::RVec<int> MuFamily){
+
+    //No Common ancestor case
+    if (MuFamily.size() == 1 && MuFamily.at(0) == -1){
+        return 0;
+    }
+
+    else {
+        if (500 < std::abs(MuFamily.at(0)) && std::abs(MuFamily.at(0)) < 600) return 1; //B mother
+        else if ((400 < std::abs(MuFamily.at(0)) && std::abs(MuFamily.at(0)) < 500) || std::abs(MuFamily.at(0)) == 10433 || std::abs(MuFamily.at(0)) == 10411 || std::abs(MuFamily.at(0)) == 20433) return 2; //D or excited D state mother
+        else if (300 < std::abs(MuFamily.at(0)) && std::abs(MuFamily.at(0)) < 400) return 3; //K mother
+        else if (std::abs(MuFamily.at(0)) == 15) return 4; //Tau mother
+        else if (5000 < std::abs(MuFamily.at(0)) && std::abs(MuFamily.at(0)) < 6000) return 5; //b-baryon mother
+        else if (4000 < std::abs(MuFamily.at(0)) && std::abs(MuFamily.at(0)) < 5000) return 6; //c-baryon mother
+        else return 7;
+    }
+
 }
 
 }}
