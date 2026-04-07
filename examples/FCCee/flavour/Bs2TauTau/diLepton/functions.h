@@ -813,12 +813,12 @@ ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetCharge(ROOT::VecOps::RVec<ROOT::V
 
 }
 
-ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetEnergy(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> GetEnergy(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
 
-    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> result;
 
     for (size_t i=0; i<reco_ind.size(); ++i){
-        ROOT::VecOps::RVec<int> temp;
+        ROOT::VecOps::RVec<float> temp;
         for (size_t j=0; j<reco_ind.at(i).size(); ++j){
             temp.push_back(reco.at(reco_ind.at(i).at(j)).energy);
         }
@@ -828,12 +828,12 @@ ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetEnergy(ROOT::VecOps::RVec<ROOT::V
 
 }
 
-ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPx(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> GetPx(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
 
-    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> result;
 
     for (size_t i=0; i<reco_ind.size(); ++i){
-        ROOT::VecOps::RVec<int> temp;
+        ROOT::VecOps::RVec<float> temp;
         for (size_t j=0; j<reco_ind.at(i).size(); ++j){
             temp.push_back(reco.at(reco_ind.at(i).at(j)).momentum.x);
         }
@@ -843,12 +843,12 @@ ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPx(ROOT::VecOps::RVec<ROOT::VecOp
 
 }
 
-ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPy(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> GetPy(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
 
-    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> result;
 
     for (size_t i=0; i<reco_ind.size(); ++i){
-        ROOT::VecOps::RVec<int> temp;
+        ROOT::VecOps::RVec<float> temp;
         for (size_t j=0; j<reco_ind.at(i).size(); ++j){
             temp.push_back(reco.at(reco_ind.at(i).at(j)).momentum.y);
         }
@@ -858,12 +858,12 @@ ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPy(ROOT::VecOps::RVec<ROOT::VecOp
 
 }
 
-ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPz(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> GetPz(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> reco_ind, ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
 
-    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> result;
 
     for (size_t i=0; i<reco_ind.size(); ++i){
-        ROOT::VecOps::RVec<int> temp;
+        ROOT::VecOps::RVec<float> temp;
         for (size_t j=0; j<reco_ind.at(i).size(); ++j){
             temp.push_back(reco.at(reco_ind.at(i).at(j)).momentum.z);
         }
@@ -873,12 +873,12 @@ ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetPz(ROOT::VecOps::RVec<ROOT::VecOp
 
 }
 
-ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> GetP(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> px, ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> py, ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> pz){
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> GetP(ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> px, ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> py, ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> pz){
 
-    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> result;
 
     for (size_t i=0; i<px.size(); ++i){
-        ROOT::VecOps::RVec<int> temp;
+        ROOT::VecOps::RVec<float> temp;
         for (size_t j=0; j<px.at(i).size(); ++j){
             temp.push_back(sqrt(px.at(i).at(j)*px.at(i).at(j) + py.at(i).at(j)*py.at(i).at(j) + pz.at(i).at(j)*pz.at(i).at(j)));
         }
