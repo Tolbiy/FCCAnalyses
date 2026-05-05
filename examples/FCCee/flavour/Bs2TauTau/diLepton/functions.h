@@ -346,6 +346,7 @@ ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau(ROOT::VecOps::RVec
                 else IndRem.push_back(daughter.at(j));
             }
                 
+            //WARNING: might select B->XTauTau, need to add checks on the remaining (only photon allowed)
             if (IndTauplus != -999 && IndTauminus != -999 && TauCounter == 2){
                 result.push_back(in.at(i));
                 result.push_back(in.at(IndTauplus));
@@ -462,6 +463,7 @@ ROOT::VecOps::RVec<int> TruthMatch_MC_Mothers(ROOT::VecOps::RVec<int> mc_ind,
     ROOT::VecOps::RVec<int> all_daughters;
 
     //Checks that the truth-matched daughters are coming from a specific decays
+    //Warning: this selection procedure might select semi-leptonic decays (Bs->XTau->L), although will be quite rare since only relevant for the signal
     for (size_t i=0; i < mc_ind.size(); ++i){
         for (size_t j=mc_in.at(mc_ind.at(i)).parents_begin; j<mc_in.at(mc_ind.at(i)).parents_end; ++j){
             if (std::abs(mc_in.at(mc_parents.at(j)).PDG) == Mother_PDG){
