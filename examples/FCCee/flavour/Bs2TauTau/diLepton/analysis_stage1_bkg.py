@@ -2,10 +2,10 @@
 
 # list of samples to process
 processList_full = {
-    'p8_ee_Zbb_ecm91':{'chunks':10,'fraction':0.01},
-    'p8_ee_Zcc_ecm91':{'chunks':10,'fraction':0.01},
-    'p8_ee_Zss_ecm91':{'chunks':10,'fraction':0.01},
-    'p8_ee_Zud_ecm91':{'chunks':10,'fraction':0.01},
+    'p8_ee_Zbb_ecm91':{'chunks':100,'fraction':1},
+    'p8_ee_Zcc_ecm91':{'chunks':100,'fraction':1},
+    'p8_ee_Zss_ecm91':{'chunks':100,'fraction':1},
+    'p8_ee_Zud_ecm91':{'chunks':100,'fraction':1},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':20,'fraction':1},
 }
@@ -41,7 +41,7 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts_bkgStudies"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts_April26"
 
 # if runBatch = False, save output locally
 outputDir   = "DummyRepo"

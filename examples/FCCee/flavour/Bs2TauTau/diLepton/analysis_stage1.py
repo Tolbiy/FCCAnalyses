@@ -41,7 +41,7 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts_bkgStudies"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Leptons_withCuts_BRCheck"
 
 # if runBatch = False, save output locally
 outputDir   = "DummyRepo"
@@ -353,7 +353,7 @@ class RDFanalysis():
                .Define("Vertex_sighemi_y","Vertex_y [Vertex_thrusthemis_emin>0]")
                .Define("Vertex_sighemi_z","Vertex_z [Vertex_thrusthemis_emin>0]")
                
-               .Define("Vertex_sighemi_ind","ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result; for (size_t i=0; i<Vertex_ind.size(); ++i) {if (Vertex_thrusthemis_emin.at(i)>0) result.push_back(Vertex_ind.at(i));} return result;") ##Doesn't work for 2D array
+               .Define("Vertex_sighemi_ind","ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result; for (size_t i=0; i<Vertex_ind.size(); ++i) {if (Vertex_thrusthemis_emin.at(i)>0) result.push_back(Vertex_ind.at(i));} return result;")
                .Define("Vertex_sighemi_RECO_PDG","FCCAnalyses::ZHfunctions::GetPDG(Vertex_sighemi_ind,RecoPartPIDAtVertex)") #the type field of RECO PID only has the fabs of PDG
                .Define("Vertex_sighemi_RECO_charge","FCCAnalyses::ZHfunctions::GetCharge(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
                .Define("Vertex_sighemi_RECO_energy","FCCAnalyses::ZHfunctions::GetEnergy(Vertex_sighemi_ind,RecoPartPIDAtVertex)")
