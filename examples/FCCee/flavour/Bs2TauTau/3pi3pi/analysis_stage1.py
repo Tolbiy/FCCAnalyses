@@ -21,8 +21,8 @@ processList_full = {
 
 processList_test = {
     #'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
-    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.000002},
+    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
@@ -41,22 +41,14 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_Dec25_InclusivenoFilter"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/TOBECREATED"
 
 # if runBatch = False, save output locally
-outputDir   = "/afs/cern.ch/work/t/tomonnar/public/Bs2TauTau/Inclusive/ParticleNet/Test_PN/Data/"
+outputDir   = "../DummyRepo"
 #"fccanalysis_output/" To be used with runBatch = True
 
-includePaths = ["functions.h"]
+includePaths = ["../functions.h"]
 
-import ROOT
-ROOT.gInterpreter.ProcessLine('''
-TMVA::Experimental::RBDT<> bdt("BDT", "/afs/cern.ch/work/x/xzuo/public/FCC_files/Bs2TauTau/BDT/xgb_bdt_trained_iteration_16.root");
-computeModel1 = TMVA::Experimental::Compute<18, float>(bdt);
-''')
-
-
-MVAFilter   = "EVT_MVA1>0.6"
 
 #Mandatory: RDFanalysis class where the use defines the operations on the TTree
 class RDFanalysis():
@@ -110,6 +102,30 @@ class RDFanalysis():
                .Define("genBs_mass",  "FCCAnalyses::MCParticle::get_mass(genBs)")
                .Define("genBs_pdg",   "FCCAnalyses::MCParticle::get_pdg (genBs)")
 
+               .Define("genBc",   "FCCAnalyses::MCParticle::sel_pdgID(541, true)(Particle)")
+               .Define("n_genBc",     "FCCAnalyses::MCParticle::get_n   (genBc)")
+               .Define("genBc_px",    "FCCAnalyses::MCParticle::get_px  (genBc)")
+               .Define("genBc_py",    "FCCAnalyses::MCParticle::get_py  (genBc)")
+               .Define("genBc_pz",    "FCCAnalyses::MCParticle::get_pz  (genBc)")
+
+               .Define("genBu",   "FCCAnalyses::MCParticle::sel_pdgID(521, true)(Particle)")
+               .Define("n_genBu",     "FCCAnalyses::MCParticle::get_n   (genBu)")
+               .Define("genBu_px",    "FCCAnalyses::MCParticle::get_px  (genBu)")
+               .Define("genBu_py",    "FCCAnalyses::MCParticle::get_py  (genBu)")
+               .Define("genBu_pz",    "FCCAnalyses::MCParticle::get_pz  (genBu)")
+
+               .Define("genBd",   "FCCAnalyses::MCParticle::sel_pdgID(511, true)(Particle)")
+               .Define("n_genBd",     "FCCAnalyses::MCParticle::get_n   (genBd)")
+               .Define("genBd_px",    "FCCAnalyses::MCParticle::get_px  (genBd)")
+               .Define("genBd_py",    "FCCAnalyses::MCParticle::get_py  (genBd)")
+               .Define("genBd_pz",    "FCCAnalyses::MCParticle::get_pz  (genBd)")
+
+               .Define("genLb",   "FCCAnalyses::MCParticle::sel_pdgID(5122, true)(Particle)")
+               .Define("n_genLb",     "FCCAnalyses::MCParticle::get_n   (genLb)")
+               .Define("genLb_px",    "FCCAnalyses::MCParticle::get_px  (genLb)")
+               .Define("genLb_py",    "FCCAnalyses::MCParticle::get_py  (genLb)")
+               .Define("genLb_pz",    "FCCAnalyses::MCParticle::get_pz  (genLb)")
+
 
                #############################################
                ##               Build MC Vertex           ##
@@ -134,7 +150,12 @@ class RDFanalysis():
                .Define("genBs_Vertex_y",   "MC_Vertex_y  [MC_Vertex_isBs>0]") #no implementation of abs() for vector
                .Define("genBs_Vertex_z",   "MC_Vertex_z  [MC_Vertex_isBs>0]")
 
+                ############################################
+                ##           Get PV MC truth              ##
+                ############################################
 
+               .Define("MC_PV_xyzt",      "FCCAnalyses::MCParticle::get_EventPrimaryVertexP4()(Particle)")
+               
                #############################################
                ##              Build Reco Vertex          ##
                #############################################
@@ -187,6 +208,14 @@ class RDFanalysis():
                .Define("Vertex_ntrk",     "myUtils::get_Vertex_ntracks(VertexObject)")
                .Define("Vertex_n",        "int(Vertex_x.size())")
                .Define("Vertex_mass",     "myUtils::get_Vertex_mass(VertexObject,RecoPartPIDAtVertex)")
+               .Define("Vertex_p4",       "FCCAnalyses::ZHfunctions::get_Vertex_p4(VertexObject,RecoPartPIDAtVertex)")
+               .Define("Vertex_px",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Px());} return result;")
+               .Define("Vertex_py",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Py());} return result;")
+               .Define("Vertex_pz",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Pz());} return result;")
+               .Define("Vertex_e",        "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.E ());} return result;")
+               .Define("Vertex_vec",      "FCCAnalyses::ZHfunctions::build_p4(Vertex_x, Vertex_y, Vertex_z, Vertex_mass)")
+               .Define("Vertex_phi",      "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_vec) {result.push_back(p.Phi());} return result;")
+               .Define("Vertex_theta",    "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_vec) {result.push_back(p.Theta());} return result;")
 
                .Define("Vertex_d2PV",     "myUtils::get_Vertex_d2PV(VertexObject,-1)")
                .Define("Vertex_d2PVx",    "myUtils::get_Vertex_d2PV(VertexObject,0)")
@@ -225,13 +254,52 @@ class RDFanalysis():
 
 
                #############################################
+               ##              Get RECO info              ##
+               #############################################
+               .Define("RP_e",              "ReconstructedParticle::get_e(RecoPartPIDAtVertex)")
+               .Define("RP_m_true",         "ReconstructedParticle::get_mass(RecoPartPIDAtVertex)")
+               .Define("RP_m_reco",         "ReconstructedParticle::get_mass(ReconstructedParticles)")
+               .Define("RP_px",             "ReconstructedParticle::get_px(RecoPartPIDAtVertex)")
+               .Define("RP_py",             "ReconstructedParticle::get_py(RecoPartPIDAtVertex)")
+               .Define("RP_pz",             "ReconstructedParticle::get_pz(RecoPartPIDAtVertex)")
+               .Define("RP_eta",            "ReconstructedParticle::get_eta(RecoPartPIDAtVertex)")
+               .Define("RP_phi",            "ReconstructedParticle::get_phi(RecoPartPIDAtVertex)")
+               .Define("RP_theta",          "ReconstructedParticle::get_theta(RecoPartPIDAtVertex)")
+               .Define("RP_charge",         "ReconstructedParticle::get_charge(RecoPartPIDAtVertex)")
+               .Define("RP_fromPV",         "FCCAnalyses::ZHfunctions::get_RP_isfromPV(VertexObject,RecoPartPIDAtVertex)")
+               .Define("RP_vert_ind",       "FCCAnalyses::ZHfunctions::get_RP_Vert_Ind(VertexObject,RecoPartPIDAtVertex)")
+               .Define("RP_vert_e",         "ROOT::VecOps::RVec<float> result; for (auto & i: RP_vert_ind) {if (i==-1) result.push_back(-1); else result.push_back(Vertex_e.at(i));} return result;")
+               .Define("RP_vert_mass",      "ROOT::VecOps::RVec<float> result; for (auto & i: RP_vert_ind) {if (i==-1) result.push_back(-1); else result.push_back(Vertex_mass.at(i));} return result;")
+
+               .Define("RP_trk_d0",         "ReconstructedParticle2Track::getRP2TRK_D0       (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_z0",         "ReconstructedParticle2Track::getRP2TRK_Z0       (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_phi",        "ReconstructedParticle2Track::getRP2TRK_phi      (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_omega",      "ReconstructedParticle2Track::getRP2TRK_omega    (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_tanLambda",  "ReconstructedParticle2Track::getRP2TRK_tanLambda(RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_dndx",           "FCCAnalyses::ZHfunctions::get_RP_dndx(RecoPartPIDAtVertex, EFlowTrack_2, EFlowTrack)")
+               .Define("RP_mtof",           "FCCAnalyses::ZHfunctions::get_RP_mtof(RecoPartPIDAtVertex, EFlowTrack_L, EFlowTrack, TrackerHits, EFlowPhoton, EFlowNeutralHadron, CalorimeterHits, MC_PV_xyzt)")
+
+               ###################################################
+               ##    check MC mathc with certain decay chains   ##
+               ###################################################
+
+               .Define("RP_nMC",        "FCCAnalyses::ZHfunctions::getRP2MC_nMC(MCRecoAssociations0,MCRecoAssociations1,RecoPartPIDAtVertex)")
+               .Define("RP_MCidx",      "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0,MCRecoAssociations1,RecoPartPIDAtVertex)")
+               .Define("RP_fromBc",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(541, true)(RP_MCidx, Particle, Particle1)")
+               .Define("RP_fromBs",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(531, true)(RP_MCidx, Particle, Particle1)")
+               .Define("RP_fromBu",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(521, true)(RP_MCidx, Particle, Particle1)")
+               .Define("RP_fromBd",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(511, true)(RP_MCidx, Particle, Particle1)")
+               .Define("RP_fromLb",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(5122, true)(RP_MCidx, Particle, Particle1)")
+
+               .Define("Vertex_fromBc", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBc)")
+               .Define("Vertex_fromBs", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBs)")
+               .Define("Vertex_fromBu", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBu)")
+               .Define("Vertex_fromBd", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBd)")
+               .Define("Vertex_fromLb", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromLb)")
+
+               #############################################
                ##              Build the thrust           ##
                #############################################
-               .Define("RP_e",          "ReconstructedParticle::get_e(RecoPartPIDAtVertex)")
-               .Define("RP_px",         "ReconstructedParticle::get_px(RecoPartPIDAtVertex)")
-               .Define("RP_py",         "ReconstructedParticle::get_py(RecoPartPIDAtVertex)")
-               .Define("RP_pz",         "ReconstructedParticle::get_pz(RecoPartPIDAtVertex)")
-               .Define("RP_charge",     "ReconstructedParticle::get_charge(RecoPartPIDAtVertex)")
 
                .Define("EVT_thrustNP",      'Algorithms::minimize_thrust("Minuit2","Migrad")(RP_px, RP_py, RP_pz)')
                .Define("RP_thrustangleNP",  'Algorithms::getAxisCosTheta(EVT_thrustNP, RP_px, RP_py, RP_pz)')
@@ -243,9 +311,11 @@ class RDFanalysis():
                ##      thrust angle of gen b, Bs          ##
                #############################################
 
-               .Define("genBottom_thrustangle",    'Algorithms::getAxisCosTheta(EVT_thrust, genBottom_px, genBottom_py, genBottom_pz)')
                .Define("genBs_thrustangle",        'Algorithms::getAxisCosTheta(EVT_thrust, genBs_px, genBs_py, genBs_pz)')
-               .Define("genBs_Vertex_thrustangle", 'Algorithms::getAxisCosTheta(EVT_thrust, genBs_Vertex_x, genBs_Vertex_y, genBs_Vertex_z)')
+               .Define("genBd_thrustangle",        'Algorithms::getAxisCosTheta(EVT_thrust, genBd_px, genBd_py, genBd_pz)')
+               .Define("genBu_thrustangle",        'Algorithms::getAxisCosTheta(EVT_thrust, genBu_px, genBu_py, genBu_pz)')
+               .Define("genBc_thrustangle",        'Algorithms::getAxisCosTheta(EVT_thrust, genBc_px, genBc_py, genBc_pz)')
+               .Define("genLb_thrustangle",        'Algorithms::getAxisCosTheta(EVT_thrust, genLb_px, genLb_py, genLb_pz)')
                .Define("recoEmiss_thrustangle",    'Algorithms::getAxisCosTheta(EVT_thrust, recoEmiss_px, recoEmiss_py, recoEmiss_pz)')
 
                #############################################
@@ -308,27 +378,14 @@ class RDFanalysis():
                .Define("EVT_ThrustEmin_NTau23PiCand",   "float(myUtils::get_Npos(cos(Tau23PiCandidates_anglethrust)))")
                .Define("EVT_ThrustEmax_NTau23PiCand",   "float(myUtils::get_Nneg(cos(Tau23PiCandidates_anglethrust)))")
 
-               .Define("MVAVec1", ROOT.computeModel1, ["EVT_ThrustEmin_E",
-                                                       "EVT_ThrustEmax_E",
-                                                       "EVT_ThrustEmin_Echarged",
-                                                       "EVT_ThrustEmax_Echarged",
-                                                       "EVT_ThrustEmin_Eneutral",
-                                                       "EVT_ThrustEmax_Eneutral",
-                                                       "EVT_ThrustEmin_Ncharged",
-                                                       "EVT_ThrustEmax_Ncharged",
-                                                       "EVT_ThrustEmin_Nneutral",
-                                                       "EVT_ThrustEmax_Nneutral",
-                                                       "EVT_NtracksPV",
-                                                       "EVT_NVertex",
-                                                       "EVT_NTau23Pi",
-                                                       "EVT_ThrustEmin_NDV",
-                                                       "EVT_ThrustEmax_NDV",
-                                                       "EVT_dPV2DVmin",
-                                                       "EVT_dPV2DVmax",
-                                                       "EVT_dPV2DVave"]) 
-               .Define("EVT_MVA1", "MVAVec1.at(0)")
-#               .Filter(MVAFilter)
+               .Filter("EVT_ThrustEmin_NTau23PiCand > 1 && recoEmiss_e > 3.5 && EVT_ThrustEmin_Eneutral < 10 && EVT_ThrustEmin_Nneutral <= 13 && EVT_ThrustEmin_E < 38.")
 
+
+               #############################################
+               ##         Tau23Pi candidates info         ##
+               #############################################
+
+               #All Candidates
                .Define("Tau23PiCandidates_mass",    "myUtils::getFCCAnalysesComposite_mass(Tau23PiCandidates)")
                .Define("Tau23PiCandidates_q",       "myUtils::getFCCAnalysesComposite_charge(Tau23PiCandidates)")
                .Define("Tau23PiCandidates_vertex",  "myUtils::getFCCAnalysesComposite_vertex(Tau23PiCandidates)")
@@ -338,7 +395,6 @@ class RDFanalysis():
                .Define("Tau23PiCandidates_pz",      "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,2)")
                .Define("Tau23PiCandidates_p",       "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,-1)")
                .Define("Tau23PiCandidates_B",       "myUtils::getFCCAnalysesComposite_B(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex)")
- 
                .Define("Tau23PiCandidates_x",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_x.at(p));} return result;")
                .Define("Tau23PiCandidates_y",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_y.at(p));} return result;")
                .Define("Tau23PiCandidates_z",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_z.at(p));} return result;")
@@ -346,25 +402,18 @@ class RDFanalysis():
                .Define("Tau23PiCandidates_yErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_yErr.at(p));} return result;")
                .Define("Tau23PiCandidates_zErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_zErr.at(p));} return result;")
                .Define("Tau23PiCandidates_chi2",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_chi2.at(p));} return result;")
-               .Define("Tau23PiCandidates_pAngles", "FCCAnalyses::ZHfunctions::Compute_TauCand_MomentaAngles(Tau23PiCandidates_px,Tau23PiCandidates_py,Tau23PiCandidates_pz)")
                .Define("Tau23PiCandidates_hemEmin", "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_thrusthemis_emin.at(p));} return result;")
-
                .Define("Tau23PiCandidates_track",   "myUtils::getFCCAnalysesComposite_track(Tau23PiCandidates, VertexObject)")
                .Define("Tau23PiCandidates_d0",      "myUtils::get_trackd0(Tau23PiCandidates_track)")
                .Define("Tau23PiCandidates_z0",      "myUtils::get_trackz0(Tau23PiCandidates_track)")
-
-               .Define("CUT_hasCandEmin",           "myUtils::has_anglethrust_emin(Tau23PiCandidates_anglethrust)")
-#               .Filter("CUT_hasCandEmin>0")
-
+               
                .Define("Tau23PiCandidates_rho",     "myUtils::build_rho(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex)")
                .Define("Tau23PiCandidates_rho1mass","myUtils::get_mass(Tau23PiCandidates_rho, 0)")
                .Define("Tau23PiCandidates_rho2mass","myUtils::get_mass(Tau23PiCandidates_rho, 1)")
                .Define("Tau23PiCandidates_rho1px",  "myUtils::get_px(Tau23PiCandidates_rho, 0)")
                .Define("Tau23PiCandidates_rho2px",  "myUtils::get_px(Tau23PiCandidates_rho, 1)")
-
                .Define("Tau23PiCandidates_rho1py",  "myUtils::get_py(Tau23PiCandidates_rho, 0)")
                .Define("Tau23PiCandidates_rho2py",  "myUtils::get_py(Tau23PiCandidates_rho, 1)")
-
                .Define("Tau23PiCandidates_rho1pz",  "myUtils::get_pz(Tau23PiCandidates_rho, 0)")
                .Define("Tau23PiCandidates_rho2pz",  "myUtils::get_pz(Tau23PiCandidates_rho, 1)")
 
@@ -375,7 +424,6 @@ class RDFanalysis():
                .Define("Tau23PiCandidates_pion1q",  "myUtils::getFCCAnalysesComposite_q(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 0)")
                .Define("Tau23PiCandidates_pion1d0", "myUtils::getFCCAnalysesComposite_d0(Tau23PiCandidates, VertexObject, 0)")
                .Define("Tau23PiCandidates_pion1z0", "myUtils::getFCCAnalysesComposite_z0(Tau23PiCandidates, VertexObject, 0)")
-
                .Define("Tau23PiCandidates_pion2px", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1, 0)")
                .Define("Tau23PiCandidates_pion2py", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1, 1)")
                .Define("Tau23PiCandidates_pion2pz", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1, 2)")
@@ -383,7 +431,6 @@ class RDFanalysis():
                .Define("Tau23PiCandidates_pion2q",  "myUtils::getFCCAnalysesComposite_q(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1)")
                .Define("Tau23PiCandidates_pion2d0", "myUtils::getFCCAnalysesComposite_d0(Tau23PiCandidates, VertexObject, 1)")
                .Define("Tau23PiCandidates_pion2z0", "myUtils::getFCCAnalysesComposite_z0(Tau23PiCandidates, VertexObject, 1)")
-
                .Define("Tau23PiCandidates_pion3px", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2, 0)")
                .Define("Tau23PiCandidates_pion3py", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2, 1)")
                .Define("Tau23PiCandidates_pion3pz", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2, 2)")
@@ -393,128 +440,198 @@ class RDFanalysis():
                .Define("Tau23PiCandidates_pion3z0", "myUtils::getFCCAnalysesComposite_z0(Tau23PiCandidates, VertexObject, 2)")
 
 
+                #####################################
+                ##   Get the two taus of interest  ##
+                #####################################               
+               
+               .Define("Tau23PiCandidates_pAngles","FCCAnalyses::ZHfunctions::Compute_Momenta_Angles(EVT_NTau23Pi,Tau23PiCandidates_px,Tau23PiCandidates_py,Tau23PiCandidates_pz)")\
+               .Define("Tau23PiCandidates_pAngles_ID","FCCAnalyses::ZHfunctions::ID_Angles(EVT_NTau23Pi)")\
+               .Define("diTau","FCCAnalyses::ZHfunctions::Find_diTau(EVT_NTau23Pi,Tau23PiCandidates_pAngles,Tau23PiCandidates_pAngles_ID,Tau23PiCandidates_q)")\
+               .Define("n_diTau","diTau.size()")\
+               .Filter("n_diTau > 1") #Get rid of the the phantom events (where no diTau where found)
+
+               .Define("diTauPlus_x", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_x[diTau[0]];  else return Tau23PiCandidates_x[diTau[1]];")
+               .Define("diTauPlus_y", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_y[diTau[0]];  else return Tau23PiCandidates_y[diTau[1]];")
+               .Define("diTauPlus_z", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_z[diTau[0]];  else return Tau23PiCandidates_z[diTau[1]];")
+               .Define("diTauPlus_px","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_px[diTau[0]]; else return Tau23PiCandidates_px[diTau[1]];")
+               .Define("diTauPlus_py","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_py[diTau[0]]; else return Tau23PiCandidates_py[diTau[1]];")
+               .Define("diTauPlus_pz","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pz[diTau[0]]; else return Tau23PiCandidates_pz[diTau[1]];")
+               .Define("diTauPlus_p", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_p[diTau[0]];  else return Tau23PiCandidates_p[diTau[1]];")
+               .Define("diTauPlus_mass","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_mass[diTau[0]];  else return Tau23PiCandidates_mass[diTau[1]];")
+               .Define("diTauPlus_chi2","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_chi2[diTau[0]];  else return Tau23PiCandidates_chi2[diTau[1]];")
+               .Define("diTauMinus_x", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_x[diTau[0]];  else return Tau23PiCandidates_x[diTau[1]];")
+               .Define("diTauMinus_y", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_y[diTau[0]];  else return Tau23PiCandidates_y[diTau[1]];")
+               .Define("diTauMinus_z", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_z[diTau[0]];  else return Tau23PiCandidates_z[diTau[1]];")
+               .Define("diTauMinus_px","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_px[diTau[0]]; else return Tau23PiCandidates_px[diTau[1]];")
+               .Define("diTauMinus_py","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_py[diTau[0]]; else return Tau23PiCandidates_py[diTau[1]];")
+               .Define("diTauMinus_pz","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pz[diTau[0]]; else return Tau23PiCandidates_pz[diTau[1]];")
+               .Define("diTauMinus_p", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_p[diTau[0]];  else return Tau23PiCandidates_p[diTau[1]];")
+               .Define("diTauMinus_mass","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_mass[diTau[0]];  else return Tau23PiCandidates_mass[diTau[1]];")
+               .Define("diTauMinus_chi2","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_chi2[diTau[0]];  else return Tau23PiCandidates_chi2[diTau[1]];")
+               .Define("diTau_Angles","FCCAnalyses::ZHfunctions::Compute_Momenta_Angles(diTauPlus_x,diTauPlus_y,diTauPlus_z,diTauMinus_x,diTauMinus_y,diTauMinus_z)")
+
+               .Define("diTauPlus_rho1mass", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1mass[diTau[0]];  else return Tau23PiCandidates_rho1mass[diTau[1]];")
+               .Define("diTauPlus_rho1px",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1px[diTau[0]];  else return Tau23PiCandidates_rho1px[diTau[1]];")
+               .Define("diTauPlus_rho1py",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1py[diTau[0]];  else return Tau23PiCandidates_rho1py[diTau[1]];")
+               .Define("diTauPlus_rho1pz",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1pz[diTau[0]];  else return Tau23PiCandidates_rho1pz[diTau[1]];")
+               .Define("diTauPlus_rho2px",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2px[diTau[0]];  else return Tau23PiCandidates_rho2px[diTau[1]];")
+               .Define("diTauPlus_rho2py",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2py[diTau[0]];  else return Tau23PiCandidates_rho2py[diTau[1]];")
+               .Define("diTauPlus_rho2pz",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2pz[diTau[0]];  else return Tau23PiCandidates_rho2pz[diTau[1]];")
+               .Define("diTauMinus_rho1mass", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1mass[diTau[0]];  else return Tau23PiCandidates_rho1mass[diTau[1]];")
+               .Define("diTauMinus_rho1px",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1px[diTau[0]];  else return Tau23PiCandidates_rho1px[diTau[1]];")
+               .Define("diTauMinus_rho1py",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1py[diTau[0]];  else return Tau23PiCandidates_rho1py[diTau[1]];")
+               .Define("diTauMinus_rho1pz",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1pz[diTau[0]];  else return Tau23PiCandidates_rho1pz[diTau[1]];")
+               .Define("diTauMinus_rho2px",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho2px[diTau[0]];  else return Tau23PiCandidates_rho2px[diTau[1]];")
+               .Define("diTauMinus_rho2py",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho2py[diTau[0]];  else return Tau23PiCandidates_rho2py[diTau[1]];")
+               .Define("diTauMinus_rho2pz",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho2pz[diTau[0]];  else return Tau23PiCandidates_rho2pz[diTau[1]];")
+
+               .Define("diTauPlus_pion1px", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1px[diTau[0]];  else return Tau23PiCandidates_pion1px[diTau[1]];")
+               .Define("diTauPlus_pion1py", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1py[diTau[0]];  else return Tau23PiCandidates_pion1py[diTau[1]];")
+               .Define("diTauPlus_pion1pz", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1pz[diTau[0]];  else return Tau23PiCandidates_pion1pz[diTau[1]];")
+               .Define("diTauPlus_pion1p",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1p[diTau[0]];  else return Tau23PiCandidates_pion1p[diTau[1]];")
+               .Define("diTauPlus_pion1q",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1q[diTau[0]];  else return Tau23PiCandidates_pion1q[diTau[1]];")
+               .Define("diTauPlus_pion1d0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1d0[diTau[0]];  else return Tau23PiCandidates_pion1d0[diTau[1]];")
+               .Define("diTauPlus_pion1z0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1z0[diTau[0]];  else return Tau23PiCandidates_pion1z0[diTau[1]];")
+               .Define("diTauPlus_pion2px", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2px[diTau[0]];  else return Tau23PiCandidates_pion2px[diTau[1]];")
+               .Define("diTauPlus_pion2py", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2py[diTau[0]];  else return Tau23PiCandidates_pion2py[diTau[1]];")
+               .Define("diTauPlus_pion2pz", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2pz[diTau[0]];  else return Tau23PiCandidates_pion2pz[diTau[1]];")
+               .Define("diTauPlus_pion2p",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2p[diTau[0]];  else return Tau23PiCandidates_pion2p[diTau[1]];")
+               .Define("diTauPlus_pion2q",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2q[diTau[0]];  else return Tau23PiCandidates_pion2q[diTau[1]];")
+               .Define("diTauPlus_pion2d0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2d0[diTau[0]];  else return Tau23PiCandidates_pion2d0[diTau[1]];")
+               .Define("diTauPlus_pion2z0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2z0[diTau[0]];  else return Tau23PiCandidates_pion2z0[diTau[1]];")
+               .Define("diTauPlus_pion3px", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3px[diTau[0]];  else return Tau23PiCandidates_pion3px[diTau[1]];")
+               .Define("diTauPlus_pion3py", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3py[diTau[0]];  else return Tau23PiCandidates_pion3py[diTau[1]];")
+               .Define("diTauPlus_pion3pz", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3pz[diTau[0]];  else return Tau23PiCandidates_pion3pz[diTau[1]];")
+               .Define("diTauPlus_pion3p",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3p[diTau[0]];  else return Tau23PiCandidates_pion3p[diTau[1]];")
+               .Define("diTauPlus_pion3q",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3q[diTau[0]];  else return Tau23PiCandidates_pion3q[diTau[1]];")
+               .Define("diTauPlus_pion3d0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3d0[diTau[0]];  else return Tau23PiCandidates_pion3d0[diTau[1]];")
+               .Define("diTauPlus_pion3z0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3z0[diTau[0]];  else return Tau23PiCandidates_pion3z0[diTau[1]];")
+               .Define("diTauMinus_pion1px", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1px[diTau[0]];  else return Tau23PiCandidates_pion1px[diTau[1]];")
+               .Define("diTauMinus_pion1py", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1py[diTau[0]];  else return Tau23PiCandidates_pion1py[diTau[1]];")
+               .Define("diTauMinus_pion1pz", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1pz[diTau[0]];  else return Tau23PiCandidates_pion1pz[diTau[1]];")
+               .Define("diTauMinus_pion1p",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1p[diTau[0]];  else return Tau23PiCandidates_pion1p[diTau[1]];")
+               .Define("diTauMinus_pion1q",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1q[diTau[0]];  else return Tau23PiCandidates_pion1q[diTau[1]];")
+               .Define("diTauMinus_pion1d0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1d0[diTau[0]];  else return Tau23PiCandidates_pion1d0[diTau[1]];")
+               .Define("diTauMinus_pion1z0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1z0[diTau[0]];  else return Tau23PiCandidates_pion1z0[diTau[1]];")
+               .Define("diTauMinus_pion2px", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2px[diTau[0]];  else return Tau23PiCandidates_pion2px[diTau[1]];")
+               .Define("diTauMinus_pion2py", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2py[diTau[0]];  else return Tau23PiCandidates_pion2py[diTau[1]];")
+               .Define("diTauMinus_pion2pz", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2pz[diTau[0]];  else return Tau23PiCandidates_pion2pz[diTau[1]];")
+               .Define("diTauMinus_pion2p",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2p[diTau[0]];  else return Tau23PiCandidates_pion2p[diTau[1]];")
+               .Define("diTauMinus_pion2q",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2q[diTau[0]];  else return Tau23PiCandidates_pion2q[diTau[1]];")
+               .Define("diTauMinus_pion2d0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2d0[diTau[0]];  else return Tau23PiCandidates_pion2d0[diTau[1]];")
+               .Define("diTauMinus_pion2z0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2z0[diTau[0]];  else return Tau23PiCandidates_pion2z0[diTau[1]];")
+               .Define("diTauMinus_pion3px", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3px[diTau[0]];  else return Tau23PiCandidates_pion3px[diTau[1]];")
+               .Define("diTauMinus_pion3py", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3py[diTau[0]];  else return Tau23PiCandidates_pion3py[diTau[1]];")
+               .Define("diTauMinus_pion3pz", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3pz[diTau[0]];  else return Tau23PiCandidates_pion3pz[diTau[1]];")
+               .Define("diTauMinus_pion3p",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3p[diTau[0]];  else return Tau23PiCandidates_pion3p[diTau[1]];")
+               .Define("diTauMinus_pion3q",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3q[diTau[0]];  else return Tau23PiCandidates_pion3q[diTau[1]];")
+               .Define("diTauMinus_pion3d0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3d0[diTau[0]];  else return Tau23PiCandidates_pion3d0[diTau[1]];")
+               .Define("diTauMinus_pion3z0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3z0[diTau[0]];  else return Tau23PiCandidates_pion3z0[diTau[1]];")
+
+
                ###############################
                ##   collinear mass cal      ##
                ###############################
 
-               .Define("Tau23PiCandidates_p4",  "FCCAnalyses::ZHfunctions::build_p4(Tau23PiCandidates_px, Tau23PiCandidates_py, Tau23PiCandidates_pz, Tau23PiCandidates_mass)")
-
-               .Define("TauCand_hemEmin_x",          "Tau23PiCandidates_x          [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_y",          "Tau23PiCandidates_y          [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_z",          "Tau23PiCandidates_z          [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_q",          "Tau23PiCandidates_q          [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_chi2",       "Tau23PiCandidates_chi2       [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_thrustangle","Tau23PiCandidates_anglethrust[Tau23PiCandidates_hemEmin>0]")
-
-               .Define("TauCand_hemEmin_p4",  "Tau23PiCandidates_p4  [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_px",  "ROOT::VecOps::RVec<float> result; for (auto & p: TauCand_hemEmin_p4) {result.push_back(p.Px());} return result;")
-               .Define("TauCand_hemEmin_py",  "ROOT::VecOps::RVec<float> result; for (auto & p: TauCand_hemEmin_p4) {result.push_back(p.Py());} return result;")
-               .Define("TauCand_hemEmin_pz",  "ROOT::VecOps::RVec<float> result; for (auto & p: TauCand_hemEmin_p4) {result.push_back(p.Pz());} return result;")
-               .Define("TauCand_hemEmin_p",   "ROOT::VecOps::RVec<float> result; for (auto & p: TauCand_hemEmin_p4) {result.push_back(p.P ());} return result;")
-               .Define("TauCand_hemEmin_e",   "ROOT::VecOps::RVec<float> result; for (auto & p: TauCand_hemEmin_p4) {result.push_back(p.E ());} return result;")
-               .Define("TauCand_hemEmin_m",   "ROOT::VecOps::RVec<float> result; for (auto & p: TauCand_hemEmin_p4) {result.push_back(p.M ());} return result;")
-               .Define("mDiTau_Vis",          "if (EVT_ThrustEmin_NTau23PiCand>1) return (TauCand_hemEmin_p4.at(0)+TauCand_hemEmin_p4.at(1)).M(); else return (-9999.9);")
-
-               .Define("TauCand_hemEmin_pion1px",   "Tau23PiCandidates_pion1px [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion1py",   "Tau23PiCandidates_pion1py [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion1pz",   "Tau23PiCandidates_pion1pz [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion1q",    "Tau23PiCandidates_pion1q  [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion1d0",   "Tau23PiCandidates_pion1d0 [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion1z0",   "Tau23PiCandidates_pion1z0 [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion2px",   "Tau23PiCandidates_pion2px [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion2py",   "Tau23PiCandidates_pion2py [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion2pz",   "Tau23PiCandidates_pion2pz [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion2q",    "Tau23PiCandidates_pion2q  [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion2d0",   "Tau23PiCandidates_pion2d0 [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion2z0",   "Tau23PiCandidates_pion2z0 [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion3px",   "Tau23PiCandidates_pion3px [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion3py",   "Tau23PiCandidates_pion3py [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion3pz",   "Tau23PiCandidates_pion3pz [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion3q",    "Tau23PiCandidates_pion3q  [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion3d0",   "Tau23PiCandidates_pion3d0 [Tau23PiCandidates_hemEmin>0]")
-               .Define("TauCand_hemEmin_pion3z0",   "Tau23PiCandidates_pion3z0 [Tau23PiCandidates_hemEmin>0]")
+               .Define("diTauPlus_p4","TLorentzVector p4p; p4p.SetXYZM(diTauPlus_px, diTauPlus_py, diTauPlus_pz, diTauPlus_mass); return p4p;")
+               .Define("diTauMinus_p4","TLorentzVector p4m; p4m.SetXYZM(diTauMinus_px, diTauMinus_py, diTauMinus_pz, diTauMinus_mass); return p4m;")
+               .Define("mDiTau_Vis",   "(diTauPlus_p4+diTauMinus_p4).M()")
+               .Define("DeltaM","mDiTau_Vis-diTauPlus_mass-diTauMinus_mass")
+               .Define("ratio_Emiss",  "(recoEmiss_px * diTauPlus_px + recoEmiss_py * diTauPlus_py + recoEmiss_pz * diTauPlus_pz) / (recoEmiss_p4.P() * diTauPlus_p)")
+               .Define("mDiTau_full",  "(diTauPlus_p4+diTauMinus_p4+ratio_Emiss*recoEmiss_p4).M()")
 
 
-               .Define("TauCand1_x",           "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_x.          at(0); else return (float(+999.9) );")
-               .Define("TauCand1_y",           "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_y.          at(0); else return (float(+999.9) );")
-               .Define("TauCand1_z",           "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_z.          at(0); else return (float(+999.9) );")
-               .Define("TauCand1_chi2",        "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_chi2.       at(0); else return (float(+999.9) );")
-               .Define("TauCand1_thrustangle", "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_thrustangle.at(0); else return (float(+999.9) );")
-               .Define("TauCand2_x",           "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_x.          at(1); else return (float(-999.9) );")
-               .Define("TauCand2_y",           "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_y.          at(1); else return (float(-999.9) );")
-               .Define("TauCand2_z",           "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_z.          at(1); else return (float(-999.9) );")
-               .Define("TauCand2_chi2",        "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_chi2.       at(1); else return (float(-999.9) );")
-               .Define("TauCand2_thrustangle", "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_thrustangle.at(1); else return (float(-999.9) );")
-
-               .Define("TauCand1_px",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_px.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_py",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_py.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pz",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pz.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_p",    "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_p. at(0); else return (float(+999.9) );")
-               .Define("TauCand1_m",    "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_m. at(0); else return (float(+999.9) );")
-               .Define("TauCand1_q",    "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_q. at(0); else return (0             );")
-               .Define("TauCand2_px",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_px.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_py",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_py.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pz",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pz.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_p",    "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_p. at(1); else return (float(-999.9) );")
-               .Define("TauCand2_m",    "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_m. at(1); else return (float(-999.9) );")
-               .Define("TauCand2_q",    "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_q. at(1); else return (0             );")
-
-               .Define("TauCand1_pion1px",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion1px.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion1py",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion1py.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion1pz",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion1pz.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion1q",    "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion1q. at(0); else return (0             );")
-               .Define("TauCand1_pion1d0",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion1d0.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion1z0",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion1z0.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion2px",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion2px.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion2py",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion2py.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion2pz",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion2pz.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion2q",    "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion2q. at(0); else return (0             );")
-               .Define("TauCand1_pion2d0",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion2d0.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion2z0",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion2z0.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion3px",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion3px.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion3py",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion3py.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion3pz",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion3pz.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion3q",    "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion3q. at(0); else return (0             );")
-               .Define("TauCand1_pion3d0",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion3d0.at(0); else return (float(+999.9) );")
-               .Define("TauCand1_pion3z0",   "if (EVT_ThrustEmin_NTau23PiCand>0) return TauCand_hemEmin_pion3z0.at(0); else return (float(+999.9) );")
-
-               .Define("TauCand2_pion1px",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion1px.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion1py",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion1py.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion1pz",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion1pz.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion1q",    "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion1q. at(1); else return (0             );")
-               .Define("TauCand2_pion1d0",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion1d0.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion1z0",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion1z0.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion2px",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion2px.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion2py",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion2py.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion2pz",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion2pz.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion2q",    "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion2q. at(1); else return (0             );")
-               .Define("TauCand2_pion2d0",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion2d0.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion2z0",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion2z0.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion3px",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion3px.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion3py",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion3py.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion3pz",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion3pz.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion3q",    "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion3q. at(1); else return (0             );")
-               .Define("TauCand2_pion3d0",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion3d0.at(1); else return (float(-999.9) );")
-               .Define("TauCand2_pion3z0",   "if (EVT_ThrustEmin_NTau23PiCand>1) return TauCand_hemEmin_pion3z0.at(1); else return (float(-999.9) );")
-
-               .Define("ratio_Emiss",  "(recoEmiss_px * TauCand1_px + recoEmiss_py * TauCand1_py + recoEmiss_pz * TauCand1_pz) / (recoEmiss_p4.P() * TauCand1_p)")
-               .Define("mDiTau_full",  "if (EVT_ThrustEmin_NTau23PiCand>1) return (TauCand_hemEmin_p4.at(0)+TauCand_hemEmin_p4.at(1)+ratio_Emiss*recoEmiss_p4).M(); else return (-9999.9);")
-
-
-               .Define("T1xT2_x",    "TauCand1_py*TauCand2_pz-TauCand1_pz*TauCand2_py")
-               .Define("T1xT2_y",    "TauCand1_pz*TauCand2_px-TauCand1_px*TauCand2_pz")
-               .Define("T1xT2_z",    "TauCand1_px*TauCand2_py-TauCand1_py*TauCand2_px")
-               .Define("T1xEm_x",    "TauCand1_py*recoEmiss_pz-TauCand1_pz*recoEmiss_py")
-               .Define("T1xEm_y",    "TauCand1_pz*recoEmiss_px-TauCand1_px*recoEmiss_pz")
-               .Define("T1xEm_z",    "TauCand1_px*recoEmiss_py-TauCand1_py*recoEmiss_px")
-               .Define("EmxT2_x",    "recoEmiss_py*TauCand2_pz-recoEmiss_pz*TauCand2_py")
-               .Define("EmxT2_y",    "recoEmiss_pz*TauCand2_px-recoEmiss_px*TauCand2_pz")
-               .Define("EmxT2_z",    "recoEmiss_px*TauCand2_py-recoEmiss_py*TauCand2_px")
+               .Define("T1xT2_x",    "diTauPlus_py*diTauMinus_pz-diTauPlus_pz*diTauMinus_py")
+               .Define("T1xT2_y",    "diTauPlus_pz*diTauMinus_px-diTauPlus_px*diTauMinus_pz")
+               .Define("T1xT2_z",    "diTauPlus_px*diTauMinus_py-diTauPlus_py*diTauMinus_px")
+               .Define("T1xEm_x",    "diTauPlus_py*recoEmiss_pz-diTauPlus_pz*recoEmiss_py")
+               .Define("T1xEm_y",    "diTauPlus_pz*recoEmiss_px-diTauPlus_px*recoEmiss_pz")
+               .Define("T1xEm_z",    "diTauPlus_px*recoEmiss_py-diTauPlus_py*recoEmiss_px")
+               .Define("EmxT2_x",    "recoEmiss_py*diTauMinus_pz-recoEmiss_pz*diTauMinus_py")
+               .Define("EmxT2_y",    "recoEmiss_pz*diTauMinus_px-recoEmiss_px*diTauMinus_pz")
+               .Define("EmxT2_z",    "recoEmiss_px*diTauMinus_py-recoEmiss_py*diTauMinus_px")
 
                .Define("T1xT2_M2",   "T1xT2_x * T1xT2_x + T1xT2_y * T1xT2_y + T1xT2_z * T1xT2_z")
                .Define("denom",      "(T1xT2_x + EmxT2_x)*(T1xT2_x + T1xEm_x) + (T1xT2_y + EmxT2_y)*(T1xT2_y + T1xEm_y) + (T1xT2_z + EmxT2_z)*(T1xT2_z + T1xEm_z)")
 
                .Define("mDiTau_collinear3D",    "mDiTau_Vis/sqrt(T1xT2_M2/denom)") 
+
+               #################################
+               ##   Bs2TauTau Vertex approx   ##
+               #################################
+
+               
+               ###############################
+               ##   Had tagger columns      ##
+               ###############################
+               
+               #.Define("RP_e_Emin",              "RP_e     [RP_thrustangle>0]").Redefine("RP_e","RP_e_Emin")
+               #.Define("RP_m_true_Emin",         "RP_m_true[RP_thrustangle>0]").Redefine("RP_m_true","RP_m_true_Emin")
+               #.Define("RP_m_reco_Emin",         "RP_m_reco[RP_thrustangle>0]").Redefine("RP_m_reco","RP_m_reco_Emin")
+               #.Define("RP_px_Emin",             "RP_px    [RP_thrustangle>0]").Redefine("RP_px","RP_px_Emin")
+               #.Define("RP_py_Emin",             "RP_py    [RP_thrustangle>0]").Redefine("RP_py","RP_py_Emin")
+               #.Define("RP_pz_Emin",             "RP_pz    [RP_thrustangle>0]").Redefine("RP_pz","RP_pz_Emin")
+               #.Define("RP_Dphi_Emin",           "RP_phi   [RP_thrustangle>0] - EVT_thrust_phi").Redefine("RP_Dphi","RP_Dphi_Emin")
+               #.Define("RP_Dtheta_Emin",         "RP_theta [RP_thrustangle>0] - EVT_thrust_theta").Redefine("RP_Dtheta","RP_Dtheta_Emin")
+               #.Define("RP_charge_Emin",         "RP_charge[RP_thrustangle>0]").Redefine("RP_charge","RP_charge_Emin")
+               #.Define("RP_fromPV_Emin",         "RP_fromPV[RP_thrustangle>0]").Redefine("RP_fromPV","RP_fromPV_Emin")
+               #.Define("RP_vert_ind_Emin",       "RP_vert_ind [RP_thrustangle>0]").Redefine("RP_vert_ind","RP_vert_ind_Emin")
+               #.Define("RP_vert_e_Emin",         "RP_vert_e   [RP_thrustangle>0]").Redefine("RP_vert_e","RP_vert_e_Emin")
+               #.Define("RP_vert_mass_Emin",      "RP_vert_mass[RP_thrustangle>0]").Redefine("RP_vert_mass","RP_vert_mass_Emin")
+               #.Define("RP_trk_d0_Emin",         "RP_trk_d0       [RP_thrustangle>0]").Redefine("RP_trk_d0","RP_trk_d0_Emin")
+               #.Define("RP_trk_z0_Emin",         "RP_trk_z0       [RP_thrustangle>0]").Redefine("RP_trk_z0","RP_trk_z0_Emin")
+               #.Define("RP_trk_phi_Emin",        "RP_trk_phi      [RP_thrustangle>0]").Redefine("RP_trk_phi","RP_trk_phi_Emin")
+               #.Define("RP_trk_omega_Emin",      "RP_trk_omega    [RP_thrustangle>0]").Redefine("RP_trk_omega","RP_trk_omega_Emin")
+               #.Define("RP_trk_tanLambda_Emin",  "RP_trk_tanLambda[RP_thrustangle>0]").Redefine("RP_trk_tanLambda","RP_trk_tanLambda_Emin")
+               #.Define("RP_dndx_Emin",           "RP_dndx         [RP_thrustangle>0]").Redefine("RP_dndx","RP_dndx_Emin")
+               #.Define("RP_mtof_Emin",           "RP_mtof         [RP_thrustangle>0]").Redefine("RP_mtof","RP_mtof_Emin")
+               #.Define("RP_nMC_Emin",            "RP_nMC   [RP_thrustangle>0]").Redefine("RP_nMC","RP_nMC_Emin")
+               #.Define("RP_MCidx_Emin",          "RP_MCidx [RP_thrustangle>0]").Redefine("RP_MCidx","RP_MCidx_Emin")
+               #.Define("RP_fromBc_Emin",         "RP_fromBc[RP_thrustangle>0]").Redefine("RP_fromBc","RP_fromBc_Emin")
+               #.Define("RP_fromBs_Emin",         "RP_fromBs[RP_thrustangle>0]").Redefine("RP_fromBs","RP_fromBs_Emin")
+               #.Define("RP_fromBu_Emin",         "RP_fromBu[RP_thrustangle>0]").Redefine("RP_fromBu","RP_fromBu_Emin")
+               #.Define("RP_fromBd_Emin",         "RP_fromBd[RP_thrustangle>0]").Redefine("RP_fromBd","RP_fromBd_Emin")
+               #.Define("RP_fromLb_Emin",         "RP_fromLb[RP_thrustangle>0]").Redefine("RP_fromLb","RP_fromLb_Emin")
+               #.Define("RP_thrustangle_Emin",    "RP_thrustangle[RP_thrustangle>0]").Redefine("RP_thrustangle","RP_thrustangle_Emin")
+               #.Define("Vertex_isPV_Emin",       "Vertex_isPV     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_isPV","Vertex_isPV_Emin")
+               #.Define("Vertex_mass_Emin",       "Vertex_mass     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_mass","Vertex_mass_Emin")
+               #.Define("Vertex_px_Emin",         "Vertex_px       [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_px","Vertex_px_Emin")
+               #.Define("Vertex_py_Emin",         "Vertex_py       [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_py","Vertex_py_Emin")
+               #.Define("Vertex_pz_Emin",         "Vertex_pz       [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_pz","Vertex_pz_Emin")
+               #.Define("Vertex_e_Emin",          "Vertex_e        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_e","Vertex_e_Emin")
+               #.Define("Vertex_x_Emin",          "Vertex_x        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_x","Vertex_x_Emin")
+               #.Define("Vertex_y_Emin",          "Vertex_y        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_y","Vertex_y_Emin")
+               #.Define("Vertex_z_Emin",          "Vertex_z        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_z","Vertex_z_Emin")
+               #.Define("Vertex_xErr_Emin",       "Vertex_xErr     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_xErr","Vertex_xErr_Emin")
+               #.Define("Vertex_yErr_Emin",       "Vertex_yErr     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_yErr","Vertex_yErr_Emin")
+               #.Define("Vertex_zErr_Emin",       "Vertex_zErr     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_zErr","Vertex_zErr_Emin")
+               #.Define("Vertex_ntrk_Emin",       "Vertex_ntrk     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_ntrk","Vertex_ntrk_Emin")
+               #.Define("Vertex_chi2_Emin",       "Vertex_chi2     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_chi2","Vertex_chi2_Emin")
+               #.Define("Vertex_d2PV_Emin",       "Vertex_d2PV     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_d2PV","Vertex_d2PV_Emin")
+               #.Define("Vertex_d2PVSig_Emin",    "Vertex_d2PVSig  [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_d2PVSig","Vertex_d2PVSig_Emin")
+               #.Define("Vertex_Dphi_Emin",       "Vertex_phi      [Vertex_thrust_angle>0 || Vertex_isPV==1] - EVT_thrust_phi").Redefine("Vertex_Dphi","Vertex_Dphi_Emin")
+               #.Define("Vertex_Dtheta_Emin",     "Vertex_theta    [Vertex_thrust_angle>0 || Vertex_isPV==1] - EVT_thrust_theta").Redefine("Vertex_Dtheta","Vertex_Dtheta_Emin")
+               #.Define("Vertex_thrustangle_Emin","Vertex_thrust_angle    [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_thrustangle","Vertex_thrustangle_Emin")
+               #.Define("Vertex_fromBc_Emin",     "Vertex_fromBc[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBc","Vertex_fromBc_Emin")
+               #.Define("Vertex_fromBs_Emin",     "Vertex_fromBs[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBs","Vertex_fromBs_Emin")
+               #.Define("Vertex_fromBu_Emin",     "Vertex_fromBu[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBu","Vertex_fromBu_Emin")
+               #.Define("Vertex_fromBd_Emin",     "Vertex_fromBd[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBd","Vertex_fromBd_Emin")
+               #.Define("Vertex_fromLb_Emin",     "Vertex_fromLb[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromLb","Vertex_fromLb_Emin")
+               #.Define("n_Bc_Emin",              "int(genBc_thrustangle[genBc_thrustangle>0].size())").Redefine("n_Bc","n_Bc_Emin")
+               #.Define("n_Bs_Emin",              "int(genBs_thrustangle[genBs_thrustangle>0].size())").Redefine("n_Bs","n_Bs_Emin")
+               #.Define("n_Bu_Emin",              "int(genBu_thrustangle[genBu_thrustangle>0].size())").Redefine("n_Bu","n_Bu_Emin")
+               #.Define("n_Bd_Emin",              "int(genBd_thrustangle[genBd_thrustangle>0].size())").Redefine("n_Bd","n_Bd_Emin")
+               #.Define("n_Lb_Emin",              "int(genLb_thrustangle[genLb_thrustangle>0].size())").Redefine("n_Lb","n_Lb_Emin")
+               #.Define("label_Bc_Emin",          "int(n_Bc_Emin==1 && n_Bs_Emin==0 && n_Bu_Emin==0 && n_Bd_Emin==0 && n_Lb_Emin==0)" ).Redefine("label_Bc","label_Bc_Emin")
+               #.Define("label_Bs_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==1 && n_Bu_Emin==0 && n_Bd_Emin==0 && n_Lb_Emin==0)" ).Redefine("label_Bs","label_Bs_Emin")
+               #.Define("label_Bu_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==0 && n_Bu_Emin==1 && n_Bd_Emin==0 && n_Lb_Emin==0)" ).Redefine("label_Bu","label_Bu_Emin")
+               #.Define("label_Bd_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==0 && n_Bu_Emin==0 && n_Bd_Emin==1 && n_Lb_Emin==0)" ).Redefine("label_Bd","label_Bd")
+               #.Define("label_Lb_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==0 && n_Bu_Emin==0 && n_Bd_Emin==0 && n_Lb_Emin==1)" ).Redefine("label_Lb","label_Lb_Emin")
+               #.Define("label_light_Emin",       "int(n_Bc_Emin==0 && n_Bs_Emin==0 && (n_Bu_Emin>0 || n_Bd_Emin>0) && n_Lb_Emin==0)" ).Redefine("label_light","label_light_Emin")
+               #.Define("label_hasBc_Emin",       "int(n_Bc_Emin>0)" ).Redefine("label_hasBc","label_hasBc_Emin")
+               #.Define("label_has1Bc_Emin",      "int(n_Bc_Emin==1)" ).Redefine("label_has1Bc","label_has1Bc_Emin")
+
+               #Redefine for correct column name for Tagger
 
 
            )
@@ -529,7 +646,6 @@ class RDFanalysis():
                 "n_genBottoms",
                 "genBottom_px", "genBottom_py", "genBottom_pz", "genBottom_eta", "genBottom_phi",
                 "genBottom_energy", "genBottom_mass", "genBottom_pdg",
-                "genBottom_thrustangle",
 
                 "n_genBs",
                 "genBs_px", "genBs_py", "genBs_pz", "genBs_eta", "genBs_phi",
@@ -537,7 +653,6 @@ class RDFanalysis():
                 "genBs_thrustangle",
 
                 "genBs_Vertex_x", "genBs_Vertex_y", "genBs_Vertex_z",
-                "genBs_Vertex_thrustangle",
 
                 "EVT_ThrustEmin_E",            "EVT_ThrustEmax_E",
                 "EVT_ThrustEmin_Echarged",     "EVT_ThrustEmax_Echarged",
@@ -574,42 +689,55 @@ class RDFanalysis():
                 "Vertex_mass",
                 "DV_d0","DV_z0",
 
-                "EVT_MVA1",
-
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
                 "recoEmiss_thrustangle",
 
-                "Tau23PiCandidates_mass", "Tau23PiCandidates_vertex", "Tau23PiCandidates_mcvertex", "Tau23PiCandidates_B",
-                "Tau23PiCandidates_px", "Tau23PiCandidates_py", "Tau23PiCandidates_pz", "Tau23PiCandidates_p", "Tau23PiCandidates_q",
-                "Tau23PiCandidates_d0",  "Tau23PiCandidates_z0","Tau23PiCandidates_anglethrust",
+                "diTauPlus_x","diTauPlus_y","diTauPlus_z","diTauPlus_px","diTauPlus_py","diTauPlus_pz","diTauPlus_p","diTauPlus_mass","diTauPlus_chi2",
+                "diTauMinus_x","diTauMinus_y","diTauMinus_z","diTauMinus_px","diTauMinus_py","diTauMinus_pz","diTauMinus_p","diTauMinus_mass","diTauMinus_chi2",
+                "diTau_Angles",
 
-                "Tau23PiCandidates_x",    "Tau23PiCandidates_y",    "Tau23PiCandidates_z",
-                "Tau23PiCandidates_xErr", "Tau23PiCandidates_yErr", "Tau23PiCandidates_zErr",
-                "Tau23PiCandidates_chi2", "Tau23PiCandidates_pAngles", "Tau23PiCandidates_hemEmin",
+                "diTauPlus_rho1mass","diTauPlus_rho1px","diTauPlus_rho1py","diTauPlus_rho1pz","diTauPlus_rho2px","diTauPlus_rho2py","diTauPlus_rho2pz", 
+                "diTauMinus_rho1mass","diTauMinus_rho1px","diTauMinus_rho1py","diTauMinus_rho1pz","diTauMinus_rho2px","diTauMinus_rho2py","diTauMinus_rho2pz", 
 
-                "Tau23PiCandidates_rho1px", "Tau23PiCandidates_rho1py", "Tau23PiCandidates_rho1pz","Tau23PiCandidates_rho1mass",
-                "Tau23PiCandidates_rho2px", "Tau23PiCandidates_rho2py", "Tau23PiCandidates_rho2pz","Tau23PiCandidates_rho2mass",
 
-                "Tau23PiCandidates_pion1px", "Tau23PiCandidates_pion1py", "Tau23PiCandidates_pion1pz",
-                "Tau23PiCandidates_pion1p", "Tau23PiCandidates_pion1q", "Tau23PiCandidates_pion1d0", "Tau23PiCandidates_pion1z0",
-                "Tau23PiCandidates_pion2px", "Tau23PiCandidates_pion2py", "Tau23PiCandidates_pion2pz",
-                "Tau23PiCandidates_pion2p", "Tau23PiCandidates_pion2q", "Tau23PiCandidates_pion2d0", "Tau23PiCandidates_pion2z0",
-                "Tau23PiCandidates_pion3px", "Tau23PiCandidates_pion3py", "Tau23PiCandidates_pion3pz",
-                "Tau23PiCandidates_pion3p", "Tau23PiCandidates_pion3q", "Tau23PiCandidates_pion3d0", "Tau23PiCandidates_pion3z0",
-              
-                "TauCand1_x",  "TauCand1_y",  "TauCand1_z", "TauCand1_chi2", "TauCand1_thrustangle",
-                "TauCand2_x",  "TauCand2_y",  "TauCand2_z", "TauCand2_chi2", "TauCand2_thrustangle",
-                "TauCand1_px", "TauCand1_py", "TauCand1_pz", "TauCand1_p", "TauCand1_m", "TauCand1_q",
-                "TauCand2_px", "TauCand2_py", "TauCand2_pz", "TauCand2_p", "TauCand2_m", "TauCand2_q",
+               "diTauPlus_pion1px","diTauPlus_pion1py","diTauPlus_pion1pz","diTauPlus_pion1p","diTauPlus_pion1q","diTauPlus_pion1d0","diTauPlus_pion1z0",
+               "diTauPlus_pion2px","diTauPlus_pion2py","diTauPlus_pion2pz","diTauPlus_pion2p","diTauPlus_pion2q","diTauPlus_pion2d0","diTauPlus_pion2z0",
+               "diTauPlus_pion3px","diTauPlus_pion3py","diTauPlus_pion3pz","diTauPlus_pion3p","diTauPlus_pion3q","diTauPlus_pion3d0","diTauPlus_pion3z0",
+               "diTauMinus_pion1px","diTauMinus_pion1py","diTauMinus_pion1pz","diTauMinus_pion1p","diTauMinus_pion1q","diTauMinus_pion1d0","diTauMinus_pion1z0",
+               "diTauMinus_pion2px","diTauMinus_pion2py","diTauMinus_pion2pz","diTauMinus_pion2p","diTauMinus_pion2q","diTauMinus_pion2d0","diTauMinus_pion2z0",
+               "diTauMinus_pion3px","diTauMinus_pion3py","diTauMinus_pion3pz","diTauMinus_pion3p","diTauMinus_pion3q","diTauMinus_pion3d0","diTauMinus_pion3z0",
 
-                "TauCand1_pion1px", "TauCand1_pion1py", "TauCand1_pion1pz", "TauCand1_pion1q", "TauCand1_pion1d0", "TauCand1_pion1z0",
-                "TauCand1_pion2px", "TauCand1_pion2py", "TauCand1_pion2pz", "TauCand1_pion2q", "TauCand1_pion2d0", "TauCand1_pion2z0",
-                "TauCand1_pion3px", "TauCand1_pion3py", "TauCand1_pion3pz", "TauCand1_pion3q", "TauCand1_pion3d0", "TauCand1_pion3z0",
-                "TauCand2_pion1px", "TauCand2_pion1py", "TauCand2_pion1pz", "TauCand2_pion1q", "TauCand2_pion1d0", "TauCand2_pion1z0",
-                "TauCand2_pion2px", "TauCand2_pion2py", "TauCand2_pion2pz", "TauCand2_pion2q", "TauCand2_pion2d0", "TauCand2_pion2z0",
-                "TauCand2_pion3px", "TauCand2_pion3py", "TauCand2_pion3pz", "TauCand2_pion3q", "TauCand2_pion3d0", "TauCand2_pion3z0",
+                #"Tau23PiCandidates_mass", "Tau23PiCandidates_vertex", "Tau23PiCandidates_mcvertex", "Tau23PiCandidates_B",
+                #"Tau23PiCandidates_px", "Tau23PiCandidates_py", "Tau23PiCandidates_pz", "Tau23PiCandidates_p", "Tau23PiCandidates_q",
+                #"Tau23PiCandidates_d0",  "Tau23PiCandidates_z0","Tau23PiCandidates_anglethrust",
 
-                "mDiTau_Vis", "mDiTau_collinear3D",
+                #"Tau23PiCandidates_x",    "Tau23PiCandidates_y",    "Tau23PiCandidates_z",
+                #"Tau23PiCandidates_xErr", "Tau23PiCandidates_yErr", "Tau23PiCandidates_zErr",
+                #"Tau23PiCandidates_chi2", "Tau23PiCandidates_pAngles", "Tau23PiCandidates_hemEmin",
+
+                #"Tau23PiCandidates_rho1px", "Tau23PiCandidates_rho1py", "Tau23PiCandidates_rho1pz","Tau23PiCandidates_rho1mass",
+                #"Tau23PiCandidates_rho2px", "Tau23PiCandidates_rho2py", "Tau23PiCandidates_rho2pz","Tau23PiCandidates_rho2mass",
+
+                #"Tau23PiCandidates_pion1px", "Tau23PiCandidates_pion1py", "Tau23PiCandidates_pion1pz",
+                #"Tau23PiCandidates_pion1p", "Tau23PiCandidates_pion1q", "Tau23PiCandidates_pion1d0", "Tau23PiCandidates_pion1z0",
+                #"Tau23PiCandidates_pion2px", "Tau23PiCandidates_pion2py", "Tau23PiCandidates_pion2pz",
+                #"Tau23PiCandidates_pion2p", "Tau23PiCandidates_pion2q", "Tau23PiCandidates_pion2d0", "Tau23PiCandidates_pion2z0",
+                #"Tau23PiCandidates_pion3px", "Tau23PiCandidates_pion3py", "Tau23PiCandidates_pion3pz",
+                #"Tau23PiCandidates_pion3p", "Tau23PiCandidates_pion3q", "Tau23PiCandidates_pion3d0", "Tau23PiCandidates_pion3z0",
+
+                #"TauCand1_x",  "TauCand1_y",  "TauCand1_z", "TauCand1_chi2", "TauCand1_thrustangle",
+                #"TauCand2_x",  "TauCand2_y",  "TauCand2_z", "TauCand2_chi2", "TauCand2_thrustangle",
+                #"TauCand1_px", "TauCand1_py", "TauCand1_pz", "TauCand1_p", "TauCand1_m", "TauCand1_q",
+                #"TauCand2_px", "TauCand2_py", "TauCand2_pz", "TauCand2_p", "TauCand2_m", "TauCand2_q",
+
+                #"TauCand1_pion1px", "TauCand1_pion1py", "TauCand1_pion1pz", "TauCand1_pion1q", "TauCand1_pion1d0", "TauCand1_pion1z0",
+                #"TauCand1_pion2px", "TauCand1_pion2py", "TauCand1_pion2pz", "TauCand1_pion2q", "TauCand1_pion2d0", "TauCand1_pion2z0",
+                #"TauCand1_pion3px", "TauCand1_pion3py", "TauCand1_pion3pz", "TauCand1_pion3q", "TauCand1_pion3d0", "TauCand1_pion3z0",
+                #"TauCand2_pion1px", "TauCand2_pion1py", "TauCand2_pion1pz", "TauCand2_pion1q", "TauCand2_pion1d0", "TauCand2_pion1z0",
+                #"TauCand2_pion2px", "TauCand2_pion2py", "TauCand2_pion2pz", "TauCand2_pion2q", "TauCand2_pion2d0", "TauCand2_pion2z0",
+                #"TauCand2_pion3px", "TauCand2_pion3py", "TauCand2_pion3pz", "TauCand2_pion3q", "TauCand2_pion3d0", "TauCand2_pion3z0",
+
+                "DeltaM","mDiTau_Vis", "mDiTau_collinear3D",
 
                 #"T1xT2_x", "T1xT2_y", "T1xT2_z",
                 #"T1xEm_x", "T1xEm_y", "T1xEm_z",
@@ -617,6 +745,73 @@ class RDFanalysis():
                 #"T1xT2_M2", "denom",
 
                 "ratio_Emiss", "mDiTau_full",
+
+                #"RP_e",             
+                #"RP_m_true",
+                #"RP_m_reco",
+                #"RP_px", 
+                #"RP_py", 
+                #"RP_pz", 
+                #"RP_Dphi",          
+                #"RP_Dtheta",        
+                #"RP_charge",
+                #"RP_fromPV",
+                #"RP_vert_ind",
+                #"RP_vert_e",
+                #"RP_vert_mass",
+                #"RP_trk_d0",
+                #"RP_trk_z0",
+                #"RP_trk_phi",
+                #"RP_trk_omega",
+                #"RP_trk_tanLambda",
+                #"RP_dndx",
+                #"RP_mtof",
+                #"RP_nMC",   
+                #"RP_MCidx", 
+                #"RP_fromBc",
+                #"RP_fromBs",
+                #"RP_fromBu",
+                #"RP_fromBd",
+                #"RP_fromLb",
+                #"RP_thrustangle",
+                #"Vertex_isPV",
+                #"Vertex_mass", 
+                #"Vertex_px",
+                #"Vertex_py",
+                #"Vertex_pz",
+                #"Vertex_e",
+                #"Vertex_x",   
+                #"Vertex_y",   
+                #"Vertex_z",   
+                #"Vertex_xErr",
+                #"Vertex_yErr",
+                #"Vertex_zErr",
+                #"Vertex_ntrk",      
+                #"Vertex_chi2",      
+                #"Vertex_d2PV",
+                #"Vertex_d2PVSig",
+                #"Vertex_Dphi",      
+                #"Vertex_Dtheta",    
+                #"Vertex_thrustangle",
+                #"Vertex_fromBc",
+                #"Vertex_fromBs",
+                #"Vertex_fromBu",
+                #"Vertex_fromBd",
+                #"Vertex_fromLb",
+
+                #"n_Bc",             
+                #"n_Bs",             
+                #"n_Bu",             
+                #"n_Bd",             
+                #"n_Lb",       
+                #"label_Bc",    
+                #"label_Bs",   
+                #"label_Bu",   
+                #"label_Bd",   
+                #"label_Lb",   
+                #"label_light",
+                #"label_hasBc",
+                #"label_has1Bc",
 
                 ]
         return branchList

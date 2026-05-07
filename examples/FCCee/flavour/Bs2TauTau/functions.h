@@ -290,8 +290,9 @@ ROOT::VecOps::RVec<TLorentzVector> build_p4(ROOT::VecOps::RVec<float> px, ROOT::
 //  return result;
 //}
 
-
+//===================================================================================================================================================================
 //A set of functions to compute the angle between two tau vertices/momenta and then select pairs of tau candidates based on that angle
+//===================================================================================================================================================================
 
 float Compute_CosTheta(float axis_x, float axis_y, float axis_z, float x, float y, float z){
     float num = axis_x*x + axis_y*y + axis_z*z;
@@ -318,8 +319,90 @@ bool CloseEnough(ROOT::VecOps::RVec<float> in, float cut_low, float cut_high){
     else return true;
 }
 
+ROOT::VecOps::RVec<float> Compute_Momenta_Angles(int NTauCand, ROOT::VecOps::RVec<float> Tau_x, ROOT::VecOps::RVec<float> Tau_y, ROOT::VecOps::RVec<float> Tau_z){
 
+    ROOT::VecOps::RVec<float> result; 
+    for (size_t i=0;i<NTauCand;++i){
+        for (size_t j=i+1;j<NTauCand;++j) result.push_back(Compute_CosTheta(Tau_x[i],Tau_y[i],Tau_z[i],Tau_x[j],Tau_y[j],Tau_z[j]));
+    } return result;
+}
+
+float Compute_Momenta_Angles(float Tau1_x, float Tau1_y, float Tau1_z, float Tau2_x, float Tau2_y, float Tau2_z){
+
+    return Compute_CosTheta(Tau1_x,Tau1_y,Tau1_z,Tau2_x,Tau2_y,Tau2_z);
+}
+
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> ID_Angles(int NTauCand){
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+    for (size_t i = 0; i<NTauCand; ++i){
+        for (size_t j = i+1; j<NTauCand; ++j){
+            ROOT::VecOps::RVec<int> Pass;
+            Pass.push_back(i);
+            Pass.push_back(j);
+            result.push_back(Pass);
+        }
+    }
+    return result;
+}
+
+ROOT::VecOps::RVec<int> Find_diTau (int NTau23Pi, ROOT::VecOps::RVec<float> Taus_MomentaAngles, ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> IDs, ROOT::VecOps::RVec<int> Taus_q){
+
+    ROOT::VecOps::RVec<int> diTau;
+
+    if (NTau23Pi<2){  //Discarded, cannot do anything without at least 2 candidates
+        return diTau;
+    }
+
+    else if (NTau23Pi==2){  //Check if in the same hemisphere and opposite charge, otherwise discarded
+        if (Taus_MomentaAngles[0] < 0 || Taus_q[0]*Taus_q[1] > 0){
+            return diTau;
+        }
+        else {
+            diTau.push_back(IDs[0][0]);
+            diTau.push_back(IDs[0][1]);
+            return diTau;
+        }
+    }
+    
+    else{  //Check all the angles, Selects the biggest cosine then check if opposite sign if same sign move on to the next angle until cos < 0
+        
+        bool swapped; //Order the angles list and rearange the angle IDs list in the same way (easier to select the angle in case the q are not opposite)
+        do{
+            swapped = false;
+            for (int i=1; i<NTau23Pi; ++i){
+                if (Taus_MomentaAngles[i-1] > Taus_MomentaAngles[i]){
+                    
+                    float tempa (Taus_MomentaAngles[i]);
+                    ROOT::VecOps::RVec<int> tempi (IDs[i]);
+
+                    Taus_MomentaAngles[i]   = Taus_MomentaAngles[i-1];
+                    Taus_MomentaAngles[i-1] = tempa;
+
+                    IDs[i]   = IDs[i-1];
+                    IDs[i-1] = tempi;
+
+                    swapped = true;
+                }
+            }
+        } while (swapped);
+        
+        for (int i=NTau23Pi-1;i>=0;--i){
+            if (Taus_MomentaAngles[i] < 0 || Taus_q[IDs[i][0]]*Taus_q[IDs[i][1]] > 0) continue; //Could check directly that the maximum cosine is negative and get out of the function, the maximum cosine will always be positive since starting from 3 candidates two are always found on the same side
+            else{
+                diTau.push_back(IDs[i][0]);
+                diTau.push_back(IDs[i][1]);
+                break;
+            }
+        }
+        return diTau;
+    }
+}
+
+
+
+//===================================================================================================================================================================
 //----------------- Select specific tau decays to analyse exclusive tau decay channels --------------------------------------------------
+//===================================================================================================================================================================
 
 //Get the gen Bs2TauTau + additional photons (used as a basis to then look for the exclusive tau decays)
 ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau(ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter){
@@ -1149,6 +1232,247 @@ int Find_Categories(ROOT::VecOps::RVec<int> MuFamily){
         else return 7;
     }
 
+}
+
+//==============================================================================================================================================================================================================================================================================
+// HADRON TAGGER UTIL FUNCTIONS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//==============================================================================================================================================================================================================================================================================
+
+ROOT::VecOps::RVec<TLorentzVector> get_Vertex_p4(ROOT::VecOps::RVec<VertexingUtils::FCCAnalysesVertex> vertex,
+                                                   ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+  ROOT::VecOps::RVec<TLorentzVector> result;
+  for (auto &p:vertex){
+    ROOT::VecOps::RVec<int> reco_ind = p.reco_ind;
+    TLorentzVector tlv = myUtils::build_tlv(reco, reco_ind);
+    result.push_back(tlv);
+  }
+  return result;
+}
+
+ROOT::VecOps::RVec<int> get_RP_isfromPV(ROOT::VecOps::RVec<VertexingUtils::FCCAnalysesVertex> vertex,
+                                                   ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+  ROOT::VecOps::RVec<int> result;
+  result.resize(reco.size(),-1);
+  for (auto &p:vertex){ 
+    ROOT::VecOps::RVec<int> reco_ind = p.reco_ind;
+    if (p.vertex.primary == 1)
+	    for (size_t j = 0; j < reco_ind.size(); ++j)
+		    result[reco_ind.at(j)] = 1;
+    else
+            for (size_t j = 0; j < reco_ind.size(); ++j)
+                    result[reco_ind.at(j)] = 2;
+  }
+  // return -1 for not belonging to any vertex, 1 for PV, 2 for SV 
+  return result;
+}
+
+ROOT::VecOps::RVec<int> get_RP_Vert_Ind(ROOT::VecOps::RVec<VertexingUtils::FCCAnalysesVertex> vertex,
+                                        ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco){
+
+  ROOT::VecOps::RVec<int> result;
+  result.resize(reco.size(),-1);
+  for (size_t iv = 0; iv < vertex.size(); ++iv){
+    auto & p = vertex[iv];
+    ROOT::VecOps::RVec<int> reco_ind = p.reco_ind;
+    for (size_t ip=0;ip<reco_ind.size();ip++){
+	result[reco_ind.at(ip)] = iv;
+    }
+  }
+  // return number of descendants from a given set of ancestors
+  return result;
+}
+
+ROOT::VecOps::RVec<float> get_RP_dndx(ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> in,
+                                      ROOT::VecOps::RVec<edm4hep::Quantity> dNdx,       // ETrackFlow_2
+                                      ROOT::VecOps::RVec<edm4hep::TrackData> trackdata) // Eflowtrack
+{
+  ROOT::VecOps::RVec<float> result;
+  for (auto & p: in)
+  {
+    if (p.tracks_begin<trackdata.size() && p.charge!=0)
+	result.push_back(dNdx.at(trackdata.at(p.tracks_begin).dxQuantities_begin).value / 1000.);
+    else
+	result.push_back(-9.);
+  }
+  return result;
+}
+
+ROOT::VecOps::RVec<float> get_RP_mtof(ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> in,
+                                      ROOT::VecOps::RVec<float> track_L,
+                                      ROOT::VecOps::RVec<edm4hep::TrackData> trackdata,
+                                      ROOT::VecOps::RVec<edm4hep::TrackerHitData> trackerhits,
+                                      ROOT::VecOps::RVec<edm4hep::ClusterData> gammadata,
+                                      ROOT::VecOps::RVec<edm4hep::ClusterData> nhdata,
+                                      ROOT::VecOps::RVec<edm4hep::CalorimeterHitData> calohits,
+                                      TLorentzVector V) // primary vertex posotion and time in mm)
+{
+    ROOT::VecOps::RVec<float>  result;
+    for (int j = 0; j < in.size(); ++j)
+    {
+      //if (in.at(j).clusters_begin < nhdata.size() + gammadata.size()) // condition in original code. charge particles have cluster begin 0, why not exclude? Ask Michele. 
+      if (in.at(j).charge == 0 and in.at(j).clusters_begin < nhdata.size() + gammadata.size())
+      {
+        if (in.at(j).type == 130)
+        {
+          // this assumes that in converter photons are filled first and nh after
+          float T = calohits.at(nhdata.at(in.at(j).clusters_begin - gammadata.size()).hits_begin).time;
+          float X = calohits.at(nhdata.at(in.at(j).clusters_begin - gammadata.size()).hits_begin).position.x;
+          float Y = calohits.at(nhdata.at(in.at(j).clusters_begin - gammadata.size()).hits_begin).position.y;
+          float Z = calohits.at(nhdata.at(in.at(j).clusters_begin - gammadata.size()).hits_begin).position.z;
+
+          float tof = T;
+          // compute path length wrt to PV
+          float L = std::sqrt((X - V.X()) * (X - V.X()) + (Y - V.Y()) * (Y - V.Y()) + (Z - V.Z()) * (Z - V.Z())) * 0.001;
+          // std::cout << "tof n: " << T << "  -  L: " << L << std::endl;
+          float beta = L / (tof * 2.99792458e+8);
+          float E = in.at(j).energy;
+          // std::cout << "tof: " << tof << " - L: " << L << " - beta: " << beta << " - energy: " << E <<" - true PID: "<<abs(pids.at(j))<<std::endl;
+          if (beta < 1. && beta > 0.)
+          {
+            result.push_back(E * std::sqrt(1 - beta * beta));
+            // std::cout << "mtof n:" << E * std::sqrt(1-beta*beta)<< std::endl;
+          }
+          else
+          {
+            // std::cout << "problem" << std::endl;
+            result.push_back((-9.));
+          }
+        }
+        else if (in.at(j).type == 22)
+        {
+          result.push_back((0.));
+        }
+	else
+	{
+          result.push_back((-8.));
+        }
+      }
+
+      else if (in.at(j).charge != 0 and in.at(j).tracks_begin < trackdata.size())
+      {
+        if (abs(in.at(j).charge) > 0 and abs(in.at(j).mass - 0.000510999) < 1.e-05)
+        {
+          result.push_back(0.000510999);
+        }
+        else if (abs(in.at(j).charge) > 0 and abs(in.at(j).mass - 0.105658) < 1.e-03)
+        {
+          result.push_back(0.105658);
+        }
+        else
+        {
+
+          // this is the time of the track origin from MC
+          // float Tin = trackerhits.at(trackdata.at(in.at(j).tracks_begin).trackerHits_begin).time;
+
+          // time given by primary vertex
+          float Tin = V.T() * 1e-3 / 2.99792458e+8;
+
+          float Tout = trackerhits.at(trackdata.at(in.at(j).tracks_begin).trackerHits_end - 1).time; // one track and 3 hits per recon. particle are assumed
+          float tof = (Tout - Tin);
+
+          // TODO: path length will have to be re-calculated from vertex position
+          float L = track_L.at(in.at(j).tracks_begin) * 0.001;
+          // std::cout << "tof: " << tof << "  -  L: " << L << std::endl;
+          float beta = L / (tof * 2.99792458e+8);
+          float p = std::sqrt(in.at(j).momentum.x * in.at(j).momentum.x + in.at(j).momentum.y * in.at(j).momentum.y + in.at(j).momentum.z * in.at(j).momentum.z);
+          // std::cout << "tof: " << tof << " - L: " << L << " - beta: " << beta << " - momentum: " << p << " - mtof: " << p * std::sqrt(1/(beta*beta)-1) << std::endl;
+          if (beta < 1. && beta > 0.)
+          {
+            result.push_back(p * std::sqrt(1 / (beta * beta) - 1));
+          }
+          else
+          {
+            result.push_back(0.13957039);
+          }
+        }
+      }
+      else // cluster or track out of range
+      {
+	    result.push_back(-7.);
+      }
+    }
+    return result;
+}
+
+ROOT::VecOps::RVec<int> getRP2MC_nMC(ROOT::VecOps::RVec<int> recind,
+                                            ROOT::VecOps::RVec<int> mcind,
+                                            ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco) {
+
+  ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> result;
+  for (size_t i=0; i<reco.size();i++) {
+    ROOT::VecOps::RVec<int> tmp;
+    result.push_back(tmp);
+  }
+
+  for (size_t i=0; i<recind.size();i++) {
+    result[recind.at(i)].push_back(mcind.at(i));
+  }
+
+  ROOT::VecOps::RVec<int> count;
+  for (size_t i=0; i<reco.size();i++) {
+    count.push_back(int(result[i].size()));
+  }
+
+  return count;
+}
+
+struct get_RP_isDescendant {
+    get_RP_isDescendant(int arg_pdg, bool arg_chargeconjugate);
+    int m_pdg = 13;
+    bool m_chargeconjugate = true;
+    ROOT::VecOps::RVec<int>  operator() (ROOT::VecOps::RVec<int> reco_mcidx, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> ind);
+};
+
+
+get_RP_isDescendant::get_RP_isDescendant(int arg_pdg, bool arg_chargeconjugate) : m_pdg(arg_pdg), m_chargeconjugate( arg_chargeconjugate )  {};
+ROOT::VecOps::RVec<int> get_RP_isDescendant::operator() (ROOT::VecOps::RVec<int> reco_mcidx,
+		                                         ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> ind ) {
+
+
+  //first find all stable decay descendants
+  ROOT::VecOps::RVec<int> descd;
+  for (size_t i = 0; i < in.size(); ++i) {
+    auto & p = in[i];
+    if ( m_chargeconjugate ) {
+        if ( std::abs( p.PDG ) == std::abs( m_pdg)  ) {
+		std::vector<int> rr = MCParticle::get_list_of_stable_particles_from_decay( i, in, ind) ;
+		descd.insert( descd.end(), rr.begin(), rr.end() );
+	}
+    }
+    else {
+        if ( p.PDG == m_pdg ) {
+		std::vector<int> rr = MCParticle::get_list_of_stable_particles_from_decay( i, in, ind) ;
+                descd.insert( descd.end(), rr.begin(), rr.end() );
+	}
+    }
+  }
+
+  //then check for reco if they are matched to any
+  ROOT::VecOps::RVec<int> result;
+  result.resize(reco_mcidx.size(), 0);
+  for (size_t i = 0; i < reco_mcidx.size(); ++i)
+	  if(std::find(descd.begin(), descd.end(), reco_mcidx[i]) != descd.end())
+		  result[i] = 1;
+
+  return result;  
+}
+
+ROOT::VecOps::RVec<int> get_Vertex_containDescendant(ROOT::VecOps::RVec<VertexingUtils::FCCAnalysesVertex> vertex,
+                                                     ROOT::VecOps::RVec<int> rp_isDescendant){
+
+  ROOT::VecOps::RVec<int> result;
+  for (auto &p:vertex){
+    ROOT::VecOps::RVec<int> reco_ind = p.reco_ind;
+    int contain = 0;
+    for (size_t i=0;i<reco_ind.size();i++){
+	contain += rp_isDescendant[reco_ind.at(i)];   
+    }
+    result.push_back(contain);
+  }
+  // return number of descendants from a given set of ancestors
+  return result;
 }
 
 }}
