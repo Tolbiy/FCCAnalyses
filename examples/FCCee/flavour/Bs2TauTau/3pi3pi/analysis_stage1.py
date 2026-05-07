@@ -194,30 +194,30 @@ class RDFanalysis():
                #############################################
                ##         Build vertex variables          ##
                #############################################
-               .Define("Vertex_x",        "myUtils::get_Vertex_x(VertexObject)")
-               .Define("Vertex_y",        "myUtils::get_Vertex_y(VertexObject)")
-               .Define("Vertex_z",        "myUtils::get_Vertex_z(VertexObject)")
-               .Define("Vertex_xErr",     "myUtils::get_Vertex_xErr(VertexObject)")
-               .Define("Vertex_yErr",     "myUtils::get_Vertex_yErr(VertexObject)")
-               .Define("Vertex_zErr",     "myUtils::get_Vertex_zErr(VertexObject)")
+               .Define("Vertex_x_pre",        "myUtils::get_Vertex_x(VertexObject)")
+               .Define("Vertex_y_pre",        "myUtils::get_Vertex_y(VertexObject)")
+               .Define("Vertex_z_pre",        "myUtils::get_Vertex_z(VertexObject)")
+               .Define("Vertex_xErr_pre",     "myUtils::get_Vertex_xErr(VertexObject)")
+               .Define("Vertex_yErr_pre",     "myUtils::get_Vertex_yErr(VertexObject)")
+               .Define("Vertex_zErr_pre",     "myUtils::get_Vertex_zErr(VertexObject)")
 
-               .Define("Vertex_chi2",     "myUtils::get_Vertex_chi2(VertexObject)")
+               .Define("Vertex_chi2_pre",     "myUtils::get_Vertex_chi2(VertexObject)")
                .Define("Vertex_mcind",    "myUtils::get_Vertex_indMC(VertexObject)")
                .Define("Vertex_ind",      "myUtils::get_Vertex_ind(VertexObject)")
-               .Define("Vertex_isPV",     "myUtils::get_Vertex_isPV(VertexObject)")
-               .Define("Vertex_ntrk",     "myUtils::get_Vertex_ntracks(VertexObject)")
-               .Define("Vertex_n",        "int(Vertex_x.size())")
-               .Define("Vertex_mass",     "myUtils::get_Vertex_mass(VertexObject,RecoPartPIDAtVertex)")
+               .Define("Vertex_isPV_pre",     "myUtils::get_Vertex_isPV(VertexObject)")
+               .Define("Vertex_ntrk_pre",     "myUtils::get_Vertex_ntracks(VertexObject)")
+               .Define("Vertex_n",        "int(Vertex_x_pre.size())")
+               .Define("Vertex_mass_pre",     "myUtils::get_Vertex_mass(VertexObject,RecoPartPIDAtVertex)")
                .Define("Vertex_p4",       "FCCAnalyses::ZHfunctions::get_Vertex_p4(VertexObject,RecoPartPIDAtVertex)")
-               .Define("Vertex_px",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Px());} return result;")
-               .Define("Vertex_py",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Py());} return result;")
-               .Define("Vertex_pz",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Pz());} return result;")
-               .Define("Vertex_e",        "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.E ());} return result;")
-               .Define("Vertex_vec",      "FCCAnalyses::ZHfunctions::build_p4(Vertex_x, Vertex_y, Vertex_z, Vertex_mass)")
+               .Define("Vertex_px_pre",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Px());} return result;")
+               .Define("Vertex_py_pre",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Py());} return result;")
+               .Define("Vertex_pz_pre",       "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.Pz());} return result;")
+               .Define("Vertex_e_pre",        "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_p4) {result.push_back(p.E ());} return result;")
+               .Define("Vertex_vec",      "FCCAnalyses::ZHfunctions::build_p4(Vertex_x_pre, Vertex_y_pre, Vertex_z_pre, Vertex_mass_pre)")
                .Define("Vertex_phi",      "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_vec) {result.push_back(p.Phi());} return result;")
                .Define("Vertex_theta",    "ROOT::VecOps::RVec<float> result; for (auto & p: Vertex_vec) {result.push_back(p.Theta());} return result;")
 
-               .Define("Vertex_d2PV",     "myUtils::get_Vertex_d2PV(VertexObject,-1)")
+               .Define("Vertex_d2PV_pre",     "myUtils::get_Vertex_d2PV(VertexObject,-1)")
                .Define("Vertex_d2PVx",    "myUtils::get_Vertex_d2PV(VertexObject,0)")
                .Define("Vertex_d2PVy",    "myUtils::get_Vertex_d2PV(VertexObject,1)")
                .Define("Vertex_d2PVz",    "myUtils::get_Vertex_d2PV(VertexObject,2)")
@@ -227,7 +227,7 @@ class RDFanalysis():
                .Define("Vertex_d2PVyErr", "myUtils::get_Vertex_d2PVError(VertexObject,1)")
                .Define("Vertex_d2PVzErr", "myUtils::get_Vertex_d2PVError(VertexObject,2)")
 
-               .Define("Vertex_d2PVSig",  "Vertex_d2PV/Vertex_d2PVErr")
+               .Define("Vertex_d2PVSig_pre",  "Vertex_d2PV_pre/Vertex_d2PVErr")
                .Define("Vertex_d2PVxSig", "Vertex_d2PVx/Vertex_d2PVxErr")
                .Define("Vertex_d2PVySig", "Vertex_d2PVy/Vertex_d2PVyErr")
                .Define("Vertex_d2PVzSig", "Vertex_d2PVz/Vertex_d2PVzErr")
@@ -237,9 +237,9 @@ class RDFanalysis():
                .Define("Vertex_d2MCy",    "myUtils::get_Vertex_d2MC(VertexObject,MCVertexObject,Vertex_mcind,1)")
                .Define("Vertex_d2MCz",    "myUtils::get_Vertex_d2MC(VertexObject,MCVertexObject,Vertex_mcind,2)")
 
-               .Define("EVT_dPV2DVmin",   "myUtils::get_dPV2DV_min(Vertex_d2PV)")
-               .Define("EVT_dPV2DVmax",   "myUtils::get_dPV2DV_max(Vertex_d2PV)")
-               .Define("EVT_dPV2DVave",   "myUtils::get_dPV2DV_ave(Vertex_d2PV)")
+               .Define("EVT_dPV2DVmin",   "myUtils::get_dPV2DV_min(Vertex_d2PV_pre)")
+               .Define("EVT_dPV2DVmax",   "myUtils::get_dPV2DV_max(Vertex_d2PV_pre)")
+               .Define("EVT_dPV2DVave",   "myUtils::get_dPV2DV_ave(Vertex_d2PV_pre)")
 
                #############################################
                ##        Build Tau -> 3Pi candidates      ##
@@ -256,55 +256,57 @@ class RDFanalysis():
                #############################################
                ##              Get RECO info              ##
                #############################################
-               .Define("RP_e",              "ReconstructedParticle::get_e(RecoPartPIDAtVertex)")
-               .Define("RP_m_true",         "ReconstructedParticle::get_mass(RecoPartPIDAtVertex)")
-               .Define("RP_m_reco",         "ReconstructedParticle::get_mass(ReconstructedParticles)")
-               .Define("RP_px",             "ReconstructedParticle::get_px(RecoPartPIDAtVertex)")
-               .Define("RP_py",             "ReconstructedParticle::get_py(RecoPartPIDAtVertex)")
-               .Define("RP_pz",             "ReconstructedParticle::get_pz(RecoPartPIDAtVertex)")
+               .Define("RP_e_pre",              "ReconstructedParticle::get_e(RecoPartPIDAtVertex)")
+               .Define("RP_m_true_pre",         "ReconstructedParticle::get_mass(RecoPartPIDAtVertex)")
+               .Define("RP_m_reco_pre",         "ReconstructedParticle::get_mass(ReconstructedParticles)")
+               .Define("RP_px_pre",             "ReconstructedParticle::get_px(RecoPartPIDAtVertex)")
+               .Define("RP_py_pre",             "ReconstructedParticle::get_py(RecoPartPIDAtVertex)")
+               .Define("RP_pz_pre",             "ReconstructedParticle::get_pz(RecoPartPIDAtVertex)")
                .Define("RP_eta",            "ReconstructedParticle::get_eta(RecoPartPIDAtVertex)")
                .Define("RP_phi",            "ReconstructedParticle::get_phi(RecoPartPIDAtVertex)")
                .Define("RP_theta",          "ReconstructedParticle::get_theta(RecoPartPIDAtVertex)")
-               .Define("RP_charge",         "ReconstructedParticle::get_charge(RecoPartPIDAtVertex)")
-               .Define("RP_fromPV",         "FCCAnalyses::ZHfunctions::get_RP_isfromPV(VertexObject,RecoPartPIDAtVertex)")
-               .Define("RP_vert_ind",       "FCCAnalyses::ZHfunctions::get_RP_Vert_Ind(VertexObject,RecoPartPIDAtVertex)")
-               .Define("RP_vert_e",         "ROOT::VecOps::RVec<float> result; for (auto & i: RP_vert_ind) {if (i==-1) result.push_back(-1); else result.push_back(Vertex_e.at(i));} return result;")
-               .Define("RP_vert_mass",      "ROOT::VecOps::RVec<float> result; for (auto & i: RP_vert_ind) {if (i==-1) result.push_back(-1); else result.push_back(Vertex_mass.at(i));} return result;")
+               .Define("RP_charge_pre",         "ReconstructedParticle::get_charge(RecoPartPIDAtVertex)")
+               .Define("RP_fromPV_pre",         "FCCAnalyses::ZHfunctions::get_RP_isfromPV(VertexObject,RecoPartPIDAtVertex)")
+               .Define("RP_vert_ind_pre",       "FCCAnalyses::ZHfunctions::get_RP_Vert_Ind(VertexObject,RecoPartPIDAtVertex)")
+               .Define("RP_vert_e_pre",         "ROOT::VecOps::RVec<float> result; for (auto & i: RP_vert_ind_pre) {if (i==-1) result.push_back(-1); else result.push_back(Vertex_e_pre.at(i));} return result;")
+               .Define("RP_vert_mass_pre",      "ROOT::VecOps::RVec<float> result; for (auto & i: RP_vert_ind_pre) {if (i==-1) result.push_back(-1); else result.push_back(Vertex_mass_pre.at(i));} return result;")
 
-               .Define("RP_trk_d0",         "ReconstructedParticle2Track::getRP2TRK_D0       (RecoPartPIDAtVertex,EFlowTrack_1)")
-               .Define("RP_trk_z0",         "ReconstructedParticle2Track::getRP2TRK_Z0       (RecoPartPIDAtVertex,EFlowTrack_1)")
-               .Define("RP_trk_phi",        "ReconstructedParticle2Track::getRP2TRK_phi      (RecoPartPIDAtVertex,EFlowTrack_1)")
-               .Define("RP_trk_omega",      "ReconstructedParticle2Track::getRP2TRK_omega    (RecoPartPIDAtVertex,EFlowTrack_1)")
-               .Define("RP_trk_tanLambda",  "ReconstructedParticle2Track::getRP2TRK_tanLambda(RecoPartPIDAtVertex,EFlowTrack_1)")
-               .Define("RP_dndx",           "FCCAnalyses::ZHfunctions::get_RP_dndx(RecoPartPIDAtVertex, EFlowTrack_2, EFlowTrack)")
-               .Define("RP_mtof",           "FCCAnalyses::ZHfunctions::get_RP_mtof(RecoPartPIDAtVertex, EFlowTrack_L, EFlowTrack, TrackerHits, EFlowPhoton, EFlowNeutralHadron, CalorimeterHits, MC_PV_xyzt)")
+               .Define("RP_trk_d0_pre",         "ReconstructedParticle2Track::getRP2TRK_D0       (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_z0_pre",         "ReconstructedParticle2Track::getRP2TRK_Z0       (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_phi_pre",        "ReconstructedParticle2Track::getRP2TRK_phi      (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_omega_pre",      "ReconstructedParticle2Track::getRP2TRK_omega    (RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_trk_tanLambda_pre",  "ReconstructedParticle2Track::getRP2TRK_tanLambda(RecoPartPIDAtVertex,EFlowTrack_1)")
+               .Define("RP_dndx_pre",           "FCCAnalyses::ZHfunctions::get_RP_dndx(RecoPartPIDAtVertex, EFlowTrack_2, EFlowTrack)")
+               .Define("RP_mtof_pre",           "FCCAnalyses::ZHfunctions::get_RP_mtof(RecoPartPIDAtVertex, EFlowTrack_L, EFlowTrack, TrackerHits, EFlowPhoton, EFlowNeutralHadron, CalorimeterHits, MC_PV_xyzt)")
 
                ###################################################
                ##    check MC mathc with certain decay chains   ##
                ###################################################
 
-               .Define("RP_nMC",        "FCCAnalyses::ZHfunctions::getRP2MC_nMC(MCRecoAssociations0,MCRecoAssociations1,RecoPartPIDAtVertex)")
-               .Define("RP_MCidx",      "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0,MCRecoAssociations1,RecoPartPIDAtVertex)")
-               .Define("RP_fromBc",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(541, true)(RP_MCidx, Particle, Particle1)")
-               .Define("RP_fromBs",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(531, true)(RP_MCidx, Particle, Particle1)")
-               .Define("RP_fromBu",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(521, true)(RP_MCidx, Particle, Particle1)")
-               .Define("RP_fromBd",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(511, true)(RP_MCidx, Particle, Particle1)")
-               .Define("RP_fromLb",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(5122, true)(RP_MCidx, Particle, Particle1)")
+               .Define("RP_nMC_pre",        "FCCAnalyses::ZHfunctions::getRP2MC_nMC(MCRecoAssociations0,MCRecoAssociations1,RecoPartPIDAtVertex)")
+               .Define("RP_MCidx_pre",      "ReconstructedParticle2MC::getRP2MC_index(MCRecoAssociations0,MCRecoAssociations1,RecoPartPIDAtVertex)")
+               .Define("RP_fromBc_pre",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(541, true)(RP_MCidx_pre, Particle, Particle1)")
+               .Define("RP_fromBs_pre",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(531, true)(RP_MCidx_pre, Particle, Particle1)")
+               .Define("RP_fromBu_pre",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(521, true)(RP_MCidx_pre, Particle, Particle1)")
+               .Define("RP_fromBd_pre",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(511, true)(RP_MCidx_pre, Particle, Particle1)")
+               .Define("RP_fromLb_pre",     "FCCAnalyses::ZHfunctions::get_RP_isDescendant(5122, true)(RP_MCidx_pre, Particle, Particle1)")
 
-               .Define("Vertex_fromBc", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBc)")
-               .Define("Vertex_fromBs", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBs)")
-               .Define("Vertex_fromBu", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBu)")
-               .Define("Vertex_fromBd", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBd)")
-               .Define("Vertex_fromLb", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromLb)")
+               .Define("Vertex_fromBc_pre", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBc_pre)")
+               .Define("Vertex_fromBs_pre", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBs_pre)")
+               .Define("Vertex_fromBu_pre", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBu_pre)")
+               .Define("Vertex_fromBd_pre", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromBd_pre)")
+               .Define("Vertex_fromLb_pre", "FCCAnalyses::ZHfunctions::get_Vertex_containDescendant(VertexObject, RP_fromLb_pre)")
 
                #############################################
                ##              Build the thrust           ##
                #############################################
 
-               .Define("EVT_thrustNP",      'Algorithms::minimize_thrust("Minuit2","Migrad")(RP_px, RP_py, RP_pz)')
-               .Define("RP_thrustangleNP",  'Algorithms::getAxisCosTheta(EVT_thrustNP, RP_px, RP_py, RP_pz)')
-               .Define("EVT_thrust",        'Algorithms::getThrustPointing(1.)(RP_thrustangleNP, RP_e, EVT_thrustNP)')
-               .Define("RP_thrustangle",    'Algorithms::getAxisCosTheta(EVT_thrust, RP_px, RP_py, RP_pz)')
+               .Define("EVT_thrustNP",      'Algorithms::minimize_thrust("Minuit2","Migrad")(RP_px_pre, RP_py_pre, RP_pz_pre)')
+               .Define("RP_thrustangleNP",  'Algorithms::getAxisCosTheta(EVT_thrustNP, RP_px_pre, RP_py_pre, RP_pz_pre)')
+               .Define("EVT_thrust",        'Algorithms::getThrustPointing(1.)(RP_thrustangleNP, RP_e_pre, EVT_thrustNP)')
+               .Define("RP_thrustangle_pre",    'Algorithms::getAxisCosTheta(EVT_thrust, RP_px_pre, RP_py_pre, RP_pz_pre)')
+               .Define("EVT_thrust_phi",    'FCCAnalyses::ZHfunctions::getAxisPhi(EVT_thrust)')
+               .Define("EVT_thrust_theta",  'FCCAnalyses::ZHfunctions::getAxisTheta(EVT_thrust)')
 
 
                #############################################
@@ -323,12 +325,12 @@ class RDFanalysis():
                #############################################
                ##hemis0 == negative angle == max energy hemisphere if pointing
                ##hemis1 == positive angle == min energy hemisphere if pointing
-               .Define("EVT_thrusthemis0_n",    "Algorithms::getAxisN(0)(RP_thrustangle, RP_charge)")
-               .Define("EVT_thrusthemis1_n",    "Algorithms::getAxisN(1)(RP_thrustangle, RP_charge)")
-               .Define("EVT_thrusthemis0_e",    "Algorithms::getAxisEnergy(0)(RP_thrustangle, RP_charge, RP_e)")
-               .Define("EVT_thrusthemis1_e",    "Algorithms::getAxisEnergy(1)(RP_thrustangle, RP_charge, RP_e)")
-               .Define("EVT_thrusthemis0_p",    "Algorithms::getAxisMomentum(0)(RP_thrustangle, RP_px, RP_py, RP_pz)")
-               .Define("EVT_thrusthemis1_p",    "Algorithms::getAxisMomentum(1)(RP_thrustangle, RP_px, RP_py, RP_pz)")
+               .Define("EVT_thrusthemis0_n",    "Algorithms::getAxisN(0)(RP_thrustangle_pre, RP_charge_pre)")
+               .Define("EVT_thrusthemis1_n",    "Algorithms::getAxisN(1)(RP_thrustangle_pre, RP_charge_pre)")
+               .Define("EVT_thrusthemis0_e",    "Algorithms::getAxisEnergy(0)(RP_thrustangle_pre, RP_charge_pre, RP_e_pre)")
+               .Define("EVT_thrusthemis1_e",    "Algorithms::getAxisEnergy(1)(RP_thrustangle_pre, RP_charge_pre, RP_e_pre)")
+               .Define("EVT_thrusthemis0_p",    "Algorithms::getAxisMomentum(0)(RP_thrustangle_pre, RP_px_pre, RP_py_pre, RP_pz_pre)")
+               .Define("EVT_thrusthemis1_p",    "Algorithms::getAxisMomentum(1)(RP_thrustangle_pre, RP_px_pre, RP_py_pre, RP_pz_pre)")
 
                .Define("EVT_ThrustEmax_E",         "EVT_thrusthemis0_e.at(0)")
                .Define("EVT_ThrustEmax_Echarged",  "EVT_thrusthemis0_e.at(1)")
@@ -395,13 +397,13 @@ class RDFanalysis():
                .Define("Tau23PiCandidates_pz",      "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,2)")
                .Define("Tau23PiCandidates_p",       "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,-1)")
                .Define("Tau23PiCandidates_B",       "myUtils::getFCCAnalysesComposite_B(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex)")
-               .Define("Tau23PiCandidates_x",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_x.at(p));} return result;")
-               .Define("Tau23PiCandidates_y",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_y.at(p));} return result;")
-               .Define("Tau23PiCandidates_z",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_z.at(p));} return result;")
-               .Define("Tau23PiCandidates_xErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_xErr.at(p));} return result;")
-               .Define("Tau23PiCandidates_yErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_yErr.at(p));} return result;")
-               .Define("Tau23PiCandidates_zErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_zErr.at(p));} return result;")
-               .Define("Tau23PiCandidates_chi2",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_chi2.at(p));} return result;")
+               .Define("Tau23PiCandidates_x",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_x_pre.at(p));} return result;")
+               .Define("Tau23PiCandidates_y",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_y_pre.at(p));} return result;")
+               .Define("Tau23PiCandidates_z",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_z_pre.at(p));} return result;")
+               .Define("Tau23PiCandidates_xErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_xErr_pre.at(p));} return result;")
+               .Define("Tau23PiCandidates_yErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_yErr_pre.at(p));} return result;")
+               .Define("Tau23PiCandidates_zErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_zErr_pre.at(p));} return result;")
+               .Define("Tau23PiCandidates_chi2",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_chi2_pre.at(p));} return result;")
                .Define("Tau23PiCandidates_hemEmin", "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_thrusthemis_emin.at(p));} return result;")
                .Define("Tau23PiCandidates_track",   "myUtils::getFCCAnalysesComposite_track(Tau23PiCandidates, VertexObject)")
                .Define("Tau23PiCandidates_d0",      "myUtils::get_trackd0(Tau23PiCandidates_track)")
@@ -560,78 +562,143 @@ class RDFanalysis():
                ##   Bs2TauTau Vertex approx   ##
                #################################
 
+    #Find the RECO (Visible) vertex and get its "quality", given by the length of the line on which the Visible vertex is found (not sure yet how to properly use it to assess the actual quality, would need a reference distance)
+               .Define("Bs2TauTau",  "FCCAnalyses::ZHfunctions::Compute_BsVisibleVertex(diTauPlus_x,diTauPlus_y,diTauPlus_z,diTauMinus_x,diTauMinus_y,diTauMinus_z,diTauPlus_px,diTauPlus_py,diTauPlus_pz,diTauMinus_px,diTauMinus_py,diTauMinus_pz)")\
+               .Define("Bs2TauTau_x","Bs2TauTau[0]")\
+               .Define("Bs2TauTau_y","Bs2TauTau[1]")\
+               .Define("Bs2TauTau_z","Bs2TauTau[2]")
+
+    #Get the PV coordinates 
+               .Define("PV_x","float res; for (size_t i=0;i<Vertex_isPV_pre.size();++i) if (Vertex_isPV_pre[i]==1) res = Vertex_x_pre[i]; return res;")
+               .Define("PV_y","float res; for (size_t i=0;i<Vertex_isPV_pre.size();++i) if (Vertex_isPV_pre[i]==1) res = Vertex_y_pre[i]; return res;")
+               .Define("PV_z","float res; for (size_t i=0;i<Vertex_isPV_pre.size();++i) if (Vertex_isPV_pre[i]==1) res = Vertex_z_pre[i]; return res;")
+
+    #Get the IPs of both taus
+               .Define("diTauPlus_IPP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauPlus_x,diTauPlus_y,diTauPlus_z,Bs2TauTau_x,Bs2TauTau_y,Bs2TauTau_z,PV_x,PV_y,PV_z)")
+               .Define("diTauPlus_IPx","diTauPlus_IPP[0]-diTauPlus_x")
+               .Define("diTauPlus_IPy","diTauPlus_IPP[1]-diTauPlus_y")
+               .Define("diTauPlus_IPz","diTauPlus_IPP[2]-diTauPlus_z")
+               .Define("diTauPlus_IP", "FCCAnalyses::ZHfunctions::Get_Norm(diTauPlus_IPx,diTauPlus_IPy,diTauPlus_IPz)")
+               .Define("diTauMinus_IPP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauMinus_x,diTauMinus_y,diTauMinus_z,Bs2TauTau_x,Bs2TauTau_y,Bs2TauTau_z,PV_x,PV_y,PV_z)")
+               .Define("diTauMinus_IPx","diTauMinus_IPP[0]-diTauMinus_x")
+               .Define("diTauMinus_IPy","diTauMinus_IPP[1]-diTauMinus_y")
+               .Define("diTauMinus_IPz","diTauMinus_IPP[2]-diTauMinus_z")
+               .Define("diTauMinus_IP", "FCCAnalyses::ZHfunctions::Get_Norm(diTauMinus_IPx,diTauMinus_IPy,diTauMinus_IPz)")
+
+    #Get the Flight Distance and Distance
+               .Define("diTauPlus_FlightDistance", "sqrt(pow(diTauPlus_x-Bs2TauTau_x,2) + pow(diTauPlus_y-Bs2TauTau_y,2) + pow(diTauPlus_z-Bs2TauTau_z,2))")
+               .Define("diTauPlus_Lifetime",       "1.7769/diTauPlus_p*diTauPlus_FlightDistance/299792458e3")
+               .Define("diTauMinus_FlightDistance","sqrt(pow(diTauMinus_x-Bs2TauTau_x,2) + pow(diTauMinus_y-Bs2TauTau_y,2) + pow(diTauMinus_z-Bs2TauTau_z,2))")
+               .Define("diTauMinus_Lifetime",      "1.7769/diTauMinus_p*diTauMinus_FlightDistance/299792458e3")
+
+    #Get the Tau Vertex IP (Distance between vertex and z-oriented line passing by PV, EXACT) and the "usual" Tau IP (Distance between Taus flight dir and PV, BIASED)
+               .Define("diTauPlus_IPVP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauPlus_x,diTauPlus_y,diTauPlus_z,PV_x,PV_y,PV_z+1.0,PV_x,PV_y,PV_z)")
+               .Define("diTauPlus_IPVx","diTauPlus_IPVP[0]-diTauPlus_x")
+               .Define("diTauPlus_IPVy","diTauPlus_IPVP[1]-diTauPlus_y")
+               .Define("diTauPlus_IPVz","diTauPlus_IPVP[2]-diTauPlus_z")
+               .Define("diTauPlus_IPV","FCCAnalyses::ZHfunctions::Get_Norm(diTauPlus_IPVx,diTauPlus_IPVy,diTauPlus_IPVz)")
+               .Define("diTauMinus_IPVP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauMinus_x,diTauMinus_y,diTauMinus_z,PV_x,PV_y,PV_z+1.0,PV_x,PV_y,PV_z)")
+               .Define("diTauMinus_IPVx","diTauMinus_IPVP[0]-diTauMinus_x")
+               .Define("diTauMinus_IPVy","diTauMinus_IPVP[1]-diTauMinus_y")
+               .Define("diTauMinus_IPVz","diTauMinus_IPVP[2]-diTauMinus_z")
+               .Define("diTauMinus_IPV","FCCAnalyses::ZHfunctions::Get_Norm(diTauMinus_IPVx,diTauMinus_IPVy,diTauMinus_IPVz)")
+
+               .Define("diTauPlus_IPFP","FCCAnalyses::ZHfunctions::Compute_IPP(PV_x,PV_y,PV_z, diTauPlus_x,diTauPlus_y,diTauPlus_z, diTauPlus_x+diTauPlus_px,diTauPlus_y+diTauPlus_py,diTauPlus_z+diTauPlus_pz)")
+               .Define("diTauPlus_IPFx","diTauPlus_IPFP[0]-PV_x")
+               .Define("diTauPlus_IPFy","diTauPlus_IPFP[1]-PV_y")
+               .Define("diTauPlus_IPFz","diTauPlus_IPFP[2]-PV_z")
+               .Define("diTauPlus_IPF","FCCAnalyses::ZHfunctions::Get_Norm(diTauPlus_IPFx,diTauPlus_IPFy,diTauPlus_IPFz)")
+               .Define("diTauMinus_IPFP","FCCAnalyses::ZHfunctions::Compute_IPP(PV_x,PV_y,PV_z, diTauMinus_x,diTauMinus_y,diTauMinus_z, diTauMinus_x+diTauMinus_px,diTauMinus_y+diTauMinus_py,diTauMinus_z+diTauMinus_pz)")
+               .Define("diTauMinus_IPFx","diTauMinus_IPFP[0]-PV_x")
+               .Define("diTauMinus_IPFy","diTauMinus_IPFP[1]-PV_y")
+               .Define("diTauMinus_IPFz","diTauMinus_IPFP[2]-PV_z")
+               .Define("diTauMinus_IPF","FCCAnalyses::ZHfunctions::Get_Norm(diTauMinus_IPFx,diTauMinus_IPFy,diTauMinus_IPFz)")
+
+    #Get the Bs IP (vertex)
+               .Define("Bs_IPVP","FCCAnalyses::ZHfunctions::Compute_IPP(Bs2TauTau_x,Bs2TauTau_y,Bs2TauTau_z,PV_x,PV_y,PV_z+1.0,PV_x,PV_y,PV_z)")
+               .Define("Bs_IPVx","Bs_IPVP[0]-Bs2TauTau_x")
+               .Define("Bs_IPVy","Bs_IPVP[1]-Bs2TauTau_y")
+               .Define("Bs_IPVz","Bs_IPVP[2]-Bs2TauTau_z")
+               .Define("Bs_IPV","FCCAnalyses::ZHfunctions::Get_Norm(Bs_IPVx,Bs_IPVy,Bs_IPVz)")
+
+    #Bs properties from RECO technique, Only visible momenta
+               .Define("Bs_FlightDistance","FCCAnalyses::ZHfunctions::Get_Norm(Bs2TauTau_x-PV_x,Bs2TauTau_y-PV_y,Bs2TauTau_z-PV_z)")
+               .Define("Bs_px","diTauMinus_px+diTauPlus_px")
+               .Define("Bs_py","diTauMinus_py+diTauPlus_py")
+               .Define("Bs_pz","diTauMinus_pz+diTauPlus_pz")
+               .Define("Bs_p","FCCAnalyses::ZHfunctions::Get_Norm(Bs_px,Bs_py,Bs_pz)")
+               .Define("Bs_Lifetime","5.3669/Bs_p*Bs_FlightDistance/299792458e3")
                
                ###############################
                ##   Had tagger columns      ##
                ###############################
                
-               #.Define("RP_e_Emin",              "RP_e     [RP_thrustangle>0]").Redefine("RP_e","RP_e_Emin")
-               #.Define("RP_m_true_Emin",         "RP_m_true[RP_thrustangle>0]").Redefine("RP_m_true","RP_m_true_Emin")
-               #.Define("RP_m_reco_Emin",         "RP_m_reco[RP_thrustangle>0]").Redefine("RP_m_reco","RP_m_reco_Emin")
-               #.Define("RP_px_Emin",             "RP_px    [RP_thrustangle>0]").Redefine("RP_px","RP_px_Emin")
-               #.Define("RP_py_Emin",             "RP_py    [RP_thrustangle>0]").Redefine("RP_py","RP_py_Emin")
-               #.Define("RP_pz_Emin",             "RP_pz    [RP_thrustangle>0]").Redefine("RP_pz","RP_pz_Emin")
-               #.Define("RP_Dphi_Emin",           "RP_phi   [RP_thrustangle>0] - EVT_thrust_phi").Redefine("RP_Dphi","RP_Dphi_Emin")
-               #.Define("RP_Dtheta_Emin",         "RP_theta [RP_thrustangle>0] - EVT_thrust_theta").Redefine("RP_Dtheta","RP_Dtheta_Emin")
-               #.Define("RP_charge_Emin",         "RP_charge[RP_thrustangle>0]").Redefine("RP_charge","RP_charge_Emin")
-               #.Define("RP_fromPV_Emin",         "RP_fromPV[RP_thrustangle>0]").Redefine("RP_fromPV","RP_fromPV_Emin")
-               #.Define("RP_vert_ind_Emin",       "RP_vert_ind [RP_thrustangle>0]").Redefine("RP_vert_ind","RP_vert_ind_Emin")
-               #.Define("RP_vert_e_Emin",         "RP_vert_e   [RP_thrustangle>0]").Redefine("RP_vert_e","RP_vert_e_Emin")
-               #.Define("RP_vert_mass_Emin",      "RP_vert_mass[RP_thrustangle>0]").Redefine("RP_vert_mass","RP_vert_mass_Emin")
-               #.Define("RP_trk_d0_Emin",         "RP_trk_d0       [RP_thrustangle>0]").Redefine("RP_trk_d0","RP_trk_d0_Emin")
-               #.Define("RP_trk_z0_Emin",         "RP_trk_z0       [RP_thrustangle>0]").Redefine("RP_trk_z0","RP_trk_z0_Emin")
-               #.Define("RP_trk_phi_Emin",        "RP_trk_phi      [RP_thrustangle>0]").Redefine("RP_trk_phi","RP_trk_phi_Emin")
-               #.Define("RP_trk_omega_Emin",      "RP_trk_omega    [RP_thrustangle>0]").Redefine("RP_trk_omega","RP_trk_omega_Emin")
-               #.Define("RP_trk_tanLambda_Emin",  "RP_trk_tanLambda[RP_thrustangle>0]").Redefine("RP_trk_tanLambda","RP_trk_tanLambda_Emin")
-               #.Define("RP_dndx_Emin",           "RP_dndx         [RP_thrustangle>0]").Redefine("RP_dndx","RP_dndx_Emin")
-               #.Define("RP_mtof_Emin",           "RP_mtof         [RP_thrustangle>0]").Redefine("RP_mtof","RP_mtof_Emin")
-               #.Define("RP_nMC_Emin",            "RP_nMC   [RP_thrustangle>0]").Redefine("RP_nMC","RP_nMC_Emin")
-               #.Define("RP_MCidx_Emin",          "RP_MCidx [RP_thrustangle>0]").Redefine("RP_MCidx","RP_MCidx_Emin")
-               #.Define("RP_fromBc_Emin",         "RP_fromBc[RP_thrustangle>0]").Redefine("RP_fromBc","RP_fromBc_Emin")
-               #.Define("RP_fromBs_Emin",         "RP_fromBs[RP_thrustangle>0]").Redefine("RP_fromBs","RP_fromBs_Emin")
-               #.Define("RP_fromBu_Emin",         "RP_fromBu[RP_thrustangle>0]").Redefine("RP_fromBu","RP_fromBu_Emin")
-               #.Define("RP_fromBd_Emin",         "RP_fromBd[RP_thrustangle>0]").Redefine("RP_fromBd","RP_fromBd_Emin")
-               #.Define("RP_fromLb_Emin",         "RP_fromLb[RP_thrustangle>0]").Redefine("RP_fromLb","RP_fromLb_Emin")
-               #.Define("RP_thrustangle_Emin",    "RP_thrustangle[RP_thrustangle>0]").Redefine("RP_thrustangle","RP_thrustangle_Emin")
-               #.Define("Vertex_isPV_Emin",       "Vertex_isPV     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_isPV","Vertex_isPV_Emin")
-               #.Define("Vertex_mass_Emin",       "Vertex_mass     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_mass","Vertex_mass_Emin")
-               #.Define("Vertex_px_Emin",         "Vertex_px       [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_px","Vertex_px_Emin")
-               #.Define("Vertex_py_Emin",         "Vertex_py       [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_py","Vertex_py_Emin")
-               #.Define("Vertex_pz_Emin",         "Vertex_pz       [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_pz","Vertex_pz_Emin")
-               #.Define("Vertex_e_Emin",          "Vertex_e        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_e","Vertex_e_Emin")
-               #.Define("Vertex_x_Emin",          "Vertex_x        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_x","Vertex_x_Emin")
-               #.Define("Vertex_y_Emin",          "Vertex_y        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_y","Vertex_y_Emin")
-               #.Define("Vertex_z_Emin",          "Vertex_z        [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_z","Vertex_z_Emin")
-               #.Define("Vertex_xErr_Emin",       "Vertex_xErr     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_xErr","Vertex_xErr_Emin")
-               #.Define("Vertex_yErr_Emin",       "Vertex_yErr     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_yErr","Vertex_yErr_Emin")
-               #.Define("Vertex_zErr_Emin",       "Vertex_zErr     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_zErr","Vertex_zErr_Emin")
-               #.Define("Vertex_ntrk_Emin",       "Vertex_ntrk     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_ntrk","Vertex_ntrk_Emin")
-               #.Define("Vertex_chi2_Emin",       "Vertex_chi2     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_chi2","Vertex_chi2_Emin")
-               #.Define("Vertex_d2PV_Emin",       "Vertex_d2PV     [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_d2PV","Vertex_d2PV_Emin")
-               #.Define("Vertex_d2PVSig_Emin",    "Vertex_d2PVSig  [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_d2PVSig","Vertex_d2PVSig_Emin")
-               #.Define("Vertex_Dphi_Emin",       "Vertex_phi      [Vertex_thrust_angle>0 || Vertex_isPV==1] - EVT_thrust_phi").Redefine("Vertex_Dphi","Vertex_Dphi_Emin")
-               #.Define("Vertex_Dtheta_Emin",     "Vertex_theta    [Vertex_thrust_angle>0 || Vertex_isPV==1] - EVT_thrust_theta").Redefine("Vertex_Dtheta","Vertex_Dtheta_Emin")
-               #.Define("Vertex_thrustangle_Emin","Vertex_thrust_angle    [Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_thrustangle","Vertex_thrustangle_Emin")
-               #.Define("Vertex_fromBc_Emin",     "Vertex_fromBc[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBc","Vertex_fromBc_Emin")
-               #.Define("Vertex_fromBs_Emin",     "Vertex_fromBs[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBs","Vertex_fromBs_Emin")
-               #.Define("Vertex_fromBu_Emin",     "Vertex_fromBu[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBu","Vertex_fromBu_Emin")
-               #.Define("Vertex_fromBd_Emin",     "Vertex_fromBd[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromBd","Vertex_fromBd_Emin")
-               #.Define("Vertex_fromLb_Emin",     "Vertex_fromLb[Vertex_thrust_angle>0 || Vertex_isPV==1]").Redefine("Vertex_fromLb","Vertex_fromLb_Emin")
-               #.Define("n_Bc_Emin",              "int(genBc_thrustangle[genBc_thrustangle>0].size())").Redefine("n_Bc","n_Bc_Emin")
-               #.Define("n_Bs_Emin",              "int(genBs_thrustangle[genBs_thrustangle>0].size())").Redefine("n_Bs","n_Bs_Emin")
-               #.Define("n_Bu_Emin",              "int(genBu_thrustangle[genBu_thrustangle>0].size())").Redefine("n_Bu","n_Bu_Emin")
-               #.Define("n_Bd_Emin",              "int(genBd_thrustangle[genBd_thrustangle>0].size())").Redefine("n_Bd","n_Bd_Emin")
-               #.Define("n_Lb_Emin",              "int(genLb_thrustangle[genLb_thrustangle>0].size())").Redefine("n_Lb","n_Lb_Emin")
-               #.Define("label_Bc_Emin",          "int(n_Bc_Emin==1 && n_Bs_Emin==0 && n_Bu_Emin==0 && n_Bd_Emin==0 && n_Lb_Emin==0)" ).Redefine("label_Bc","label_Bc_Emin")
-               #.Define("label_Bs_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==1 && n_Bu_Emin==0 && n_Bd_Emin==0 && n_Lb_Emin==0)" ).Redefine("label_Bs","label_Bs_Emin")
-               #.Define("label_Bu_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==0 && n_Bu_Emin==1 && n_Bd_Emin==0 && n_Lb_Emin==0)" ).Redefine("label_Bu","label_Bu_Emin")
-               #.Define("label_Bd_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==0 && n_Bu_Emin==0 && n_Bd_Emin==1 && n_Lb_Emin==0)" ).Redefine("label_Bd","label_Bd")
-               #.Define("label_Lb_Emin",          "int(n_Bc_Emin==0 && n_Bs_Emin==0 && n_Bu_Emin==0 && n_Bd_Emin==0 && n_Lb_Emin==1)" ).Redefine("label_Lb","label_Lb_Emin")
-               #.Define("label_light_Emin",       "int(n_Bc_Emin==0 && n_Bs_Emin==0 && (n_Bu_Emin>0 || n_Bd_Emin>0) && n_Lb_Emin==0)" ).Redefine("label_light","label_light_Emin")
-               #.Define("label_hasBc_Emin",       "int(n_Bc_Emin>0)" ).Redefine("label_hasBc","label_hasBc_Emin")
-               #.Define("label_has1Bc_Emin",      "int(n_Bc_Emin==1)" ).Redefine("label_has1Bc","label_has1Bc_Emin")
+               .Define("RP_e",              "RP_e_pre     [RP_thrustangle_pre>0]")
+               .Define("RP_m_true",         "RP_m_true_pre[RP_thrustangle_pre>0]")
+               .Define("RP_m_reco",         "RP_m_reco_pre[RP_thrustangle_pre>0]")
+               .Define("RP_px",             "RP_px_pre    [RP_thrustangle_pre>0]")
+               .Define("RP_py",             "RP_py_pre    [RP_thrustangle_pre>0]")
+               .Define("RP_pz",             "RP_pz_pre    [RP_thrustangle_pre>0]")
+               .Define("RP_Dphi",           "RP_phi   [RP_thrustangle_pre>0] - EVT_thrust_phi")
+               .Define("RP_Dtheta",         "RP_theta [RP_thrustangle_pre>0] - EVT_thrust_theta")
+               .Define("RP_charge",         "RP_charge_pre[RP_thrustangle_pre>0]")
+               .Define("RP_fromPV",         "RP_fromPV_pre[RP_thrustangle_pre>0]")
+               .Define("RP_vert_ind",       "RP_vert_ind_pre [RP_thrustangle_pre>0]")
+               .Define("RP_vert_e",         "RP_vert_e_pre   [RP_thrustangle_pre>0]")
+               .Define("RP_vert_mass",      "RP_vert_mass_pre[RP_thrustangle_pre>0]")
+               .Define("RP_trk_d0",         "RP_trk_d0_pre       [RP_thrustangle_pre>0]")
+               .Define("RP_trk_z0",         "RP_trk_z0_pre       [RP_thrustangle_pre>0]")
+               .Define("RP_trk_phi",        "RP_trk_phi_pre      [RP_thrustangle_pre>0]")
+               .Define("RP_trk_omega",      "RP_trk_omega_pre    [RP_thrustangle_pre>0]")
+               .Define("RP_trk_tanLambda",  "RP_trk_tanLambda_pre[RP_thrustangle_pre>0]")
+               .Define("RP_dndx",           "RP_dndx_pre         [RP_thrustangle_pre>0]")
+               .Define("RP_mtof",           "RP_mtof_pre         [RP_thrustangle_pre>0]")
+               .Define("RP_nMC",            "RP_nMC_pre   [RP_thrustangle_pre>0]")
+               .Define("RP_MCidx",          "RP_MCidx_pre [RP_thrustangle_pre>0]")
+               .Define("RP_fromBc",         "RP_fromBc_pre[RP_thrustangle_pre>0]")
+               .Define("RP_fromBs",         "RP_fromBs_pre[RP_thrustangle_pre>0]")
+               .Define("RP_fromBu",         "RP_fromBu_pre[RP_thrustangle_pre>0]")
+               .Define("RP_fromBd",         "RP_fromBd_pre[RP_thrustangle_pre>0]")
+               .Define("RP_fromLb",         "RP_fromLb_pre[RP_thrustangle_pre>0]")
+               .Define("RP_thrustangle",    "RP_thrustangle_pre[RP_thrustangle_pre>0]")
+               .Define("Vertex_isPV",       "Vertex_isPV_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_mass",       "Vertex_mass_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_px",         "Vertex_px_pre       [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_py",         "Vertex_py_pre       [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_pz",         "Vertex_pz_pre       [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_e",          "Vertex_e_pre        [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_x",          "Vertex_x_pre        [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_y",          "Vertex_y_pre        [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_z",          "Vertex_z_pre        [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_xErr",       "Vertex_xErr_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_yErr",       "Vertex_yErr_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_zErr",       "Vertex_zErr_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_ntrk",       "Vertex_ntrk_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_chi2",       "Vertex_chi2_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_d2PV",       "Vertex_d2PV_pre     [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_d2PVSig",    "Vertex_d2PVSig_pre  [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_Dphi",       "Vertex_phi      [Vertex_thrust_angle>0 || Vertex_isPV_pre==1] - EVT_thrust_phi")
+               .Define("Vertex_Dtheta",     "Vertex_theta    [Vertex_thrust_angle>0 || Vertex_isPV_pre==1] - EVT_thrust_theta")
+               .Define("Vertex_thrustangle","Vertex_thrust_angle    [Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_fromBc",     "Vertex_fromBc_pre[Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_fromBs",     "Vertex_fromBs_pre[Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_fromBu",     "Vertex_fromBu_pre[Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_fromBd",     "Vertex_fromBd_pre[Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
+               .Define("Vertex_fromLb",     "Vertex_fromLb_pre[Vertex_thrust_angle>0 || Vertex_isPV_pre==1]")
 
-               #Redefine for correct column name for Tagger
+               .Define("n_Bc",              "int(genBc_thrustangle[genBc_thrustangle>0].size())")
+               .Define("n_Bs",              "int(genBs_thrustangle[genBs_thrustangle>0].size())")
+               .Define("n_Bu",              "int(genBu_thrustangle[genBu_thrustangle>0].size())")
+               .Define("n_Bd",              "int(genBd_thrustangle[genBd_thrustangle>0].size())")
+               .Define("n_Lb",              "int(genLb_thrustangle[genLb_thrustangle>0].size())")
+               .Define("label_Bc",          "int(n_Bc==1 && n_Bs==0 && n_Bu==0 && n_Bd==0 && n_Lb==0)" )
+               .Define("label_Bs",          "int(n_Bc==0 && n_Bs==1 && n_Bu==0 && n_Bd==0 && n_Lb==0)" )
+               .Define("label_Bu",          "int(n_Bc==0 && n_Bs==0 && n_Bu==1 && n_Bd==0 && n_Lb==0)" )
+               .Define("label_Bd",          "int(n_Bc==0 && n_Bs==0 && n_Bu==0 && n_Bd==1 && n_Lb==0)" )
+               .Define("label_Lb",          "int(n_Bc==0 && n_Bs==0 && n_Bu==0 && n_Bd==0 && n_Lb==1)" )
+               .Define("label_light",       "int(n_Bc==0 && n_Bs==0 && (n_Bu>0 || n_Bd>0) && n_Lb==0)" )
+               .Define("label_hasBc",       "int(n_Bc>0)" )
+               .Define("label_has1Bc",      "int(n_Bc)" )
 
 
            )
@@ -679,14 +746,14 @@ class RDFanalysis():
 
                 "MC_Vertex_PDG","MC_Vertex_PDGmother","MC_Vertex_PDGgmother",
 
-                "Vertex_x", "Vertex_y", "Vertex_z",
-                "Vertex_xErr", "Vertex_yErr", "Vertex_zErr",
-                "Vertex_isPV", "Vertex_ntrk", "Vertex_chi2", "Vertex_n",
+                "Vertex_x_pre", "Vertex_y_pre", "Vertex_z_pre",
+                "Vertex_xErr_pre", "Vertex_yErr_pre", "Vertex_zErr_pre",
+                "Vertex_isPV_pre", "Vertex_ntrk_pre", "Vertex_chi2_pre", "Vertex_n",
                 "Vertex_thrust_angle", "Vertex_thrusthemis_emin", "Vertex_thrusthemis_emax",
 
-                "Vertex_d2PV", "Vertex_d2PVx", "Vertex_d2PVy", "Vertex_d2PVz",
+                "Vertex_d2PV_pre", "Vertex_d2PVx", "Vertex_d2PVy", "Vertex_d2PVz",
                 "Vertex_d2PVErr", "Vertex_d2PVxErr", "Vertex_d2PVyErr", "Vertex_d2PVzErr",
-                "Vertex_mass",
+                "Vertex_mass_pre",
                 "DV_d0","DV_z0",
 
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
@@ -707,111 +774,28 @@ class RDFanalysis():
                "diTauMinus_pion2px","diTauMinus_pion2py","diTauMinus_pion2pz","diTauMinus_pion2p","diTauMinus_pion2q","diTauMinus_pion2d0","diTauMinus_pion2z0",
                "diTauMinus_pion3px","diTauMinus_pion3py","diTauMinus_pion3pz","diTauMinus_pion3p","diTauMinus_pion3q","diTauMinus_pion3d0","diTauMinus_pion3z0",
 
-                #"Tau23PiCandidates_mass", "Tau23PiCandidates_vertex", "Tau23PiCandidates_mcvertex", "Tau23PiCandidates_B",
-                #"Tau23PiCandidates_px", "Tau23PiCandidates_py", "Tau23PiCandidates_pz", "Tau23PiCandidates_p", "Tau23PiCandidates_q",
-                #"Tau23PiCandidates_d0",  "Tau23PiCandidates_z0","Tau23PiCandidates_anglethrust",
-
-                #"Tau23PiCandidates_x",    "Tau23PiCandidates_y",    "Tau23PiCandidates_z",
-                #"Tau23PiCandidates_xErr", "Tau23PiCandidates_yErr", "Tau23PiCandidates_zErr",
-                #"Tau23PiCandidates_chi2", "Tau23PiCandidates_pAngles", "Tau23PiCandidates_hemEmin",
-
-                #"Tau23PiCandidates_rho1px", "Tau23PiCandidates_rho1py", "Tau23PiCandidates_rho1pz","Tau23PiCandidates_rho1mass",
-                #"Tau23PiCandidates_rho2px", "Tau23PiCandidates_rho2py", "Tau23PiCandidates_rho2pz","Tau23PiCandidates_rho2mass",
-
-                #"Tau23PiCandidates_pion1px", "Tau23PiCandidates_pion1py", "Tau23PiCandidates_pion1pz",
-                #"Tau23PiCandidates_pion1p", "Tau23PiCandidates_pion1q", "Tau23PiCandidates_pion1d0", "Tau23PiCandidates_pion1z0",
-                #"Tau23PiCandidates_pion2px", "Tau23PiCandidates_pion2py", "Tau23PiCandidates_pion2pz",
-                #"Tau23PiCandidates_pion2p", "Tau23PiCandidates_pion2q", "Tau23PiCandidates_pion2d0", "Tau23PiCandidates_pion2z0",
-                #"Tau23PiCandidates_pion3px", "Tau23PiCandidates_pion3py", "Tau23PiCandidates_pion3pz",
-                #"Tau23PiCandidates_pion3p", "Tau23PiCandidates_pion3q", "Tau23PiCandidates_pion3d0", "Tau23PiCandidates_pion3z0",
-
-                #"TauCand1_x",  "TauCand1_y",  "TauCand1_z", "TauCand1_chi2", "TauCand1_thrustangle",
-                #"TauCand2_x",  "TauCand2_y",  "TauCand2_z", "TauCand2_chi2", "TauCand2_thrustangle",
-                #"TauCand1_px", "TauCand1_py", "TauCand1_pz", "TauCand1_p", "TauCand1_m", "TauCand1_q",
-                #"TauCand2_px", "TauCand2_py", "TauCand2_pz", "TauCand2_p", "TauCand2_m", "TauCand2_q",
-
-                #"TauCand1_pion1px", "TauCand1_pion1py", "TauCand1_pion1pz", "TauCand1_pion1q", "TauCand1_pion1d0", "TauCand1_pion1z0",
-                #"TauCand1_pion2px", "TauCand1_pion2py", "TauCand1_pion2pz", "TauCand1_pion2q", "TauCand1_pion2d0", "TauCand1_pion2z0",
-                #"TauCand1_pion3px", "TauCand1_pion3py", "TauCand1_pion3pz", "TauCand1_pion3q", "TauCand1_pion3d0", "TauCand1_pion3z0",
-                #"TauCand2_pion1px", "TauCand2_pion1py", "TauCand2_pion1pz", "TauCand2_pion1q", "TauCand2_pion1d0", "TauCand2_pion1z0",
-                #"TauCand2_pion2px", "TauCand2_pion2py", "TauCand2_pion2pz", "TauCand2_pion2q", "TauCand2_pion2d0", "TauCand2_pion2z0",
-                #"TauCand2_pion3px", "TauCand2_pion3py", "TauCand2_pion3pz", "TauCand2_pion3q", "TauCand2_pion3d0", "TauCand2_pion3z0",
-
                 "DeltaM","mDiTau_Vis", "mDiTau_collinear3D",
-
-                #"T1xT2_x", "T1xT2_y", "T1xT2_z",
-                #"T1xEm_x", "T1xEm_y", "T1xEm_z",
-                #"EmxT2_x", "EmxT2_y", "EmxT2_z",
-                #"T1xT2_M2", "denom",
-
                 "ratio_Emiss", "mDiTau_full",
 
-                #"RP_e",             
-                #"RP_m_true",
-                #"RP_m_reco",
-                #"RP_px", 
-                #"RP_py", 
-                #"RP_pz", 
-                #"RP_Dphi",          
-                #"RP_Dtheta",        
-                #"RP_charge",
-                #"RP_fromPV",
-                #"RP_vert_ind",
-                #"RP_vert_e",
-                #"RP_vert_mass",
-                #"RP_trk_d0",
-                #"RP_trk_z0",
-                #"RP_trk_phi",
-                #"RP_trk_omega",
-                #"RP_trk_tanLambda",
-                #"RP_dndx",
-                #"RP_mtof",
-                #"RP_nMC",   
-                #"RP_MCidx", 
-                #"RP_fromBc",
-                #"RP_fromBs",
-                #"RP_fromBu",
-                #"RP_fromBd",
-                #"RP_fromLb",
-                #"RP_thrustangle",
-                #"Vertex_isPV",
-                #"Vertex_mass", 
-                #"Vertex_px",
-                #"Vertex_py",
-                #"Vertex_pz",
-                #"Vertex_e",
-                #"Vertex_x",   
-                #"Vertex_y",   
-                #"Vertex_z",   
-                #"Vertex_xErr",
-                #"Vertex_yErr",
-                #"Vertex_zErr",
-                #"Vertex_ntrk",      
-                #"Vertex_chi2",      
-                #"Vertex_d2PV",
-                #"Vertex_d2PVSig",
-                #"Vertex_Dphi",      
-                #"Vertex_Dtheta",    
-                #"Vertex_thrustangle",
-                #"Vertex_fromBc",
-                #"Vertex_fromBs",
-                #"Vertex_fromBu",
-                #"Vertex_fromBd",
-                #"Vertex_fromLb",
+                "PV_x","PV_y","PV_z",
+                "diTauPlus_IPx","diTauPlus_IPy","diTauPlus_IPz","diTauPlus_IP",
+                "diTauMinus_IPx","diTauMinus_IPy","diTauMinus_IPz","diTauMinus_IP",
+                "diTauPlus_IPVx","diTauPlus_IPVy","diTauPlus_IPVz","diTauPlus_IPV",
+                "diTauMinus_IPVx","diTauMinus_IPVy","diTauMinus_IPVz","diTauMinus_IPV",
+                "diTauPlus_IPFx","diTauPlus_IPFy","diTauPlus_IPFz","diTauPlus_IPF",
+                "diTauMinus_IPFx","diTauMinus_IPFy","diTauMinus_IPFz","diTauMinus_IPF",
+                "diTauPlus_Lifetime","diTauPlus_FlightDistance","diTauMinus_Lifetime","diTauMinus_FlightDistance",
 
-                #"n_Bc",             
-                #"n_Bs",             
-                #"n_Bu",             
-                #"n_Bd",             
-                #"n_Lb",       
-                #"label_Bc",    
-                #"label_Bs",   
-                #"label_Bu",   
-                #"label_Bd",   
-                #"label_Lb",   
-                #"label_light",
-                #"label_hasBc",
-                #"label_has1Bc",
+                "Bs_IPVx","Bs_IPVy","Bs_IPVz","Bs_IPV",
+                "Bs_FlightDistance","Bs_px","Bs_py","Bs_pz","Bs_p","Bs_Lifetime",
+                
+
+                "RP_e","RP_m_true","RP_m_reco","RP_px","RP_py","RP_pz","RP_Dphi","RP_Dtheta","RP_charge","RP_fromPV",
+                "RP_vert_ind","RP_vert_e","RP_vert_mass","RP_trk_d0","RP_trk_z0","RP_trk_phi","RP_trk_omega","RP_trk_tanLambda","RP_dndx","RP_mtof",
+                "RP_nMC","RP_MCidx","RP_fromBc","RP_fromBs","RP_fromBu","RP_fromBd","RP_fromLb","RP_thrustangle",
+                "Vertex_isPV","Vertex_mass", "Vertex_px","Vertex_py","Vertex_pz","Vertex_e","Vertex_x","Vertex_y","Vertex_z","Vertex_xErr","Vertex_yErr","Vertex_zErr","Vertex_ntrk","Vertex_chi2",
+                "Vertex_d2PV","Vertex_d2PVSig","Vertex_Dphi","Vertex_Dtheta","Vertex_thrustangle","Vertex_fromBc","Vertex_fromBs","Vertex_fromBu","Vertex_fromBd","Vertex_fromLb",
+                "n_Bc","n_Bs","n_Bu","n_Bd","n_Lb","label_Bc","label_Bs","label_Bu","label_Bd","label_Lb","label_light","label_hasBc","label_has1Bc",
 
                 ]
         return branchList

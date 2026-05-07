@@ -1475,5 +1475,69 @@ ROOT::VecOps::RVec<int> get_Vertex_containDescendant(ROOT::VecOps::RVec<Vertexin
   return result;
 }
 
+float getAxisPhi(const ROOT::VecOps::RVec<float> & axis){
+
+  TLorentzVector tlv;
+  tlv.SetXYZM(axis[1], axis[3], axis[5], 0);
+  return tlv.Phi();
+}
+
+float getAxisTheta(const ROOT::VecOps::RVec<float> & axis){
+
+  TLorentzVector tlv;
+  tlv.SetXYZM(axis[1], axis[3], axis[5], 0);
+  return tlv.Theta();
+}
+
+//==============================================================================================================================================================================================================================================================================
+// Bs2TauTau visible vertex reco ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//==============================================================================================================================================================================================================================================================================
+
+float Get_Norm(float x, float y, float z){
+
+    return sqrt(pow(x,float(2.0)) + pow(y,float(2.0)) + pow(z,float(2.0)));
+
+}
+
+float Compute_DotProduct (float Vx, float Vy, float Vz, float Wx, float Wy, float Wz){
+    return Vx*Wx + Vy*Wy + Vz*Wz;
+}
+
+ROOT::VecOps::RVec<float> Compute_BsVisibleVertex(float Ver1x, float Ver1y, float Ver1z, float Ver2x, float Ver2y, float Ver2z, float p1x, float p1y, float p1z, float p2x, float p2y, float p2z){
+    ROOT::VecOps::RVec<float> Bs_Vertex;
+
+    float n_x = p1y*p2z - p1z*p2y;
+    float n_y = p1z*p2x - p1x*p2z;
+    float n_z = p1x*p2y - p1y*p2x; 
+
+    float t1 = ((p2y*n_z-p2z*n_y)*(Ver2x-Ver1x) + (p2z*n_x-p2x*n_z)*(Ver2y-Ver1y) + (p2x*n_y-p2y*n_x)*(Ver2z-Ver1z))/(n_x*n_x + n_y*n_y + n_z*n_z);
+    float t2 = ((p1y*n_z-p1z*n_y)*(Ver2x-Ver1x) + (p1z*n_x-p1x*n_z)*(Ver2y-Ver1y) + (p1x*n_y-p1y*n_x)*(Ver2z-Ver1z))/(n_x*n_x + n_y*n_y + n_z*n_z);
+
+    float Pt1x = t1*p1x + Ver1x;
+    float Pt1y = t1*p1y + Ver1y;
+    float Pt1z = t1*p1z + Ver1z;
+
+    float Pt2x = t2*p2x + Ver2x;
+    float Pt2y = t2*p2y + Ver2y;
+    float Pt2z = t2*p2z + Ver2z;
+
+    Bs_Vertex.push_back(Pt2x + (Pt1x-Pt2x)/2);
+    Bs_Vertex.push_back(Pt2y + (Pt1y-Pt2y)/2);
+    Bs_Vertex.push_back(Pt2z + (Pt1z-Pt2z)/2);
+    return Bs_Vertex;
+}
+
+ROOT::VecOps::RVec<float> Compute_IPP(float Vx, float Vy, float Vz, float SVx, float SVy, float SVz, float PVx, float PVy, float PVz){
+    ROOT::VecOps::RVec<float> result;
+    ROOT::VecOps::RVec<float> FlightDir = {SVx-PVx,SVy-PVy,SVz-PVz};
+    ROOT::VecOps::RVec<float> ToProject = {Vx-PVx,Vy-PVy,Vz-PVz};
+
+    float t = Compute_DotProduct(ToProject[0],ToProject[1],ToProject[2],FlightDir[0],FlightDir[1],FlightDir[2])/pow(Get_Norm(FlightDir[0],FlightDir[1],FlightDir[2]),2);
+    result.push_back(PVx+t*FlightDir[0]);
+    result.push_back(PVy+t*FlightDir[1]);
+    result.push_back(PVz+t*FlightDir[2]);
+    return result;
+}
+
 }}
 #endif
