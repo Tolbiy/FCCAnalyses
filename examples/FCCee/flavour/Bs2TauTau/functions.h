@@ -458,7 +458,7 @@ ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_Leptons(ROOT::VecO
                     Rem.push_back(daughter.at(j));
                 }
             }
-            if (Leptons.size() == 1){
+            if (Leptons.size() == 1){ //only one lepton is allowed
                 for (size_t m = 0; m < Leptons.size(); ++m){
                     result.push_back(in.at(Leptons[m]));
                 }
@@ -469,6 +469,34 @@ ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_Leptons(ROOT::VecO
         }
     }
     return result; //Structure (electron, nu0, nu1, photon0, photon1, ...)
+}
+
+//Get the exclusive Tau2Pi(Pi0)Nu Tau decay in the Bs2TauTau decays WARNING: PM = 1 GIVES TAU_MINUS WHILE -1 GIVES TAU_PLUS
+ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_1Pi(ROOT::VecOps::RVec<edm4hep::MCParticleData> genBs2TauTau_list, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter, int pm){
+    ROOT::VecOps::RVec<edm4hep::MCParticleData> result;
+    for (size_t i = 0; i < genBs2TauTau_list.size(); ++i){
+        if (genBs2TauTau_list[i].PDG == pm*15){
+            ROOT::VecOps::RVec<int> Pions;
+            ROOT::VecOps::RVec<int> Rem;
+            for (size_t j = genBs2TauTau_list[i].daughters_begin; j < genBs2TauTau_list[i].daughters_end; ++j){
+                if (std::abs(in[daughter.at(j)].PDG) == 211){ //Select charged pion
+                    Pions.push_back(daughter.at(j));
+                }
+                else {
+                    Rem.push_back(daughter.at(j)); //Pi0 comes for free 
+                }
+            }
+            if (Pions.size() == 1){ //Only one pion is allowed
+                for (size_t m = 0; m < Pions.size(); ++m){
+                    result.push_back(in.at(Pions[m]));
+                }
+                for (size_t n = 0; n < Rem.size(); ++n){
+                    result.push_back(in.at(Rem[n]));
+                }
+            }
+        }
+    }
+    return result; //Structure (Charged Pion, (nu, (Pi0) ...))
 }
 
 

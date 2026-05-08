@@ -20,12 +20,12 @@ processList_full = {
 #}
 
 processList_test = {
-    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
-    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
+    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
 }
 
 nCPUS       = 8
@@ -44,7 +44,7 @@ prodTag     = "FCCee/winter2023/IDEA/"
 outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/TOBECREATED"
 
 # if runBatch = False, save output locally
-outputDir   = "../DummyRepo"
+outputDir   = "./" #"../DummyRepo"
 #"fccanalysis_output/" To be used with runBatch = True
 
 includePaths = ["../functions.h"]
@@ -155,6 +155,90 @@ class RDFanalysis():
                 ############################################
 
                .Define("MC_PV_xyzt",      "FCCAnalyses::MCParticle::get_EventPrimaryVertexP4()(Particle)")
+
+               #############################################
+               ##            Find genBs2TauTau            ##
+               #############################################
+               
+               .Define("genBs2TauTau","FCCAnalyses::ZHfunctions::Find_genBs2TauTau(Particle,Particle1)")
+               .Define("n_genBs2TauTau",     "FCCAnalyses::MCParticle::get_n   (genBs2TauTau)")
+               .Define("genBs2TauTau_px",    "FCCAnalyses::MCParticle::get_px  (genBs2TauTau)")
+               .Define("genBs2TauTau_py",    "FCCAnalyses::MCParticle::get_py  (genBs2TauTau)")
+               .Define("genBs2TauTau_pz",    "FCCAnalyses::MCParticle::get_pz  (genBs2TauTau)")
+               .Define("genBs2TauTau_phi",   "FCCAnalyses::MCParticle::get_phi (genBs2TauTau)")
+               .Define("genBs2TauTau_eta",   "FCCAnalyses::MCParticle::get_eta (genBs2TauTau)")
+               .Define("genBs2TauTau_energy","FCCAnalyses::MCParticle::get_e   (genBs2TauTau)")
+               .Define("genBs2TauTau_mass",  "FCCAnalyses::MCParticle::get_mass(genBs2TauTau)")
+               .Define("genBs2TauTau_pdg",   "FCCAnalyses::MCParticle::get_pdg (genBs2TauTau)")
+               .Define("genBs2TauTau_Vertex_x", "FCCAnalyses::MCParticle::get_vertex_x(genBs2TauTau)")
+               .Define("genBs2TauTau_Vertex_y", "FCCAnalyses::MCParticle::get_vertex_y(genBs2TauTau)")
+               .Define("genBs2TauTau_Vertex_z", "FCCAnalyses::MCParticle::get_vertex_z(genBs2TauTau)")
+
+               #############################################
+               ## Find genTau2Pi(Pi0)Nu & genTau2EllNuNu  ##
+               #############################################
+               .Define("genBs2TauTau_Tauplus_1pi",  "FCCAnalyses::ZHfunctions::Find_genBs2TauTau_1Pi(genBs2TauTau,Particle,Particle1,-1)")
+               .Define("genBs2TauTau_Tauminus_1pi", "FCCAnalyses::ZHfunctions::Find_genBs2TauTau_1Pi(genBs2TauTau,Particle,Particle1,1)")
+               .Define("genBs2TauTau_Tauplus_ell", "FCCAnalyses::ZHfunctions::Find_genBs2TauTau_Leptons(genBs2TauTau,Particle,Particle1,-1)")
+               .Define("genBs2TauTau_Tauminus_ell","FCCAnalyses::ZHfunctions::Find_genBs2TauTau_Leptons(genBs2TauTau,Particle,Particle1,1)")
+
+               .Define("n_genBs2TauTau_Tauplus_1pi",     "FCCAnalyses::MCParticle::get_n   (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_px",    "FCCAnalyses::MCParticle::get_px  (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_py",    "FCCAnalyses::MCParticle::get_py  (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_pz",    "FCCAnalyses::MCParticle::get_pz  (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_phi",   "FCCAnalyses::MCParticle::get_phi (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_eta",   "FCCAnalyses::MCParticle::get_eta (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_energy","FCCAnalyses::MCParticle::get_e   (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_mass",  "FCCAnalyses::MCParticle::get_mass(genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_pdg",   "FCCAnalyses::MCParticle::get_pdg (genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_Vertex_x", "FCCAnalyses::MCParticle::get_vertex_x(genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_Vertex_y", "FCCAnalyses::MCParticle::get_vertex_y(genBs2TauTau_Tauplus_1pi)")
+               .Define("genBs2TauTau_Tauplus_1pi_Vertex_z", "FCCAnalyses::MCParticle::get_vertex_z(genBs2TauTau_Tauplus_1pi)")
+
+               .Define("n_genBs2TauTau_Tauminus_1pi",     "FCCAnalyses::MCParticle::get_n   (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_px",    "FCCAnalyses::MCParticle::get_px  (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_py",    "FCCAnalyses::MCParticle::get_py  (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_pz",    "FCCAnalyses::MCParticle::get_pz  (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_phi",   "FCCAnalyses::MCParticle::get_phi (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_eta",   "FCCAnalyses::MCParticle::get_eta (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_energy","FCCAnalyses::MCParticle::get_e   (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_mass",  "FCCAnalyses::MCParticle::get_mass(genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_pdg",   "FCCAnalyses::MCParticle::get_pdg (genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_Vertex_x", "FCCAnalyses::MCParticle::get_vertex_x(genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_Vertex_y", "FCCAnalyses::MCParticle::get_vertex_y(genBs2TauTau_Tauminus_1pi)")
+               .Define("genBs2TauTau_Tauminus_1pi_Vertex_z", "FCCAnalyses::MCParticle::get_vertex_z(genBs2TauTau_Tauminus_1pi)")
+               
+               .Define("n_genBs2TauTau_Tauplus_ell",     "FCCAnalyses::MCParticle::get_n   (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_px",    "FCCAnalyses::MCParticle::get_px  (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_py",    "FCCAnalyses::MCParticle::get_py  (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_pz",    "FCCAnalyses::MCParticle::get_pz  (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_phi",   "FCCAnalyses::MCParticle::get_phi (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_eta",   "FCCAnalyses::MCParticle::get_eta (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_energy","FCCAnalyses::MCParticle::get_e   (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_mass",  "FCCAnalyses::MCParticle::get_mass(genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_pdg",   "FCCAnalyses::MCParticle::get_pdg (genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_Vertex_x", "FCCAnalyses::MCParticle::get_vertex_x(genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_Vertex_y", "FCCAnalyses::MCParticle::get_vertex_y(genBs2TauTau_Tauplus_ell)")
+               .Define("genBs2TauTau_Tauplus_ell_Vertex_z", "FCCAnalyses::MCParticle::get_vertex_z(genBs2TauTau_Tauplus_ell)")
+
+               .Define("n_genBs2TauTau_Tauminus_ell",     "FCCAnalyses::MCParticle::get_n   (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_px",    "FCCAnalyses::MCParticle::get_px  (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_py",    "FCCAnalyses::MCParticle::get_py  (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_pz",    "FCCAnalyses::MCParticle::get_pz  (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_phi",   "FCCAnalyses::MCParticle::get_phi (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_eta",   "FCCAnalyses::MCParticle::get_eta (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_energy","FCCAnalyses::MCParticle::get_e   (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_mass",  "FCCAnalyses::MCParticle::get_mass(genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_pdg",   "FCCAnalyses::MCParticle::get_pdg (genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_Vertex_x", "FCCAnalyses::MCParticle::get_vertex_x(genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_Vertex_y", "FCCAnalyses::MCParticle::get_vertex_y(genBs2TauTau_Tauminus_ell)")
+               .Define("genBs2TauTau_Tauminus_ell_Vertex_z", "FCCAnalyses::MCParticle::get_vertex_z(genBs2TauTau_Tauminus_ell)")
+               
+               #############################################
+               ##      Select Bs->Tau(->ell)Tau(->1pi)    ##
+               #############################################
+               #IF SIGNAL => FILTER
+               .Filter("(n_genBs2TauTau_Tauminus_1pi > 0 && n_genBs2TauTau_Tauplus_ell > 0) || (n_genBs2TauTau_Tauplus_1pi > 0 && n_genBs2TauTau_Tauminus_ell > 0)") 
                
                #############################################
                ##              Build Reco Vertex          ##
@@ -241,21 +325,11 @@ class RDFanalysis():
                .Define("EVT_dPV2DVmax",   "myUtils::get_dPV2DV_max(Vertex_d2PV_pre)")
                .Define("EVT_dPV2DVave",   "myUtils::get_dPV2DV_ave(Vertex_d2PV_pre)")
 
-               #############################################
-               ##        Build Tau -> 3Pi candidates      ##
-               #############################################
-               .Define("Tau23PiCandidates",         "myUtils::build_tau23pi(VertexObject,RecoPartPIDAtVertex)")
-
-               #############################################
-               ##       Filter Tau -> 3Pi candidates      ##
-               #############################################
-               .Define("EVT_NTau23Pi",              "float(myUtils::getFCCAnalysesComposite_N(Tau23PiCandidates))")
-#               .Filter("EVT_NTau23Pi>1")
-
 
                #############################################
                ##              Get RECO info              ##
                #############################################
+               
                .Define("RP_e_pre",              "ReconstructedParticle::get_e(RecoPartPIDAtVertex)")
                .Define("RP_m_true_pre",         "ReconstructedParticle::get_mass(RecoPartPIDAtVertex)")
                .Define("RP_m_reco_pre",         "ReconstructedParticle::get_mass(ReconstructedParticles)")
@@ -376,258 +450,56 @@ class RDFanalysis():
                .Define("DV_d0",            "myUtils::get_trackd0(DV_tracks)")
                .Define("DV_z0",            "myUtils::get_trackz0(DV_tracks)")
 
-               .Define("Tau23PiCandidates_anglethrust", "myUtils::getFCCAnalysesComposite_anglethrust(Tau23PiCandidates, EVT_thrust)")
-               .Define("EVT_ThrustEmin_NTau23PiCand",   "float(myUtils::get_Npos(cos(Tau23PiCandidates_anglethrust)))")
-               .Define("EVT_ThrustEmax_NTau23PiCand",   "float(myUtils::get_Nneg(cos(Tau23PiCandidates_anglethrust)))")
+               #.Filter("EVT_ThrustEmin_NTau23PiCand > 1 && recoEmiss_e > 3.5 && EVT_ThrustEmin_Eneutral < 10 && EVT_ThrustEmin_Nneutral <= 13 && EVT_ThrustEmin_E < 38.")
 
-               .Filter("EVT_ThrustEmin_NTau23PiCand > 1 && recoEmiss_e > 3.5 && EVT_ThrustEmin_Eneutral < 10 && EVT_ThrustEmin_Nneutral <= 13 && EVT_ThrustEmin_E < 38.")
+               ##############################
+               ##      Get the leptons     ##
+               ##############################
 
+               #concat the two indices collections to treat all of them in one go
+               .Alias("Electron0","Electron#0.index")
+               .Alias("Muon0","Muon#0.index")
+               .Define("Lepton0","ROOT::VecOps::RVec<int> result; for(size_t i=0; i<Electron0.size(); ++i){result.push_back(Electron0.at(i));} for(size_t j=0; j<Muon0.size(); ++j){result.push_back(Muon0.at(j));} return result;")
 
-               #############################################
-               ##         Tau23Pi candidates info         ##
-               #############################################
-
-               #All Candidates
-               .Define("Tau23PiCandidates_mass",    "myUtils::getFCCAnalysesComposite_mass(Tau23PiCandidates)")
-               .Define("Tau23PiCandidates_q",       "myUtils::getFCCAnalysesComposite_charge(Tau23PiCandidates)")
-               .Define("Tau23PiCandidates_vertex",  "myUtils::getFCCAnalysesComposite_vertex(Tau23PiCandidates)")
-               .Define("Tau23PiCandidates_mcvertex","myUtils::getFCCAnalysesComposite_mcvertex(Tau23PiCandidates,VertexObject)")
-               .Define("Tau23PiCandidates_px",      "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,0)")
-               .Define("Tau23PiCandidates_py",      "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,1)")
-               .Define("Tau23PiCandidates_pz",      "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,2)")
-               .Define("Tau23PiCandidates_p",       "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,-1)")
-               .Define("Tau23PiCandidates_B",       "myUtils::getFCCAnalysesComposite_B(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex)")
-               .Define("Tau23PiCandidates_x",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_x_pre.at(p));} return result;")
-               .Define("Tau23PiCandidates_y",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_y_pre.at(p));} return result;")
-               .Define("Tau23PiCandidates_z",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_z_pre.at(p));} return result;")
-               .Define("Tau23PiCandidates_xErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_xErr_pre.at(p));} return result;")
-               .Define("Tau23PiCandidates_yErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_yErr_pre.at(p));} return result;")
-               .Define("Tau23PiCandidates_zErr",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_zErr_pre.at(p));} return result;")
-               .Define("Tau23PiCandidates_chi2",    "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_chi2_pre.at(p));} return result;")
-               .Define("Tau23PiCandidates_hemEmin", "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_thrusthemis_emin.at(p));} return result;")
-               .Define("Tau23PiCandidates_track",   "myUtils::getFCCAnalysesComposite_track(Tau23PiCandidates, VertexObject)")
-               .Define("Tau23PiCandidates_d0",      "myUtils::get_trackd0(Tau23PiCandidates_track)")
-               .Define("Tau23PiCandidates_z0",      "myUtils::get_trackz0(Tau23PiCandidates_track)")
-               
-               .Define("Tau23PiCandidates_rho",     "myUtils::build_rho(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex)")
-               .Define("Tau23PiCandidates_rho1mass","myUtils::get_mass(Tau23PiCandidates_rho, 0)")
-               .Define("Tau23PiCandidates_rho2mass","myUtils::get_mass(Tau23PiCandidates_rho, 1)")
-               .Define("Tau23PiCandidates_rho1px",  "myUtils::get_px(Tau23PiCandidates_rho, 0)")
-               .Define("Tau23PiCandidates_rho2px",  "myUtils::get_px(Tau23PiCandidates_rho, 1)")
-               .Define("Tau23PiCandidates_rho1py",  "myUtils::get_py(Tau23PiCandidates_rho, 0)")
-               .Define("Tau23PiCandidates_rho2py",  "myUtils::get_py(Tau23PiCandidates_rho, 1)")
-               .Define("Tau23PiCandidates_rho1pz",  "myUtils::get_pz(Tau23PiCandidates_rho, 0)")
-               .Define("Tau23PiCandidates_rho2pz",  "myUtils::get_pz(Tau23PiCandidates_rho, 1)")
-
-               .Define("Tau23PiCandidates_pion1px", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 0, 0)")
-               .Define("Tau23PiCandidates_pion1py", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 0, 1)")
-               .Define("Tau23PiCandidates_pion1pz", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 0, 2)")
-               .Define("Tau23PiCandidates_pion1p",  "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 0, -1)")
-               .Define("Tau23PiCandidates_pion1q",  "myUtils::getFCCAnalysesComposite_q(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 0)")
-               .Define("Tau23PiCandidates_pion1d0", "myUtils::getFCCAnalysesComposite_d0(Tau23PiCandidates, VertexObject, 0)")
-               .Define("Tau23PiCandidates_pion1z0", "myUtils::getFCCAnalysesComposite_z0(Tau23PiCandidates, VertexObject, 0)")
-               .Define("Tau23PiCandidates_pion2px", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1, 0)")
-               .Define("Tau23PiCandidates_pion2py", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1, 1)")
-               .Define("Tau23PiCandidates_pion2pz", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1, 2)")
-               .Define("Tau23PiCandidates_pion2p",  "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1, -1)")
-               .Define("Tau23PiCandidates_pion2q",  "myUtils::getFCCAnalysesComposite_q(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 1)")
-               .Define("Tau23PiCandidates_pion2d0", "myUtils::getFCCAnalysesComposite_d0(Tau23PiCandidates, VertexObject, 1)")
-               .Define("Tau23PiCandidates_pion2z0", "myUtils::getFCCAnalysesComposite_z0(Tau23PiCandidates, VertexObject, 1)")
-               .Define("Tau23PiCandidates_pion3px", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2, 0)")
-               .Define("Tau23PiCandidates_pion3py", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2, 1)")
-               .Define("Tau23PiCandidates_pion3pz", "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2, 2)")
-               .Define("Tau23PiCandidates_pion3p",  "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2, -1)")
-               .Define("Tau23PiCandidates_pion3q",  "myUtils::getFCCAnalysesComposite_q(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex, 2)")
-               .Define("Tau23PiCandidates_pion3d0", "myUtils::getFCCAnalysesComposite_d0(Tau23PiCandidates, VertexObject, 2)")
-               .Define("Tau23PiCandidates_pion3z0", "myUtils::getFCCAnalysesComposite_z0(Tau23PiCandidates, VertexObject, 2)")
+               .Define("n_ell",      "ReconstructedParticle::get_n(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_px",     "ReconstructedParticle::get_px(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_py",     "ReconstructedParticle::get_py(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_pz",     "ReconstructedParticle::get_pz(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_phi",    "ReconstructedParticle::get_phi(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_eta",    "ReconstructedParticle::get_eta(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_d0",     "ReconstructedParticle2Track::getRP2TRK_D0(ReconstructedParticle::get(Lepton0,ReconstructedParticles),EFlowTrack_1)")
+               .Define("ell_z0",     "ReconstructedParticle2Track::getRP2TRK_Z0(ReconstructedParticle::get(Lepton0,ReconstructedParticles),EFlowTrack_1)")
+               .Define("ell_energy", "ReconstructedParticle::get_e(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_charge", "ReconstructedParticle::get_charge(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_PDG",    "ReconstructedParticle::get_type(ReconstructedParticle::get(Lepton0,ReconstructedParticles))")
+               .Define("ell_thrustangles",'Algorithms::getAxisCosTheta(EVT_thrust, ell_px, ell_py, ell_pz)')
+               .Define("ell_thrustEmin_n","int result (0); for (size_t i=0; i<ell_thrustangles.size(); ++i){if (ell_thrustangles[i] > 0.0) ++result;} return result;")
+               .Define("ell_thrustEmax_n","int result (0); for (size_t i=0; i<ell_thrustangles.size(); ++i){if (ell_thrustangles[i] <= 0.0) ++result;} return result;")
 
 
-                #####################################
-                ##   Get the two taus of interest  ##
-                #####################################               
-               
-               .Define("Tau23PiCandidates_pAngles","FCCAnalyses::ZHfunctions::Compute_Momenta_Angles(EVT_NTau23Pi,Tau23PiCandidates_px,Tau23PiCandidates_py,Tau23PiCandidates_pz)")\
-               .Define("Tau23PiCandidates_pAngles_ID","FCCAnalyses::ZHfunctions::ID_Angles(EVT_NTau23Pi)")\
-               .Define("diTau","FCCAnalyses::ZHfunctions::Find_diTau(EVT_NTau23Pi,Tau23PiCandidates_pAngles,Tau23PiCandidates_pAngles_ID,Tau23PiCandidates_q)")\
-               .Define("n_diTau","diTau.size()")\
-               .Filter("n_diTau > 1") #Get rid of the the phantom events (where no diTau where found)
+               ##############################
+               ##       Get the pions      ##
+               ##############################
 
-               .Define("diTauPlus_x", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_x[diTau[0]];  else return Tau23PiCandidates_x[diTau[1]];")
-               .Define("diTauPlus_y", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_y[diTau[0]];  else return Tau23PiCandidates_y[diTau[1]];")
-               .Define("diTauPlus_z", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_z[diTau[0]];  else return Tau23PiCandidates_z[diTau[1]];")
-               .Define("diTauPlus_px","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_px[diTau[0]]; else return Tau23PiCandidates_px[diTau[1]];")
-               .Define("diTauPlus_py","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_py[diTau[0]]; else return Tau23PiCandidates_py[diTau[1]];")
-               .Define("diTauPlus_pz","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pz[diTau[0]]; else return Tau23PiCandidates_pz[diTau[1]];")
-               .Define("diTauPlus_p", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_p[diTau[0]];  else return Tau23PiCandidates_p[diTau[1]];")
-               .Define("diTauPlus_mass","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_mass[diTau[0]];  else return Tau23PiCandidates_mass[diTau[1]];")
-               .Define("diTauPlus_chi2","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_chi2[diTau[0]];  else return Tau23PiCandidates_chi2[diTau[1]];")
-               .Define("diTauMinus_x", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_x[diTau[0]];  else return Tau23PiCandidates_x[diTau[1]];")
-               .Define("diTauMinus_y", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_y[diTau[0]];  else return Tau23PiCandidates_y[diTau[1]];")
-               .Define("diTauMinus_z", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_z[diTau[0]];  else return Tau23PiCandidates_z[diTau[1]];")
-               .Define("diTauMinus_px","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_px[diTau[0]]; else return Tau23PiCandidates_px[diTau[1]];")
-               .Define("diTauMinus_py","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_py[diTau[0]]; else return Tau23PiCandidates_py[diTau[1]];")
-               .Define("diTauMinus_pz","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pz[diTau[0]]; else return Tau23PiCandidates_pz[diTau[1]];")
-               .Define("diTauMinus_p", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_p[diTau[0]];  else return Tau23PiCandidates_p[diTau[1]];")
-               .Define("diTauMinus_mass","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_mass[diTau[0]];  else return Tau23PiCandidates_mass[diTau[1]];")
-               .Define("diTauMinus_chi2","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_chi2[diTau[0]];  else return Tau23PiCandidates_chi2[diTau[1]];")
-               .Define("diTau_Angles","FCCAnalyses::ZHfunctions::Compute_Momenta_Angles(diTauPlus_x,diTauPlus_y,diTauPlus_z,diTauMinus_x,diTauMinus_y,diTauMinus_z)")
+               #Use perfect PID from PIDatVertex
+               .Define("pi_ind","ROOT::VecOps::RVec<int> result; for (size_t i=0; i<RP_m_true_pre.size(); ++i) if (std::abs(RP_m_true_pre.at(i)-0.13957039) < 1e-3) result.push_back(i); return result;")
 
-               .Define("diTauPlus_rho1mass", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1mass[diTau[0]];  else return Tau23PiCandidates_rho1mass[diTau[1]];")
-               .Define("diTauPlus_rho1px",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1px[diTau[0]];  else return Tau23PiCandidates_rho1px[diTau[1]];")
-               .Define("diTauPlus_rho1py",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1py[diTau[0]];  else return Tau23PiCandidates_rho1py[diTau[1]];")
-               .Define("diTauPlus_rho1pz",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1pz[diTau[0]];  else return Tau23PiCandidates_rho1pz[diTau[1]];")
-               .Define("diTauPlus_rho2px",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2px[diTau[0]];  else return Tau23PiCandidates_rho2px[diTau[1]];")
-               .Define("diTauPlus_rho2py",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2py[diTau[0]];  else return Tau23PiCandidates_rho2py[diTau[1]];")
-               .Define("diTauPlus_rho2pz",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2pz[diTau[0]];  else return Tau23PiCandidates_rho2pz[diTau[1]];")
-               .Define("diTauMinus_rho1mass", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1mass[diTau[0]];  else return Tau23PiCandidates_rho1mass[diTau[1]];")
-               .Define("diTauMinus_rho1px",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1px[diTau[0]];  else return Tau23PiCandidates_rho1px[diTau[1]];")
-               .Define("diTauMinus_rho1py",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1py[diTau[0]];  else return Tau23PiCandidates_rho1py[diTau[1]];")
-               .Define("diTauMinus_rho1pz",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1pz[diTau[0]];  else return Tau23PiCandidates_rho1pz[diTau[1]];")
-               .Define("diTauMinus_rho2px",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho2px[diTau[0]];  else return Tau23PiCandidates_rho2px[diTau[1]];")
-               .Define("diTauMinus_rho2py",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho2py[diTau[0]];  else return Tau23PiCandidates_rho2py[diTau[1]];")
-               .Define("diTauMinus_rho2pz",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho2pz[diTau[0]];  else return Tau23PiCandidates_rho2pz[diTau[1]];")
-
-               .Define("diTauPlus_pion1px", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1px[diTau[0]];  else return Tau23PiCandidates_pion1px[diTau[1]];")
-               .Define("diTauPlus_pion1py", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1py[diTau[0]];  else return Tau23PiCandidates_pion1py[diTau[1]];")
-               .Define("diTauPlus_pion1pz", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1pz[diTau[0]];  else return Tau23PiCandidates_pion1pz[diTau[1]];")
-               .Define("diTauPlus_pion1p",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1p[diTau[0]];  else return Tau23PiCandidates_pion1p[diTau[1]];")
-               .Define("diTauPlus_pion1q",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1q[diTau[0]];  else return Tau23PiCandidates_pion1q[diTau[1]];")
-               .Define("diTauPlus_pion1d0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1d0[diTau[0]];  else return Tau23PiCandidates_pion1d0[diTau[1]];")
-               .Define("diTauPlus_pion1z0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion1z0[diTau[0]];  else return Tau23PiCandidates_pion1z0[diTau[1]];")
-               .Define("diTauPlus_pion2px", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2px[diTau[0]];  else return Tau23PiCandidates_pion2px[diTau[1]];")
-               .Define("diTauPlus_pion2py", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2py[diTau[0]];  else return Tau23PiCandidates_pion2py[diTau[1]];")
-               .Define("diTauPlus_pion2pz", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2pz[diTau[0]];  else return Tau23PiCandidates_pion2pz[diTau[1]];")
-               .Define("diTauPlus_pion2p",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2p[diTau[0]];  else return Tau23PiCandidates_pion2p[diTau[1]];")
-               .Define("diTauPlus_pion2q",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2q[diTau[0]];  else return Tau23PiCandidates_pion2q[diTau[1]];")
-               .Define("diTauPlus_pion2d0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2d0[diTau[0]];  else return Tau23PiCandidates_pion2d0[diTau[1]];")
-               .Define("diTauPlus_pion2z0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion2z0[diTau[0]];  else return Tau23PiCandidates_pion2z0[diTau[1]];")
-               .Define("diTauPlus_pion3px", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3px[diTau[0]];  else return Tau23PiCandidates_pion3px[diTau[1]];")
-               .Define("diTauPlus_pion3py", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3py[diTau[0]];  else return Tau23PiCandidates_pion3py[diTau[1]];")
-               .Define("diTauPlus_pion3pz", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3pz[diTau[0]];  else return Tau23PiCandidates_pion3pz[diTau[1]];")
-               .Define("diTauPlus_pion3p",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3p[diTau[0]];  else return Tau23PiCandidates_pion3p[diTau[1]];")
-               .Define("diTauPlus_pion3q",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3q[diTau[0]];  else return Tau23PiCandidates_pion3q[diTau[1]];")
-               .Define("diTauPlus_pion3d0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3d0[diTau[0]];  else return Tau23PiCandidates_pion3d0[diTau[1]];")
-               .Define("diTauPlus_pion3z0", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pion3z0[diTau[0]];  else return Tau23PiCandidates_pion3z0[diTau[1]];")
-               .Define("diTauMinus_pion1px", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1px[diTau[0]];  else return Tau23PiCandidates_pion1px[diTau[1]];")
-               .Define("diTauMinus_pion1py", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1py[diTau[0]];  else return Tau23PiCandidates_pion1py[diTau[1]];")
-               .Define("diTauMinus_pion1pz", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1pz[diTau[0]];  else return Tau23PiCandidates_pion1pz[diTau[1]];")
-               .Define("diTauMinus_pion1p",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1p[diTau[0]];  else return Tau23PiCandidates_pion1p[diTau[1]];")
-               .Define("diTauMinus_pion1q",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1q[diTau[0]];  else return Tau23PiCandidates_pion1q[diTau[1]];")
-               .Define("diTauMinus_pion1d0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1d0[diTau[0]];  else return Tau23PiCandidates_pion1d0[diTau[1]];")
-               .Define("diTauMinus_pion1z0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion1z0[diTau[0]];  else return Tau23PiCandidates_pion1z0[diTau[1]];")
-               .Define("diTauMinus_pion2px", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2px[diTau[0]];  else return Tau23PiCandidates_pion2px[diTau[1]];")
-               .Define("diTauMinus_pion2py", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2py[diTau[0]];  else return Tau23PiCandidates_pion2py[diTau[1]];")
-               .Define("diTauMinus_pion2pz", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2pz[diTau[0]];  else return Tau23PiCandidates_pion2pz[diTau[1]];")
-               .Define("diTauMinus_pion2p",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2p[diTau[0]];  else return Tau23PiCandidates_pion2p[diTau[1]];")
-               .Define("diTauMinus_pion2q",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2q[diTau[0]];  else return Tau23PiCandidates_pion2q[diTau[1]];")
-               .Define("diTauMinus_pion2d0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2d0[diTau[0]];  else return Tau23PiCandidates_pion2d0[diTau[1]];")
-               .Define("diTauMinus_pion2z0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion2z0[diTau[0]];  else return Tau23PiCandidates_pion2z0[diTau[1]];")
-               .Define("diTauMinus_pion3px", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3px[diTau[0]];  else return Tau23PiCandidates_pion3px[diTau[1]];")
-               .Define("diTauMinus_pion3py", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3py[diTau[0]];  else return Tau23PiCandidates_pion3py[diTau[1]];")
-               .Define("diTauMinus_pion3pz", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3pz[diTau[0]];  else return Tau23PiCandidates_pion3pz[diTau[1]];")
-               .Define("diTauMinus_pion3p",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3p[diTau[0]];  else return Tau23PiCandidates_pion3p[diTau[1]];")
-               .Define("diTauMinus_pion3q",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3q[diTau[0]];  else return Tau23PiCandidates_pion3q[diTau[1]];")
-               .Define("diTauMinus_pion3d0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3d0[diTau[0]];  else return Tau23PiCandidates_pion3d0[diTau[1]];")
-               .Define("diTauMinus_pion3z0", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pion3z0[diTau[0]];  else return Tau23PiCandidates_pion3z0[diTau[1]];")
-
-
-               ###############################
-               ##   collinear mass cal      ##
-               ###############################
-
-               .Define("diTauPlus_p4","TLorentzVector p4p; p4p.SetXYZM(diTauPlus_px, diTauPlus_py, diTauPlus_pz, diTauPlus_mass); return p4p;")
-               .Define("diTauMinus_p4","TLorentzVector p4m; p4m.SetXYZM(diTauMinus_px, diTauMinus_py, diTauMinus_pz, diTauMinus_mass); return p4m;")
-               .Define("mDiTau_Vis",   "(diTauPlus_p4+diTauMinus_p4).M()")
-               .Define("DeltaM","mDiTau_Vis-diTauPlus_mass-diTauMinus_mass")
-               .Define("ratio_Emiss",  "(recoEmiss_px * diTauPlus_px + recoEmiss_py * diTauPlus_py + recoEmiss_pz * diTauPlus_pz) / (recoEmiss_p4.P() * diTauPlus_p)")
-               .Define("mDiTau_full",  "(diTauPlus_p4+diTauMinus_p4+ratio_Emiss*recoEmiss_p4).M()")
-
-
-               .Define("T1xT2_x",    "diTauPlus_py*diTauMinus_pz-diTauPlus_pz*diTauMinus_py")
-               .Define("T1xT2_y",    "diTauPlus_pz*diTauMinus_px-diTauPlus_px*diTauMinus_pz")
-               .Define("T1xT2_z",    "diTauPlus_px*diTauMinus_py-diTauPlus_py*diTauMinus_px")
-               .Define("T1xEm_x",    "diTauPlus_py*recoEmiss_pz-diTauPlus_pz*recoEmiss_py")
-               .Define("T1xEm_y",    "diTauPlus_pz*recoEmiss_px-diTauPlus_px*recoEmiss_pz")
-               .Define("T1xEm_z",    "diTauPlus_px*recoEmiss_py-diTauPlus_py*recoEmiss_px")
-               .Define("EmxT2_x",    "recoEmiss_py*diTauMinus_pz-recoEmiss_pz*diTauMinus_py")
-               .Define("EmxT2_y",    "recoEmiss_pz*diTauMinus_px-recoEmiss_px*diTauMinus_pz")
-               .Define("EmxT2_z",    "recoEmiss_px*diTauMinus_py-recoEmiss_py*diTauMinus_px")
-
-               .Define("T1xT2_M2",   "T1xT2_x * T1xT2_x + T1xT2_y * T1xT2_y + T1xT2_z * T1xT2_z")
-               .Define("denom",      "(T1xT2_x + EmxT2_x)*(T1xT2_x + T1xEm_x) + (T1xT2_y + EmxT2_y)*(T1xT2_y + T1xEm_y) + (T1xT2_z + EmxT2_z)*(T1xT2_z + T1xEm_z)")
-
-               .Define("mDiTau_collinear3D",    "mDiTau_Vis/sqrt(T1xT2_M2/denom)") 
-
-               #################################
-               ##   Bs2TauTau Vertex approx   ##
-               #################################
-
-    #Find the RECO (Visible) vertex and get its "quality", given by the length of the line on which the Visible vertex is found (not sure yet how to properly use it to assess the actual quality, would need a reference distance)
-               .Define("Bs2TauTau",  "FCCAnalyses::ZHfunctions::Compute_BsVisibleVertex(diTauPlus_x,diTauPlus_y,diTauPlus_z,diTauMinus_x,diTauMinus_y,diTauMinus_z,diTauPlus_px,diTauPlus_py,diTauPlus_pz,diTauMinus_px,diTauMinus_py,diTauMinus_pz)")\
-               .Define("Bs2TauTau_x","Bs2TauTau[0]")\
-               .Define("Bs2TauTau_y","Bs2TauTau[1]")\
-               .Define("Bs2TauTau_z","Bs2TauTau[2]")
-
-    #Get the PV coordinates 
-               .Define("PV_x","float res; for (size_t i=0;i<Vertex_isPV_pre.size();++i) if (Vertex_isPV_pre[i]==1) res = Vertex_x_pre[i]; return res;")
-               .Define("PV_y","float res; for (size_t i=0;i<Vertex_isPV_pre.size();++i) if (Vertex_isPV_pre[i]==1) res = Vertex_y_pre[i]; return res;")
-               .Define("PV_z","float res; for (size_t i=0;i<Vertex_isPV_pre.size();++i) if (Vertex_isPV_pre[i]==1) res = Vertex_z_pre[i]; return res;")
-
-    #Get the IPs of both taus
-               .Define("diTauPlus_IPP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauPlus_x,diTauPlus_y,diTauPlus_z,Bs2TauTau_x,Bs2TauTau_y,Bs2TauTau_z,PV_x,PV_y,PV_z)")
-               .Define("diTauPlus_IPx","diTauPlus_IPP[0]-diTauPlus_x")
-               .Define("diTauPlus_IPy","diTauPlus_IPP[1]-diTauPlus_y")
-               .Define("diTauPlus_IPz","diTauPlus_IPP[2]-diTauPlus_z")
-               .Define("diTauPlus_IP", "FCCAnalyses::ZHfunctions::Get_Norm(diTauPlus_IPx,diTauPlus_IPy,diTauPlus_IPz)")
-               .Define("diTauMinus_IPP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauMinus_x,diTauMinus_y,diTauMinus_z,Bs2TauTau_x,Bs2TauTau_y,Bs2TauTau_z,PV_x,PV_y,PV_z)")
-               .Define("diTauMinus_IPx","diTauMinus_IPP[0]-diTauMinus_x")
-               .Define("diTauMinus_IPy","diTauMinus_IPP[1]-diTauMinus_y")
-               .Define("diTauMinus_IPz","diTauMinus_IPP[2]-diTauMinus_z")
-               .Define("diTauMinus_IP", "FCCAnalyses::ZHfunctions::Get_Norm(diTauMinus_IPx,diTauMinus_IPy,diTauMinus_IPz)")
-
-    #Get the Flight Distance and Distance
-               .Define("diTauPlus_FlightDistance", "sqrt(pow(diTauPlus_x-Bs2TauTau_x,2) + pow(diTauPlus_y-Bs2TauTau_y,2) + pow(diTauPlus_z-Bs2TauTau_z,2))")
-               .Define("diTauPlus_Lifetime",       "1.7769/diTauPlus_p*diTauPlus_FlightDistance/299792458e3")
-               .Define("diTauMinus_FlightDistance","sqrt(pow(diTauMinus_x-Bs2TauTau_x,2) + pow(diTauMinus_y-Bs2TauTau_y,2) + pow(diTauMinus_z-Bs2TauTau_z,2))")
-               .Define("diTauMinus_Lifetime",      "1.7769/diTauMinus_p*diTauMinus_FlightDistance/299792458e3")
-
-    #Get the Tau Vertex IP (Distance between vertex and z-oriented line passing by PV, EXACT) and the "usual" Tau IP (Distance between Taus flight dir and PV, BIASED)
-               .Define("diTauPlus_IPVP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauPlus_x,diTauPlus_y,diTauPlus_z,PV_x,PV_y,PV_z+1.0,PV_x,PV_y,PV_z)")
-               .Define("diTauPlus_IPVx","diTauPlus_IPVP[0]-diTauPlus_x")
-               .Define("diTauPlus_IPVy","diTauPlus_IPVP[1]-diTauPlus_y")
-               .Define("diTauPlus_IPVz","diTauPlus_IPVP[2]-diTauPlus_z")
-               .Define("diTauPlus_IPV","FCCAnalyses::ZHfunctions::Get_Norm(diTauPlus_IPVx,diTauPlus_IPVy,diTauPlus_IPVz)")
-               .Define("diTauMinus_IPVP","FCCAnalyses::ZHfunctions::Compute_IPP(diTauMinus_x,diTauMinus_y,diTauMinus_z,PV_x,PV_y,PV_z+1.0,PV_x,PV_y,PV_z)")
-               .Define("diTauMinus_IPVx","diTauMinus_IPVP[0]-diTauMinus_x")
-               .Define("diTauMinus_IPVy","diTauMinus_IPVP[1]-diTauMinus_y")
-               .Define("diTauMinus_IPVz","diTauMinus_IPVP[2]-diTauMinus_z")
-               .Define("diTauMinus_IPV","FCCAnalyses::ZHfunctions::Get_Norm(diTauMinus_IPVx,diTauMinus_IPVy,diTauMinus_IPVz)")
-
-               .Define("diTauPlus_IPFP","FCCAnalyses::ZHfunctions::Compute_IPP(PV_x,PV_y,PV_z, diTauPlus_x,diTauPlus_y,diTauPlus_z, diTauPlus_x+diTauPlus_px,diTauPlus_y+diTauPlus_py,diTauPlus_z+diTauPlus_pz)")
-               .Define("diTauPlus_IPFx","diTauPlus_IPFP[0]-PV_x")
-               .Define("diTauPlus_IPFy","diTauPlus_IPFP[1]-PV_y")
-               .Define("diTauPlus_IPFz","diTauPlus_IPFP[2]-PV_z")
-               .Define("diTauPlus_IPF","FCCAnalyses::ZHfunctions::Get_Norm(diTauPlus_IPFx,diTauPlus_IPFy,diTauPlus_IPFz)")
-               .Define("diTauMinus_IPFP","FCCAnalyses::ZHfunctions::Compute_IPP(PV_x,PV_y,PV_z, diTauMinus_x,diTauMinus_y,diTauMinus_z, diTauMinus_x+diTauMinus_px,diTauMinus_y+diTauMinus_py,diTauMinus_z+diTauMinus_pz)")
-               .Define("diTauMinus_IPFx","diTauMinus_IPFP[0]-PV_x")
-               .Define("diTauMinus_IPFy","diTauMinus_IPFP[1]-PV_y")
-               .Define("diTauMinus_IPFz","diTauMinus_IPFP[2]-PV_z")
-               .Define("diTauMinus_IPF","FCCAnalyses::ZHfunctions::Get_Norm(diTauMinus_IPFx,diTauMinus_IPFy,diTauMinus_IPFz)")
-
-    #Get the Bs IP (vertex)
-               .Define("Bs_IPVP","FCCAnalyses::ZHfunctions::Compute_IPP(Bs2TauTau_x,Bs2TauTau_y,Bs2TauTau_z,PV_x,PV_y,PV_z+1.0,PV_x,PV_y,PV_z)")
-               .Define("Bs_IPVx","Bs_IPVP[0]-Bs2TauTau_x")
-               .Define("Bs_IPVy","Bs_IPVP[1]-Bs2TauTau_y")
-               .Define("Bs_IPVz","Bs_IPVP[2]-Bs2TauTau_z")
-               .Define("Bs_IPV","FCCAnalyses::ZHfunctions::Get_Norm(Bs_IPVx,Bs_IPVy,Bs_IPVz)")
-
-    #Bs properties from RECO technique, Only visible momenta
-               .Define("Bs_FlightDistance","FCCAnalyses::ZHfunctions::Get_Norm(Bs2TauTau_x-PV_x,Bs2TauTau_y-PV_y,Bs2TauTau_z-PV_z)")
-               .Define("Bs_px","diTauMinus_px+diTauPlus_px")
-               .Define("Bs_py","diTauMinus_py+diTauPlus_py")
-               .Define("Bs_pz","diTauMinus_pz+diTauPlus_pz")
-               .Define("Bs_p","FCCAnalyses::ZHfunctions::Get_Norm(Bs_px,Bs_py,Bs_pz)")
-               .Define("Bs_Lifetime","5.3669/Bs_p*Bs_FlightDistance/299792458e3")
+               .Define("n_pi",      "ReconstructedParticle::get_n(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_px",     "ReconstructedParticle::get_px(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_py",     "ReconstructedParticle::get_py(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_pz",     "ReconstructedParticle::get_pz(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_phi",    "ReconstructedParticle::get_phi(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_eta",    "ReconstructedParticle::get_eta(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_d0",     "ReconstructedParticle2Track::getRP2TRK_D0(ReconstructedParticle::get(pi_ind,ReconstructedParticles),EFlowTrack_1)")
+               .Define("pi_z0",     "ReconstructedParticle2Track::getRP2TRK_Z0(ReconstructedParticle::get(pi_ind,ReconstructedParticles),EFlowTrack_1)")
+               .Define("pi_energy", "ReconstructedParticle::get_e(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_mass",   "ReconstructedParticle::get_mass(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_charge", "ReconstructedParticle::get_charge(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_PDG",    "ReconstructedParticle::get_type(ReconstructedParticle::get(pi_ind,ReconstructedParticles))")
+               .Define("pi_thrustangles",'Algorithms::getAxisCosTheta(EVT_thrust, pi_px, pi_py, pi_pz)')
+               .Define("pi_thrustEmin_n","int result (0); for (size_t i=0; i<pi_thrustangles.size(); ++i){if (pi_thrustangles[i] > 0.0) ++result;} return result;")
+               .Define("pi_thrustEmax_n","int result (0); for (size_t i=0; i<pi_thrustangles.size(); ++i){if (pi_thrustangles[i] <= 0.0) ++result;} return result;")
                
                ###############################
                ##   Had tagger columns      ##
@@ -731,13 +603,12 @@ class RDFanalysis():
                 "EVT_ThrustEmin_py",           "EVT_ThrustEmax_py",
                 "EVT_ThrustEmin_pz",           "EVT_ThrustEmax_pz",
                 "EVT_ThrustEmin_NDV",          "EVT_ThrustEmax_NDV",
-                "EVT_ThrustEmin_NTau23PiCand", "EVT_ThrustEmax_NTau23PiCand",
                 "EVT_Thrust_Mag",
                 "EVT_Thrust_X",  "EVT_Thrust_XErr",
                 "EVT_Thrust_Y",  "EVT_Thrust_YErr",
                 "EVT_Thrust_Z",  "EVT_Thrust_ZErr",
 
-                "EVT_NtracksPV", "EVT_NVertex", "EVT_NTau23Pi",
+                "EVT_NtracksPV", "EVT_NVertex",
 
                 "EVT_dPV2DVmin","EVT_dPV2DVmax","EVT_dPV2DVave",
 
@@ -759,36 +630,8 @@ class RDFanalysis():
                 "recoEmiss_px", "recoEmiss_py", "recoEmiss_pz", "recoEmiss_e", "recoEmiss_m",
                 "recoEmiss_thrustangle",
 
-                "diTauPlus_x","diTauPlus_y","diTauPlus_z","diTauPlus_px","diTauPlus_py","diTauPlus_pz","diTauPlus_p","diTauPlus_mass","diTauPlus_chi2",
-                "diTauMinus_x","diTauMinus_y","diTauMinus_z","diTauMinus_px","diTauMinus_py","diTauMinus_pz","diTauMinus_p","diTauMinus_mass","diTauMinus_chi2",
-                "diTau_Angles",
-
-                "diTauPlus_rho1mass","diTauPlus_rho1px","diTauPlus_rho1py","diTauPlus_rho1pz","diTauPlus_rho2px","diTauPlus_rho2py","diTauPlus_rho2pz", 
-                "diTauMinus_rho1mass","diTauMinus_rho1px","diTauMinus_rho1py","diTauMinus_rho1pz","diTauMinus_rho2px","diTauMinus_rho2py","diTauMinus_rho2pz", 
-
-
-               "diTauPlus_pion1px","diTauPlus_pion1py","diTauPlus_pion1pz","diTauPlus_pion1p","diTauPlus_pion1q","diTauPlus_pion1d0","diTauPlus_pion1z0",
-               "diTauPlus_pion2px","diTauPlus_pion2py","diTauPlus_pion2pz","diTauPlus_pion2p","diTauPlus_pion2q","diTauPlus_pion2d0","diTauPlus_pion2z0",
-               "diTauPlus_pion3px","diTauPlus_pion3py","diTauPlus_pion3pz","diTauPlus_pion3p","diTauPlus_pion3q","diTauPlus_pion3d0","diTauPlus_pion3z0",
-               "diTauMinus_pion1px","diTauMinus_pion1py","diTauMinus_pion1pz","diTauMinus_pion1p","diTauMinus_pion1q","diTauMinus_pion1d0","diTauMinus_pion1z0",
-               "diTauMinus_pion2px","diTauMinus_pion2py","diTauMinus_pion2pz","diTauMinus_pion2p","diTauMinus_pion2q","diTauMinus_pion2d0","diTauMinus_pion2z0",
-               "diTauMinus_pion3px","diTauMinus_pion3py","diTauMinus_pion3pz","diTauMinus_pion3p","diTauMinus_pion3q","diTauMinus_pion3d0","diTauMinus_pion3z0",
-
-                "DeltaM","mDiTau_Vis", "mDiTau_collinear3D",
-                "ratio_Emiss", "mDiTau_full",
-
-                "PV_x","PV_y","PV_z",
-                "diTauPlus_IPx","diTauPlus_IPy","diTauPlus_IPz","diTauPlus_IP",
-                "diTauMinus_IPx","diTauMinus_IPy","diTauMinus_IPz","diTauMinus_IP",
-                "diTauPlus_IPVx","diTauPlus_IPVy","diTauPlus_IPVz","diTauPlus_IPV",
-                "diTauMinus_IPVx","diTauMinus_IPVy","diTauMinus_IPVz","diTauMinus_IPV",
-                "diTauPlus_IPFx","diTauPlus_IPFy","diTauPlus_IPFz","diTauPlus_IPF",
-                "diTauMinus_IPFx","diTauMinus_IPFy","diTauMinus_IPFz","diTauMinus_IPF",
-                "diTauPlus_Lifetime","diTauPlus_FlightDistance","diTauMinus_Lifetime","diTauMinus_FlightDistance",
-
-                "Bs_IPVx","Bs_IPVy","Bs_IPVz","Bs_IPV",
-                "Bs_FlightDistance","Bs_px","Bs_py","Bs_pz","Bs_p","Bs_Lifetime",
-                
+                "n_ell","ell_px","ell_py","ell_pz","ell_phi","ell_eta","ell_d0","ell_z0","ell_energy","ell_mass","ell_charge","ell_PDG","ell_thrustangles","ell_thrustEmin_n","ell_thrustEmax_n",
+                "n_pi","pi_px","pi_py","pi_pz","pi_phi","pi_eta","pi_d0","pi_z0","pi_energy","pi_mass","pi_charge","pi_PDG","pi_thrustangles","pi_thrustEmin_n","pi_thrustEmax_n",
 
                 "RP_e","RP_m_true","RP_m_reco","RP_px","RP_py","RP_pz","RP_Dphi","RP_Dtheta","RP_charge","RP_fromPV",
                 "RP_vert_ind","RP_vert_e","RP_vert_mass","RP_trk_d0","RP_trk_z0","RP_trk_phi","RP_trk_omega","RP_trk_tanLambda","RP_dndx","RP_mtof",
