@@ -2,12 +2,12 @@
 
 # list of samples to process
 processList_full = {
-    #'p8_ee_Zbb_ecm91':{'chunks':10},
-    #'p8_ee_Zcc_ecm91':{'chunks':10},
-    #'p8_ee_Zss_ecm91':{'chunks':10},
-    #'p8_ee_Zud_ecm91':{'chunks':10},
+    'p8_ee_Zbb_ecm91':{'chunks':10,'fraction':2e-3},
+    'p8_ee_Zcc_ecm91':{'chunks':10,'fraction':2e-3},
+    'p8_ee_Zss_ecm91':{'chunks':10,'fraction':2e-3},
+    'p8_ee_Zud_ecm91':{'chunks':10,'fraction':2e-3},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
-    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':20,'fraction':1.0},
+    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':10,'fraction':0.1},
 }
 
 #processList_full = {
@@ -238,7 +238,7 @@ class RDFanalysis():
                ##      Select Bs->Tau(->ell)Tau(->1pi)    ##
                #############################################
                #IF SIGNAL => FILTER
-               .Filter("(n_genBs2TauTau_Tauminus_1pi > 0 && n_genBs2TauTau_Tauplus_ell > 0) || (n_genBs2TauTau_Tauplus_1pi > 0 && n_genBs2TauTau_Tauminus_ell > 0)") 
+               #.Filter("(n_genBs2TauTau_Tauminus_1pi > 0 && n_genBs2TauTau_Tauplus_ell > 0) || (n_genBs2TauTau_Tauplus_1pi > 0 && n_genBs2TauTau_Tauminus_ell > 0)") 
                
                #############################################
                ##              Build Reco Vertex          ##
