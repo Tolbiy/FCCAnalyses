@@ -709,6 +709,59 @@ float TM_ComputeOpeningAngle(ROOT::VecOps::RVec<float> px1,
     }
 }
 
+
+//Get the indices of the tau daughters exclusive Tau2Pi(Pi0)Nu Tau decay in the Bs2TauTau decays WARNING: PM = 1 GIVES TAU_MINUS WHILE -1 GIVES TAU_PLUS
+ROOT::VecOps::RVec<int> Find_genBs2TauTau_1Piind(ROOT::VecOps::RVec<edm4hep::MCParticleData> genBs2TauTau_list, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter, int pm){
+    ROOT::VecOps::RVec<int> result;
+    for (size_t i = 0; i < genBs2TauTau_list.size(); ++i){
+        if (genBs2TauTau_list[i].PDG == pm*15){
+            ROOT::VecOps::RVec<int> Pions;
+            ROOT::VecOps::RVec<int> Rem;
+            for (size_t j = genBs2TauTau_list[i].daughters_begin; j < genBs2TauTau_list[i].daughters_end; ++j){
+                if (std::abs(in[daughter.at(j)].PDG) == 211){ //Select charged pion
+                    Pions.push_back(daughter.at(j));
+                }
+                else {
+                    Rem.push_back(daughter.at(j)); //Pi0 comes for free 
+                }
+            }
+            if (Pions.size() == 1){ //Only one pion is allowed
+                for (size_t m = 0; m < Pions.size(); ++m){
+                    result.push_back(Pions[m]);
+                }
+                for (size_t n = 0; n < Rem.size(); ++n){
+                    result.push_back(Rem[n]);
+                }
+            }
+        }
+    }
+    return result; //Structure (Charged Pion, (nu, (Pi0) ...))
+}
+
+//From the MC 1pi daughters, find the RECO index of the corresponding particle (return a list to work with the other analyzer functions)
+//if -1, no MC 1pi daughter
+//if -2, no corresponding RECO 1pi
+ROOT::VecOps::RVec<int> TM_Bs2TauTau1PiDaughters_ind(ROOT::VecOps::RVec<int> list_1pi, ROOT::VecOps::RVec<int> mcind, ROOT::VecOps::RVec<int> recoind){
+
+    ROOT::VecOps::RVec<int> result;
+    
+    if (list_1pi.size() == 0) {
+        result.push_back(-1); //Reject if no 1pi MC daughter
+        return result;
+    }
+    
+    else{
+        int mc1pi (list_1pi.at(0));
+        for (size_t i=0; i<mcind.size(); ++i){ //Search the MC part of the MCRECO list
+            if (mcind.at(i) == mc1pi){
+                result.push_back(recoind.at(i)); //can check for duplication
+            }
+        }
+        if (result.size() == 0) result.push_back(-2); //No corresponding RECO 1pi
+        return result;
+    }
+}
+
 //------------------ di-lepton system identification --------------------------------------------------------------
 
 ROOT::VecOps::RVec<float> Leptons_ComputeOpeningAngle(ROOT::VecOps::RVec<float> px,ROOT::VecOps::RVec<float> py,ROOT::VecOps::RVec<float> pz){
