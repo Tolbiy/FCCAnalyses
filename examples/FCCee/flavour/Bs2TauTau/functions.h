@@ -738,28 +738,80 @@ ROOT::VecOps::RVec<int> Find_genBs2TauTau_1Piind(ROOT::VecOps::RVec<edm4hep::MCP
     return result; //Structure (Charged Pion, (nu, (Pi0) ...))
 }
 
-//From the MC 1pi daughters, find the RECO index of the corresponding particle (return a list to work with the other analyzer functions)
-//if -1, no MC 1pi daughter
-//if -2, no corresponding RECO 1pi
-ROOT::VecOps::RVec<int> TM_Bs2TauTau1PiDaughters_ind(ROOT::VecOps::RVec<int> list_1pi, ROOT::VecOps::RVec<int> mcind, ROOT::VecOps::RVec<int> recoind){
+//Get the INDICES of the Bs2TauTau (grand)daughters
+ROOT::VecOps::RVec<int> Find_genBs2TauTauDaughter_ind(ROOT::VecOps::RVec<edm4hep::MCParticleData> genBs2TauTau_list, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter, int DaughterPDG){
+    ROOT::VecOps::RVec<int> result;
+    for (size_t i = 0; i < genBs2TauTau_list.size(); ++i){
+        if (std::abs(genBs2TauTau_list[i].PDG) == 15){
+            ROOT::VecOps::RVec<int> Daughter;
+            ROOT::VecOps::RVec<int> Rem;
+            for (size_t j = genBs2TauTau_list[i].daughters_begin; j < genBs2TauTau_list[i].daughters_end; ++j){
+                if (in[daughter.at(j)].PDG == DaughterPDG){
+                    Daughter.push_back(daughter.at(j));
+                }
+                else {
+                    Rem.push_back(daughter.at(j));
+                }
+            }
+            if (Daughter.size() == 1){ //only one charged daughters: rejects unidentified (size==0) and multiple charged daughters (size>1)
+                for (size_t m = 0; m < Daughter.size(); ++m){
+                    result.push_back(Daughter[m]);
+                }
+                for (size_t n = 0; n < Rem.size(); ++n){
+                    result.push_back(Rem[n]);
+                }
+            }
+        }
+    }
+    return result;
+    //If not found, size == 0
+    //Else result = [Daughter of interest, [rest]]
+}
+
+//From the MC daughters, find the RECO index of the corresponding particle (return a list to work with the other analyzer functions)
+//if -1, no MC daughter
+//if -2, no corresponding RECO
+ROOT::VecOps::RVec<int> TM_Bs2TauTauDaughters_ind(ROOT::VecOps::RVec<int> MClist, ROOT::VecOps::RVec<int> mcind, ROOT::VecOps::RVec<int> recoind){
 
     ROOT::VecOps::RVec<int> result;
     
-    if (list_1pi.size() == 0) {
-        result.push_back(-1); //Reject if no 1pi MC daughter
+    if (MClist.size() == 0) {
+        result.push_back(-1); //Reject if no MC daughter
         return result;
     }
     
     else{
-        int mc1pi (list_1pi.at(0));
+        int mc (MClist.at(0));
         for (size_t i=0; i<mcind.size(); ++i){ //Search the MC part of the MCRECO list
-            if (mcind.at(i) == mc1pi){
+            if (mcind.at(i) == mc){
                 result.push_back(recoind.at(i)); //can check for duplication
             }
         }
         if (result.size() == 0) result.push_back(-2); //No corresponding RECO 1pi
         return result;
     }
+}
+
+//===========================================================================================================================================================================================================
+// RECO particle vertices selection and studies
+//===========================================================================================================================================================================================================
+
+//Flag 1pi with an associated vertex
+ROOT::VecOps::RVec<int> has_RECOVertex_1pi(ROOT::VecOps::RVec<int> list_1pi, ROOT::VecOps::RVec<VertexingUtils::FCCAnalysesVertex> Vertices){
+    
+    ROOT::VecOps::RVec<int> result;
+
+    //Proceed with the full search among all particle coming from vertices
+    for (size_t i=0; i<list_1pi.size(); ++i){
+        result.push_back(0);
+        for (auto &p:Vertices){
+            for (auto &r:p.reco_ind){
+                if (r == list_1pi.at(i)) result.at(i) = 1;
+            }
+        }
+    }
+
+    return result; 
 }
 
 //------------------ di-lepton system identification --------------------------------------------------------------
