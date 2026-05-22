@@ -2,12 +2,12 @@
 
 # list of samples to process
 processList_full = {
-    #'p8_ee_Zbb_ecm91':{'chunks':10},
-    #'p8_ee_Zcc_ecm91':{'chunks':10},
-    #'p8_ee_Zss_ecm91':{'chunks':10},
-    #'p8_ee_Zud_ecm91':{'chunks':10},
-    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
-    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':10,'fraction':0.1},
+    'p8_ee_Zbb_ecm91':{'chunks':100},
+    'p8_ee_Zcc_ecm91':{'chunks':100},
+    'p8_ee_Zss_ecm91':{'chunks':100},
+    'p8_ee_Zud_ecm91':{'chunks':100},
+    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
+    #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':10,'fraction':0.1},
 }
 
 #processList_full = {
@@ -20,16 +20,16 @@ processList_full = {
 #}
 
 processList_test = {
-    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
     'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
 }
 
 nCPUS       = 8
-runBatch    = False
+runBatch    = True 
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -41,7 +41,7 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/TOBECREATED"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_3pi3pi_withCuts"
 
 # if runBatch = False, save output locally
 outputDir   = "../DummyRepo"
