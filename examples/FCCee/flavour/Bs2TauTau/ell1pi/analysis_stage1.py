@@ -451,7 +451,7 @@ class RDFanalysis():
                .Define("DV_d0",            "myUtils::get_trackd0(DV_tracks)")
                .Define("DV_z0",            "myUtils::get_trackz0(DV_tracks)")
 
-               .Filter("recoEmiss_e > 10.0 && EVT_ThrustEmin_E < 38.0")
+               #.Filter("recoEmiss_e > 10.0 && EVT_ThrustEmin_E < 38.0")
 
                ##############################
                ##      Get the leptons     ##
