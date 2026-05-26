@@ -58,6 +58,10 @@ class RDFanalysis():
     def analysers(df):
         df2 = (
             df
+
+               #Get event number for tagger
+               .Define("EventNumber","(int)rdfentry_")
+
                #############################################
                ##          Aliases for # in python        ##
                #############################################
@@ -473,6 +477,7 @@ class RDFanalysis():
                .Define("diTau_Angles","FCCAnalyses::ZHfunctions::Compute_Momenta_Angles(diTauPlus_x,diTauPlus_y,diTauPlus_z,diTauMinus_x,diTauMinus_y,diTauMinus_z)")
 
                .Define("diTauPlus_rho1mass", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1mass[diTau[0]];  else return Tau23PiCandidates_rho1mass[diTau[1]];")
+               .Define("diTauPlus_rho2mass", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2mass[diTau[0]];  else return Tau23PiCandidates_rho2mass[diTau[1]];")
                .Define("diTauPlus_rho1px",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1px[diTau[0]];  else return Tau23PiCandidates_rho1px[diTau[1]];")
                .Define("diTauPlus_rho1py",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1py[diTau[0]];  else return Tau23PiCandidates_rho1py[diTau[1]];")
                .Define("diTauPlus_rho1pz",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho1pz[diTau[0]];  else return Tau23PiCandidates_rho1pz[diTau[1]];")
@@ -480,6 +485,7 @@ class RDFanalysis():
                .Define("diTauPlus_rho2py",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2py[diTau[0]];  else return Tau23PiCandidates_rho2py[diTau[1]];")
                .Define("diTauPlus_rho2pz",  "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_rho2pz[diTau[0]];  else return Tau23PiCandidates_rho2pz[diTau[1]];")
                .Define("diTauMinus_rho1mass", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1mass[diTau[0]];  else return Tau23PiCandidates_rho1mass[diTau[1]];")
+               .Define("diTauMinus_rho2mass", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho2mass[diTau[0]];  else return Tau23PiCandidates_rho2mass[diTau[1]];")
                .Define("diTauMinus_rho1px",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1px[diTau[0]];  else return Tau23PiCandidates_rho1px[diTau[1]];")
                .Define("diTauMinus_rho1py",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1py[diTau[0]];  else return Tau23PiCandidates_rho1py[diTau[1]];")
                .Define("diTauMinus_rho1pz",  "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_rho1pz[diTau[0]];  else return Tau23PiCandidates_rho1pz[diTau[1]];")
@@ -763,8 +769,8 @@ class RDFanalysis():
                 "diTauMinus_x","diTauMinus_y","diTauMinus_z","diTauMinus_px","diTauMinus_py","diTauMinus_pz","diTauMinus_p","diTauMinus_mass","diTauMinus_chi2",
                 "diTau_Angles",
 
-                "diTauPlus_rho1mass","diTauPlus_rho1px","diTauPlus_rho1py","diTauPlus_rho1pz","diTauPlus_rho2px","diTauPlus_rho2py","diTauPlus_rho2pz", 
-                "diTauMinus_rho1mass","diTauMinus_rho1px","diTauMinus_rho1py","diTauMinus_rho1pz","diTauMinus_rho2px","diTauMinus_rho2py","diTauMinus_rho2pz", 
+                "diTauPlus_rho1mass","diTauPlus_rho1px","diTauPlus_rho1py","diTauPlus_rho1pz","diTauPlus_rho2mass","diTauPlus_rho2px","diTauPlus_rho2py","diTauPlus_rho2pz", 
+                "diTauMinus_rho1mass","diTauMinus_rho1px","diTauMinus_rho1py","diTauMinus_rho1pz","diTauMinus_rho2mass","diTauMinus_rho2px","diTauMinus_rho2py","diTauMinus_rho2pz", 
 
 
                "diTauPlus_pion1px","diTauPlus_pion1py","diTauPlus_pion1pz","diTauPlus_pion1p","diTauPlus_pion1q","diTauPlus_pion1d0","diTauPlus_pion1z0",
