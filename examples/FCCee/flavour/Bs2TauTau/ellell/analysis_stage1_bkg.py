@@ -58,6 +58,9 @@ class RDFanalysis():
     def analysers(df):
         df2 = (
             df
+               #Get event number for tagger
+               .Define("EventNumber","(int)rdfentry_")
+               
                #############################################
                ##          Aliases for # in python        ##
                #############################################

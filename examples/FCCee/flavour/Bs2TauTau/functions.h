@@ -398,6 +398,64 @@ ROOT::VecOps::RVec<int> Find_diTau (int NTau23Pi, ROOT::VecOps::RVec<float> Taus
     }
 }
 
+//======================================================================================================================================================================
+// ------ Bs mass reconstruction attempts
+//============================================================================================================================================================================
+
+//Reconstruct the mass of the Bs using the missing energy in the signal hemisphere (Etot sighemi = Mz/2, |Ptot| sighemi = sqrt(Mz*Mz/2 - mb*mb) and aligned with thrust axis)
+float Compute_Emiss_sighem(ROOT::VecOps::RVec<float> in_e,
+                           ROOT::VecOps::RVec<float> in_px,
+                           ROOT::VecOps::RVec<float> in_py,
+                           ROOT::VecOps::RVec<float> in_pz, 
+                           float Thrustaxis_px, 
+                           float Thrustaxis_py, 
+                           float Thrustaxis_pz,
+                           int which){
+
+    if (which == 0) {
+        float Evis_sighemi (0.0);
+        for(size_t i = 0; i<in_e.size(); ++i) {
+            Evis_sighemi += in_e.at(i);
+        }
+        return 91.188/2.0-Evis_sighemi;
+    }
+
+    else if (which == 1) {
+        
+        float thrustaxismag ( sqrt(Thrustaxis_px*Thrustaxis_px + Thrustaxis_py*Thrustaxis_py + Thrustaxis_pz*Thrustaxis_pz) );
+
+        float Pxvis_sighemi (0.0);
+        for(size_t i = 0; i<in_px.size(); ++i) {
+            Pxvis_sighemi += in_px.at(i);
+        }
+        return -Pxvis_sighemi + sqrt(91.188*91.188/4.0 - 4.186*4.186)*Thrustaxis_px/thrustaxismag;
+    }
+
+    else if (which == 2) {
+        
+        float thrustaxismag ( sqrt(Thrustaxis_px*Thrustaxis_px + Thrustaxis_py*Thrustaxis_py + Thrustaxis_pz*Thrustaxis_pz) );
+
+        float Pyvis_sighemi (0.0);
+        for(size_t i = 0; i<in_py.size(); ++i) {
+            Pyvis_sighemi += in_py.at(i);
+        }
+        return -Pyvis_sighemi + sqrt(91.188*91.188/4.0 - 4.186*4.186)*Thrustaxis_py/thrustaxismag;
+    }
+
+    else if (which == 3) {
+        
+        float thrustaxismag ( sqrt(Thrustaxis_px*Thrustaxis_px + Thrustaxis_py*Thrustaxis_py + Thrustaxis_pz*Thrustaxis_pz) );
+
+        float Pzvis_sighemi (0.0);
+        for(size_t i = 0; i<in_pz.size(); ++i) {
+            Pzvis_sighemi += in_pz.at(i);
+        }
+        return -Pzvis_sighemi + sqrt(91.188*91.188/4.0 - 4.186*4.186)*Thrustaxis_pz/thrustaxismag;
+    }
+
+    else return -999.9;
+
+}
 
 
 //===================================================================================================================================================================
