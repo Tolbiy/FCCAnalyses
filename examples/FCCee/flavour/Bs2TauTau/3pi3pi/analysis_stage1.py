@@ -6,7 +6,7 @@ processList_full = {
     'p8_ee_Zcc_ecm91':{'chunks':100},
     'p8_ee_Zss_ecm91':{'chunks':100},
     'p8_ee_Zud_ecm91':{'chunks':100},
-    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
+    'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':20},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':10,'fraction':0.1},
 }
 
@@ -29,7 +29,7 @@ processList_test = {
 }
 
 nCPUS       = 8
-runBatch    = True 
+runBatch    = False 
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -41,10 +41,10 @@ if not runBatch:
 prodTag     = "FCCee/winter2023/IDEA/"
 
 # if runBatch = True, save output on eos
-outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_3pi3pi_withCuts"
+outputDirEos   = "/eos/experiment/fcc/ee/analyses_storage/flavor/Bs2TauTau/flatNtuples/winter2023/analysis_stage1_3pi3pi_withCuts_June26"
 
 # if runBatch = False, save output locally
-outputDir   = "../DummyRepo"
+outputDir   = "/afs/cern.ch/work/t/tomonnar/public/FCCeePhysicsPerformance/case-studies/flavour/Bs2TauTau/3pi3pi/Stage1/Plots"    #"../DummyRepo"
 #"fccanalysis_output/" To be used with runBatch = True
 
 includePaths = ["../functions.h"]
@@ -400,6 +400,7 @@ class RDFanalysis():
                .Define("Tau23PiCandidates_py",      "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,1)")
                .Define("Tau23PiCandidates_pz",      "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,2)")
                .Define("Tau23PiCandidates_p",       "myUtils::getFCCAnalysesComposite_p(Tau23PiCandidates,-1)")
+               .Define("Tau23PiCandidates_energy",  "sqrt( Tau23PiCandidates_mass*Tau23PiCandidates_mass + Tau23PiCandidates_p*Tau23PiCandidates_p)")
                .Define("Tau23PiCandidates_B",       "myUtils::getFCCAnalysesComposite_B(Tau23PiCandidates, VertexObject, RecoPartPIDAtVertex)")
                .Define("Tau23PiCandidates_x",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_x_pre.at(p));} return result;")
                .Define("Tau23PiCandidates_y",       "ROOT::VecOps::RVec<float> result; for (auto & p: Tau23PiCandidates_vertex) {result.push_back(Vertex_y_pre.at(p));} return result;")
@@ -464,6 +465,7 @@ class RDFanalysis():
                .Define("diTauPlus_pz","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_pz[diTau[0]]; else return Tau23PiCandidates_pz[diTau[1]];")
                .Define("diTauPlus_p", "if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_p[diTau[0]];  else return Tau23PiCandidates_p[diTau[1]];")
                .Define("diTauPlus_mass","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_mass[diTau[0]];  else return Tau23PiCandidates_mass[diTau[1]];")
+               .Define("diTauPlus_energy","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_energy[diTau[0]]; else return Tau23PiCandidates_energy[diTau[1]];")
                .Define("diTauPlus_chi2","if (Tau23PiCandidates_q[diTau[0]] > 0) return Tau23PiCandidates_chi2[diTau[0]];  else return Tau23PiCandidates_chi2[diTau[1]];")
                .Define("diTauMinus_x", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_x[diTau[0]];  else return Tau23PiCandidates_x[diTau[1]];")
                .Define("diTauMinus_y", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_y[diTau[0]];  else return Tau23PiCandidates_y[diTau[1]];")
@@ -473,6 +475,7 @@ class RDFanalysis():
                .Define("diTauMinus_pz","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_pz[diTau[0]]; else return Tau23PiCandidates_pz[diTau[1]];")
                .Define("diTauMinus_p", "if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_p[diTau[0]];  else return Tau23PiCandidates_p[diTau[1]];")
                .Define("diTauMinus_mass","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_mass[diTau[0]];  else return Tau23PiCandidates_mass[diTau[1]];")
+               .Define("diTauMinus_energy","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_energy[diTau[0]]; else return Tau23PiCandidates_energy[diTau[1]];")
                .Define("diTauMinus_chi2","if (Tau23PiCandidates_q[diTau[0]] < 0) return Tau23PiCandidates_chi2[diTau[0]];  else return Tau23PiCandidates_chi2[diTau[1]];")
                .Define("diTau_Angles","FCCAnalyses::ZHfunctions::Compute_Momenta_Angles(diTauPlus_x,diTauPlus_y,diTauPlus_z,diTauMinus_x,diTauMinus_y,diTauMinus_z)")
 
@@ -563,6 +566,7 @@ class RDFanalysis():
                .Define("denom",      "(T1xT2_x + EmxT2_x)*(T1xT2_x + T1xEm_x) + (T1xT2_y + EmxT2_y)*(T1xT2_y + T1xEm_y) + (T1xT2_z + EmxT2_z)*(T1xT2_z + T1xEm_z)")
 
                .Define("mDiTau_collinear3D",    "mDiTau_Vis/sqrt(T1xT2_M2/denom)") 
+
 
                #################################
                ##   Bs2TauTau Vertex approx   ##
@@ -706,6 +710,23 @@ class RDFanalysis():
                .Define("label_hasBc",       "int(n_Bc>0)" )
                .Define("label_has1Bc",      "int(n_Bc)" )
 
+               #################################
+               ##   Bs mass from missing E    ##
+               #################################
+
+               .Define("Emiss_sighemi","FCCAnalyses::ZHfunctions::Compute_Emiss_sighem(RP_e,RP_px,RP_py,RP_pz,EVT_Thrust_X,EVT_Thrust_Y,EVT_Thrust_Z,0)")
+               .Define("Pxmiss_sighemi","FCCAnalyses::ZHfunctions::Compute_Emiss_sighem(RP_e,RP_px,RP_py,RP_pz,EVT_Thrust_X,EVT_Thrust_Y,EVT_Thrust_Z,1)")
+               .Define("Pymiss_sighemi","FCCAnalyses::ZHfunctions::Compute_Emiss_sighem(RP_e,RP_px,RP_py,RP_pz,EVT_Thrust_X,EVT_Thrust_Y,EVT_Thrust_Z,2)")
+               .Define("Pzmiss_sighemi","FCCAnalyses::ZHfunctions::Compute_Emiss_sighem(RP_e,RP_px,RP_py,RP_pz,EVT_Thrust_X,EVT_Thrust_Y,EVT_Thrust_Z,3)")
+
+               .Define("diTau_E_miss","diTauPlus_energy + diTauMinus_energy + Emiss_sighemi")
+               .Define("diTau_px_miss","diTauPlus_px + diTauMinus_px + Pxmiss_sighemi")
+               .Define("diTau_py_miss","diTauPlus_py + diTauMinus_py + Pymiss_sighemi")
+               .Define("diTau_pz_miss","diTauPlus_pz + diTauMinus_pz + Pzmiss_sighemi")
+               .Define("diTau_p4_miss",  "TLorentzVector(diTau_px_miss, diTau_py_miss, diTau_pz_miss, diTau_E_miss)")
+               .Define("mDiTau_miss","diTau_p4_miss.M()")
+               #.Define("mDiTau_miss","sqrt( diTau_E_miss*diTau_E_miss - diTau_px_miss*diTau_px_miss - diTau_py_miss*diTau_py_miss - diTau_pz_miss*diTau_pz_miss )")
+
 
            )
         return df2
@@ -714,6 +735,8 @@ class RDFanalysis():
     #Mandatory: output function, please make sure you return the branchlist as a python list
     def output():
         branchList = [
+                "EventNumber",
+                
                 "MC_PDG","MC_M1","MC_M2","MC_n","MC_D1","MC_D2",
 
                 "n_genBottoms",
@@ -795,6 +818,8 @@ class RDFanalysis():
                 "Bs_IPVx","Bs_IPVy","Bs_IPVz","Bs_IPV",
                 "Bs_FlightDistance","Bs_px","Bs_py","Bs_pz","Bs_p","Bs_Lifetime",
                 
+                "Emiss_sighemi","Pxmiss_sighemi","Pymiss_sighemi","Pzmiss_sighemi",
+                "diTau_E_miss","diTau_px_miss","diTau_py_miss","diTau_pz_miss","mDiTau_miss",
 
                 "RP_e","RP_m_true","RP_m_reco","RP_px","RP_py","RP_pz","RP_Dphi","RP_Dtheta","RP_charge","RP_fromPV",
                 "RP_vert_ind","RP_vert_e","RP_vert_mass","RP_trk_d0","RP_trk_z0","RP_trk_phi","RP_trk_omega","RP_trk_tanLambda","RP_dndx","RP_mtof",
