@@ -29,7 +29,7 @@ processList_test = {
 }
 
 nCPUS       = 8
-runBatch    = True
+runBatch    = False
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -58,6 +58,8 @@ class RDFanalysis():
     def analysers(df):
         df2 = (
             df
+               .Define("EventNumber","(int)rdfentry_")
+               
                #############################################
                ##          Aliases for # in python        ##
                #############################################
@@ -451,7 +453,7 @@ class RDFanalysis():
                .Define("DV_d0",            "myUtils::get_trackd0(DV_tracks)")
                .Define("DV_z0",            "myUtils::get_trackz0(DV_tracks)")
 
-               #.Filter("recoEmiss_e > 10.0 && EVT_ThrustEmin_E < 38.0")
+               .Filter("recoEmiss_e > 10.0 && EVT_ThrustEmin_E < 38.0")
 
                ##############################
                ##      Get the leptons     ##
@@ -516,9 +518,18 @@ class RDFanalysis():
                ## Select the ell1pi candidates ##
                ##################################
 
-               #.Define("ell1pi_qq","ROOT::VecOps::RVec<int> res; for (size_t i=0; i<n_pi_charge_noVertex_sighemi; ++i){for (size_t j=0; j<n_ell_charge_noVertex_sighemi; ++j){res.push_back(pi_charge_noVertex_sighemi.at(i)*ell_charge_noVertex_sighemi.at(j));}} return res;")
-               #.Define("ell1pi_candidates","ell1pi_qq [ell1pi_qq < 0]")
-               #.Define("n_ell1pi_candidates","ell1pi_candidates.size()")
+               .Define("ell1pi_Pair_ind","ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> res; for (size_t i=0; i<pi_px.size(); ++i){for(size_t j=0; j<ell_px.size(); ++j){ROOT::VecOps::RVec<int> temp = {int(i),int(j)}; res.push_back(temp);}} return res;")
+               .Define("ell1pi_Pair_isSigSide",  "ROOT::VecOps::RVec<int> res; for (size_t i=0; i<ell1pi_Pair_ind.size(); ++i){if (ell_thrustangles.at(ell1pi_Pair_ind.at(i).at(1)) > 0   &&   pi_thrustangles.at(ell1pi_Pair_ind.at(i).at(0)) > 0)   res.push_back(1); else res.push_back(0);} return res;")
+               .Define("ell1pi_Pair_isOppCharge","ROOT::VecOps::RVec<int> res; for (size_t i=0; i<ell1pi_Pair_ind.size(); ++i){if (ell_charge.at(ell1pi_Pair_ind.at(i).at(1))             *    pi_charge.at(ell1pi_Pair_ind.at(i).at(0)) < 0)         res.push_back(1); else res.push_back(0);} return res;")
+               .Define("ell1pi_Pair_isGood1pi",  "ROOT::VecOps::RVec<int> res; for (size_t i=0; i<ell1pi_Pair_ind.size(); ++i){if (pi_energy.at(ell1pi_Pair_ind.at(i).at(0)) > 2.0        &&   pi_d0.at(ell1pi_Pair_ind.at(i).at(0)) > 0.02)          res.push_back(1); else res.push_back(0);} return res;")
+               .Define("ell1pi_Pair_isNoVertex", "ROOT::VecOps::RVec<int> res; for (size_t i=0; i<ell1pi_Pair_ind.size(); ++i){if (pi_hasVertex.at(ell1pi_Pair_ind.at(i).at(0)) == 0      &&   ell_hasVertex.at(ell1pi_Pair_ind.at(i).at(1)) == 0)    res.push_back(1); else res.push_back(0);} return res;")
+
+               .Define("ell1pi_ConservativeSel",  "ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> res; for (size_t i=0; i<ell1pi_Pair_ind.size(); ++i) {if (ell1pi_Pair_isSigSide.at(i) > 0 && ell1pi_Pair_isOppCharge.at(i) > 0 && ell1pi_Pair_isGood1pi.at(i) > 0) res.push_back(ell1pi_Pair_ind.at(i));} return res;")
+               .Define("ell1pi_ConservativeCand", "FCCAnalyses::ZHfunctions::ell1pi_SelectCandidates_Ediff(ell1pi_ConservativeSel,ell_energy,pi_energy)")
+               .Define("ell1pi_OptimisticSel",   "ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> res; for (size_t i=0; i<ell1pi_Pair_ind.size(); ++i) {if (ell1pi_Pair_isSigSide.at(i) > 0 && ell1pi_Pair_isOppCharge.at(i) > 0 && ell1pi_Pair_isNoVertex.at(i) > 0) res.push_back(ell1pi_Pair_ind.at(i));} return res;")
+               .Define("ell1pi_OptimisticCand",  "FCCAnalyses::ZHfunctions::ell1pi_SelectCandidates_Ediff(ell1pi_OptimisticSel,ell_energy,pi_energy)")
+
+               .Filter("ell1pi_OptimisticCand.at(0) > -1 || ell1pi_ConservativeCand.at(0) > -1")
 
 
                #####################################
@@ -583,42 +594,6 @@ class RDFanalysis():
                .Define("TM_ell_thrustEmax_n","int result (0); if(TM_ell_ind.at(0) < 0) result = -999; for (size_t i=0; i<TM_ell_thrustangles.size(); ++i){if (TM_ell_thrustangles[i] <= 0.0) ++result;} return result;")
                .Define("TM_ell_hasVertex","ROOT::VecOps::RVec<int> res; if (TM_ell_ind.at(0) < 0) res.push_back(-1); else res = FCCAnalyses::ZHfunctions::has_RECOVertex_1pi(TM_ell_ind,VertexObject); return res;")
                .Define("n_TM_ell_hasVertex","if (TM_ell_hasVertex.at(0) == -1) return int(-1); else {int n (0); for (size_t i=0; i<TM_ell_hasVertex.size(); ++i) if (TM_ell_hasVertex.at(i) == 1) ++n; return n;}")
-
-               #.Define("nTM_1piminus","if (TM_1piminus_ind.at(0) < 0) return TM_1piminus_ind.at(0); else return int(TM_1piminus_ind.size());")
-               #.Define("TM_1piminus_px",     "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_px(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_py",     "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_py(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_pz",     "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_pz(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_phi",    "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_phi(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_eta",    "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_eta(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_z0",     "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle2Track::getRP2TRK_Z0(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles),EFlowTrack_1); return res;")
-               #.Define("TM_1piminus_d0",     "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle2Track::getRP2TRK_D0(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles),EFlowTrack_1); return res;")
-               #.Define("TM_1piminus_energy", "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_e(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_mass",   "ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_charge", "ROOT::VecOps::RVec<int> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999); else res = ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_PDG",    "ROOT::VecOps::RVec<int> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999); else res = ReconstructedParticle::get_type(ReconstructedParticle::get(TM_1piminus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piminus_thrustangles","ROOT::VecOps::RVec<float> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-999.9); else res = Algorithms::getAxisCosTheta(EVT_thrust, TM_1piminus_px, TM_1piminus_py, TM_1piminus_pz); return res;")
-               #.Define("TM_1piminus_thrustEmin_n","int result (0); if(TM_1piminus_ind.at(0) < 0) result = -999; for (size_t i=0; i<TM_1piminus_thrustangles.size(); ++i){if (TM_1piminus_thrustangles[i] > 0.0) ++result;}  return result;")
-               #.Define("TM_1piminus_thrustEmax_n","int result (0); if(TM_1piminus_ind.at(0) < 0) result = -999; for (size_t i=0; i<TM_1piminus_thrustangles.size(); ++i){if (TM_1piminus_thrustangles[i] <= 0.0) ++result;} return result;")
-               #.Define("TM_1piminus_hasVertex","ROOT::VecOps::RVec<int> res; if (TM_1piminus_ind.at(0) < 0) res.push_back(-1); else res = FCCAnalyses::ZHfunctions::has_RECOVertex_1pi(TM_1piminus_ind,VertexObject); return res;")
-               #.Define("n_TM_1piminus_hasVertex","if (TM_1piminus_hasVertex.at(0) == -1) return int(-1); else {int n (0); for (size_t i=0; i<TM_1piminus_hasVertex.size(); ++i) if (TM_1piminus_hasVertex.at(i) == 1) ++n; return n;}")
-
-               #.Define("nTM_1piplus","if (TM_1piplus_ind.at(0) < 0) return TM_1piplus_ind.at(0); else return int(TM_1piplus_ind.size());")
-               #.Define("TM_1piplus_px",     "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_px(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_py",     "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_py(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_pz",     "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_pz(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_phi",    "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_phi(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_eta",    "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_eta(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_z0",     "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle2Track::getRP2TRK_Z0(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles),EFlowTrack_1); return res;")
-               #.Define("TM_1piplus_d0",     "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle2Track::getRP2TRK_D0(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles),EFlowTrack_1); return res;")
-               #.Define("TM_1piplus_energy", "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_e(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_mass",   "ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = ReconstructedParticle::get_mass(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_charge", "ROOT::VecOps::RVec<int> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999); else res = ReconstructedParticle::get_charge(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_PDG",    "ROOT::VecOps::RVec<int> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999); else res = ReconstructedParticle::get_type(ReconstructedParticle::get(TM_1piplus_ind,ReconstructedParticles)); return res;")
-               #.Define("TM_1piplus_thrustangles","ROOT::VecOps::RVec<float> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-999.9); else res = Algorithms::getAxisCosTheta(EVT_thrust, TM_1piplus_px, TM_1piplus_py, TM_1piplus_pz); return res;")
-               #.Define("TM_1piplus_thrustEmin_n","int result (0); if(TM_1piplus_ind.at(0) < 0) result = -999; for (size_t i=0; i<TM_1piplus_thrustangles.size(); ++i){if (TM_1piplus_thrustangles[i] > 0.0) ++result;}  return result;")
-               #.Define("TM_1piplus_thrustEmax_n","int result (0); if(TM_1piplus_ind.at(0) < 0) result = -999; for (size_t i=0; i<TM_1piplus_thrustangles.size(); ++i){if (TM_1piplus_thrustangles[i] <= 0.0) ++result;} return result;")
-               #.Define("TM_1piplus_hasVertex","ROOT::VecOps::RVec<int> res; if (TM_1piplus_ind.at(0) < 0) res.push_back(-1); else res = FCCAnalyses::ZHfunctions::has_RECOVertex_1pi(TM_1piplus_ind,VertexObject); return res;")
-               #.Define("n_TM_1piplus_hasVertex","if (TM_1piplus_hasVertex.at(0) == -1) return int(-1); else {int n (0); for (size_t i=0; i<TM_1piplus_hasVertex.size(); ++i) if (TM_1piplus_hasVertex.at(i) == 1) ++n; return n;}")
 
 
                ###############################
@@ -700,6 +675,8 @@ class RDFanalysis():
     #Mandatory: output function, please make sure you return the branchlist as a python list
     def output():
         branchList = [
+                "EventNumber",
+
                 "MC_PDG","MC_M1","MC_M2","MC_n","MC_D1","MC_D2",
 
                 "n_genBottoms",
@@ -752,18 +729,15 @@ class RDFanalysis():
 
                 "n_ell","ell_px","ell_py","ell_pz","ell_phi","ell_eta","ell_d0","ell_z0","ell_energy","ell_mass","ell_charge","ell_PDG","ell_thrustangles","ell_thrustEmin_n","ell_thrustEmax_n","ell_hasVertex","n_ell_hasNoVertex", "n_ell_charge_noVertex_sighemi",
                 "n_pi","pi_px","pi_py","pi_pz","pi_phi","pi_eta","pi_d0","pi_z0","pi_energy","pi_mass","pi_charge","pi_PDG","pi_thrustangles","pi_thrustEmin_n","pi_thrustEmax_n","pi_hasVertex","n_pi_hasNoVertex", "n_pi_charge_noVertex_sighemi",
-                #"ell1pi_qq","ell1pi_candidates","n_ell1pi_candidates",
+                
+                "ell1pi_Pair_isSigSide","ell1pi_Pair_isOppCharge","ell1pi_Pair_isGood1pi","ell1pi_Pair_isNoVertex",
+                "ell1pi_ConservativeCand","ell1pi_OptimisticCand",
 
                 "n_1piplusDaughters","n_1piminusDaughters","n_eplusDaughters","n_eminusDaughters","n_muplusDaughters","n_muminusDaughters","nTM_MC1pi","nTM_MCell",
                 "nTM_1pi","TM_1pi_px","TM_1pi_py","TM_1pi_pz","TM_1pi_phi","TM_1pi_eta","TM_1pi_d0","TM_1pi_z0","TM_1pi_energy",
                 "TM_1pi_mass","TM_1pi_charge","TM_1pi_PDG","TM_1pi_thrustangles","TM_1pi_thrustEmin_n","TM_1pi_thrustEmax_n","TM_1pi_hasVertex","n_TM_1pi_hasVertex",
                 "nTM_ell","TM_ell_px","TM_ell_py","TM_ell_pz","TM_ell_phi","TM_ell_eta","TM_ell_d0","TM_ell_z0","TM_ell_energy",
                 "TM_ell_mass","TM_ell_charge","TM_ell_PDG","TM_ell_thrustangles","TM_ell_thrustEmin_n","TM_ell_thrustEmax_n","TM_ell_hasVertex","n_TM_ell_hasVertex",
-
-                #"nTM_1piminus","TM_1piminus_px","TM_1piminus_py","TM_1piminus_pz","TM_1piminus_phi","TM_1piminus_eta","TM_1piminus_d0","TM_1piminus_z0","TM_1piminus_energy",
-                #"TM_1piminus_mass","TM_1piminus_charge","TM_1piminus_PDG","TM_1piminus_thrustangles","TM_1piminus_thrustEmin_n","TM_1piminus_thrustEmax_n","TM_1piminus_hasVertex","n_TM_1piminus_hasVertex",
-                #"nTM_1piplus","TM_1piplus_px","TM_1piplus_py","TM_1piplus_pz","TM_1piplus_phi","TM_1piplus_eta","TM_1piplus_d0","TM_1piplus_z0","TM_1piplus_energy",
-                #"TM_1piplus_mass","TM_1piplus_charge","TM_1piplus_PDG","TM_1piplus_thrustangles","TM_1piplus_thrustEmin_n","TM_1piplus_thrustEmax_n","TM_1piplus_hasVertex","n_TM_1piplus_hasVertex",
 
                 "RP_e","RP_m_true","RP_m_reco","RP_px","RP_py","RP_pz","RP_Dphi","RP_Dtheta","RP_charge","RP_fromPV",
                 "RP_vert_ind","RP_vert_e","RP_vert_mass","RP_trk_d0","RP_trk_z0","RP_trk_phi","RP_trk_omega","RP_trk_tanLambda","RP_dndx","RP_mtof",
