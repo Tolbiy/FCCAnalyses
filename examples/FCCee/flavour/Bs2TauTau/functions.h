@@ -1164,6 +1164,34 @@ ROOT::VecOps::RVec<ROOT::VecOps::RVec<float>> GetP(ROOT::VecOps::RVec<ROOT::VecO
 
 }
 
+//======================================================================================================================================
+// ---------------- ell1pi ----------------------------------
+//======================================================================================================================================
+
+//Candidates selections among ell1pi pairs based on smallest relative energy difference
+ROOT::VecOps::RVec<int> ell1pi_SelectCandidates_Ediff(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> Pair_Ind,
+                                                      ROOT::VecOps::RVec<float> ell_energy,
+                                                      ROOT::VecOps::RVec<float> pi_energy){
+ 
+    ROOT::VecOps::RVec<int> candidates;
+    if (Pair_Ind.size() == 0) candidates = {-1,-1};
+    else{
+        float Ediff ( std::abs(ell_energy.at(Pair_Ind.at(0).at(1)) - pi_energy.at(Pair_Ind.at(0).at(0))) / (ell_energy.at(Pair_Ind.at(0).at(1)) + pi_energy.at(Pair_Ind.at(0).at(0))) );
+        int ind (0);
+        for (size_t i=1; i<Pair_Ind.size(); ++i){
+            float Ediffi ( std::abs(ell_energy.at(Pair_Ind.at(i).at(1)) - pi_energy.at(Pair_Ind.at(i).at(0))) / (ell_energy.at(Pair_Ind.at(i).at(1)) + pi_energy.at(Pair_Ind.at(i).at(0))) );
+            if ( Ediffi < Ediff ) {
+                Ediff = Ediffi;
+                ind = i;
+            }
+        }
+        candidates = Pair_Ind.at(ind);
+    }
+    return candidates;
+}
+
+                                            
+
 //------------ BKG Studies --------------------------------------------------------------------------------------------
 
 //Finding the MC muons truth-matched to dimuon
