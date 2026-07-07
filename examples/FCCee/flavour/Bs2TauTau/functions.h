@@ -557,6 +557,33 @@ ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_1Pi(ROOT::VecOps::
     return result; //Structure (Charged Pion, (nu, (Pi0) ...))
 }
 
+//Get the exclusive Tau23Pi(Pi0)Nu Tau decay in the Bs2TauTau decays WARNING: PM = 1 GIVES TAU_MINUS WHILE -1 GIVES TAU_PLUS
+ROOT::VecOps::RVec<edm4hep::MCParticleData> Find_genBs2TauTau_3Pi(ROOT::VecOps::RVec<edm4hep::MCParticleData> genBs2TauTau_list, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter, int pm){
+    ROOT::VecOps::RVec<edm4hep::MCParticleData> result;
+    for (size_t i = 0; i < genBs2TauTau_list.size(); ++i){
+        if (genBs2TauTau_list[i].PDG == pm*15){
+            ROOT::VecOps::RVec<int> Pions;
+            ROOT::VecOps::RVec<int> Rem;
+            for (size_t j = genBs2TauTau_list[i].daughters_begin; j < genBs2TauTau_list[i].daughters_end; ++j){
+                if (std::abs(in[daughter.at(j)].PDG) == 211){ //Select charged pion
+                    Pions.push_back(daughter.at(j));
+                }
+                else {
+                    Rem.push_back(daughter.at(j)); //Pi0 comes for free 
+                }
+            }
+            if (Pions.size() == 3){ //Only three pions is allowed
+                for (size_t m = 0; m < Pions.size(); ++m){
+                    result.push_back(in.at(Pions[m]));
+                }
+                for (size_t n = 0; n < Rem.size(); ++n){
+                    result.push_back(in.at(Rem[n]));
+                }
+            }
+        }
+    }
+    return result; //Structure (Charged Pion (1,2,3), (nu, (Pi0) ...))
+}
 
 //Truth-match the muons, use a pm flag (+1 = mu+, -1 = mu-) to create two collection of reco muons truth-matched to the MC ones
 //Perform the truth matching by going through the reco part that got truth-matched
@@ -826,6 +853,39 @@ ROOT::VecOps::RVec<int> Find_genBs2TauTauDaughter_ind(ROOT::VecOps::RVec<edm4hep
     //Else result = [Daughter of interest, [rest]]
 }
 
+//Get the INDICES of the Bs2TauTau (grand)daughters, Tau into 3 daughters only
+ROOT::VecOps::RVec<int> Find_genBs2TauTauDaughter_3ind(ROOT::VecOps::RVec<edm4hep::MCParticleData> genBs2TauTau_list, ROOT::VecOps::RVec<edm4hep::MCParticleData> in, ROOT::VecOps::RVec<int> daughter, int DaughterPDG){
+    ROOT::VecOps::RVec<int> result;
+    for (size_t i = 0; i < genBs2TauTau_list.size(); ++i){
+        if (std::abs(genBs2TauTau_list[i].PDG) == 15){
+            ROOT::VecOps::RVec<int> Daughter;
+            ROOT::VecOps::RVec<int> Rem;
+            int totq (0);
+            for (size_t j = genBs2TauTau_list[i].daughters_begin; j < genBs2TauTau_list[i].daughters_end; ++j){
+                if (in[daughter.at(j)].PDG == std::abs(DaughterPDG)){
+                    Daughter.push_back(daughter.at(j));
+                    totq += in[daughter.at(j)].PDG;
+                }
+                else {
+                    Rem.push_back(daughter.at(j));
+                }
+            }
+            if (Daughter.size() == 3 && totq*DaughterPDG > 0){ //exactly three charged daughters: rejects unidentified (size==0) and multiple charged daughters (size>1) and correct charge
+                    
+                    for (size_t m = 0; m < Daughter.size(); ++m){
+                        result.push_back(Daughter[m]);
+                    }
+                    for (size_t n = 0; n < Rem.size(); ++n){
+                        result.push_back(Rem[n]);
+                    }
+            }
+        }
+    }
+    return result;
+    //If not found, size == 0
+    //Else result = [[Daughter of interest], [rest]]
+}
+
 //From the MC daughters, find the RECO index of the corresponding particle (return a list to work with the other analyzer functions)
 //if -1, no MC daughter
 //if -2, no corresponding RECO
@@ -846,6 +906,42 @@ ROOT::VecOps::RVec<int> TM_Bs2TauTauDaughters_ind(ROOT::VecOps::RVec<int> MClist
             }
         }
         if (result.size() == 0) result.push_back(-2); //No corresponding RECO 1pi
+        return result;
+    }
+}
+
+//From the MC daughters, find the RECO index of the corresponding particle (return a list to work with the other analyzer functions)
+//if -1, no MC daughter
+//if -2, no corresponding RECO
+ROOT::VecOps::RVec<int> TM_Bs2TauTauDaughters_3ind(ROOT::VecOps::RVec<int> MClist, ROOT::VecOps::RVec<int> mcind, ROOT::VecOps::RVec<int> recoind){
+
+    ROOT::VecOps::RVec<int> result;
+    
+    if (MClist.size() == 0) {
+        result.push_back(-1); //Reject if no MC daughter
+        return result;
+    }
+    
+    else{
+        for (size_t i=0; i<mcind.size(); ++i){ //Search the MC part of the MCRECO list
+            ROOT::VecOps::RVec<int> found = {0,0,0};
+            
+            //Check only the first three MC as these are the part. of interest and avoid duplications
+            if (mcind.at(i) == MClist.at(0) && found.at(0) == 0){ 
+                result.push_back(recoind.at(i));
+                found.at(0) = 1;
+            }
+            else if (mcind.at(i) == MClist.at(1) && found.at(1) == 0){
+                result.push_back(recoind.at(i));
+                found.at(1) = 1;
+            }
+            else if (mcind.at(i) == MClist.at(2) && found.at(2) == 0){
+                result.push_back(recoind.at(i));
+                found.at(2) = 1;
+            }
+        }
+        
+        if (result.size() == 0) result.push_back(-2); //No corresponding RECO
         return result;
     }
 }
@@ -1190,7 +1286,52 @@ ROOT::VecOps::RVec<int> ell1pi_SelectCandidates_Ediff(ROOT::VecOps::RVec<ROOT::V
     return candidates;
 }
 
-                                            
+//Candidates selections among ell1pi pairs based on smallest relative energy difference
+ROOT::VecOps::RVec<int> SelectCandidates_3pi1pi_Ediff(ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> Pair_Ind,
+                                                      ROOT::VecOps::RVec<float> ell_energy,
+                                                      ROOT::VecOps::RVec<float> pi_energy){
+ 
+    ROOT::VecOps::RVec<int> candidates;
+    if (Pair_Ind.size() == 0) candidates = {-1,-1};
+    else{
+        float Ediff ( std::abs(ell_energy.at(Pair_Ind.at(0).at(1)) - pi_energy.at(Pair_Ind.at(0).at(0))) / (ell_energy.at(Pair_Ind.at(0).at(1)) + pi_energy.at(Pair_Ind.at(0).at(0))) );
+        int ind (0);
+        for (size_t i=1; i<Pair_Ind.size(); ++i){
+            float Ediffi ( std::abs(ell_energy.at(Pair_Ind.at(i).at(1)) - pi_energy.at(Pair_Ind.at(i).at(0))) / (ell_energy.at(Pair_Ind.at(i).at(1)) + pi_energy.at(Pair_Ind.at(i).at(0))) );
+            if ( Ediffi < Ediff ) {
+                Ediff = Ediffi;
+                ind = i;
+            }
+        }
+        candidates = Pair_Ind.at(ind);
+    }
+    return candidates;
+}
+
+//======================================================================================================================================
+// ---------------- 3pi1pi ----------------------------------
+//======================================================================================================================================
+
+//1pi candidates selections among those not id'd by the Tau23Pi candidates
+ROOT::VecOps::RVec<int> SelectCandidates_3pi1pi_1pi(ROOT::VecOps::RVec<int> allind,
+                                                     ROOT::VecOps::RVec<float> allpx,
+                                                     ROOT::VecOps::RVec<float> px_3pi1,
+                                                     ROOT::VecOps::RVec<float> px_3pi2,
+                                                     ROOT::VecOps::RVec<float> px_3pi3){
+
+    ROOT::VecOps::RVec<int> result;
+    for (size_t i=0; i<allpx.size(); ++i){
+        bool from3pi (false);
+        for (size_t j=0; j<px_3pi1.size(); ++j){
+            if ( std::abs(allpx.at(i)-px_3pi1.at(j)) < 1e-4 && std::abs(allpx.at(i)-px_3pi2.at(j)) < 1e-4 && std::abs(allpx.at(i)-px_3pi3.at(j)) < 1e-4 ){
+                from3pi = true;
+                break;        
+            }
+        }
+        if (!from3pi) result.push_back(allind.at(i));
+    }
+    return result;
+}                
 
 //------------ BKG Studies --------------------------------------------------------------------------------------------
 
