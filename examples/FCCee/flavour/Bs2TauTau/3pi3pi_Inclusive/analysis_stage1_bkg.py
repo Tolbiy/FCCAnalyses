@@ -2,10 +2,10 @@
 
 # list of samples to process
 processList_full = {
-    'p8_ee_Zbb_ecm91':{'chunks':100},
-    'p8_ee_Zcc_ecm91':{'chunks':100},
-    'p8_ee_Zss_ecm91':{'chunks':100},
-    'p8_ee_Zud_ecm91':{'chunks':100},
+    'p8_ee_Zbb_ecm91':{'chunks':100,'fraction':1.0},
+    'p8_ee_Zcc_ecm91':{'chunks':100,'fraction':1.0},
+    'p8_ee_Zss_ecm91':{'chunks':100,'fraction':1.0},
+    'p8_ee_Zud_ecm91':{'chunks':100,'fraction':1.0},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':20},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':20},
 }
@@ -20,16 +20,16 @@ processList_full = {
 #}
 
 processList_test = {
-    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.000002},
+    'p8_ee_Zbb_ecm91':{'chunks':1, 'fraction':0.002},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':1, 'fraction':0.000002},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
-    'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zss_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zud_ecm91':{'chunks':1, 'fraction':0.000002},
+    #'p8_ee_Zcc_ecm91':{'chunks':1, 'fraction':0.000002},
 }
 
 nCPUS       = 8
-runBatch    = False 
+runBatch    = True
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
@@ -784,6 +784,21 @@ class RDFanalysis():
                .Define("mDiTau_miss","diTau_p4_miss.M()")
                #.Define("mDiTau_miss","sqrt( diTau_E_miss*diTau_E_miss - diTau_px_miss*diTau_px_miss - diTau_py_miss*diTau_py_miss - diTau_pz_miss*diTau_pz_miss )")
 
+               ############################
+               ##   Background studies   ##
+               ############################
+
+               .Define("MC_diTau_ind","FCCAnalyses::ZHfunctions::Find_MC_3pi3pi_px(diTauPlus_pion1px,diTauMinus_pion1px,RecoPartPIDAtVertex,MCRecoAssociations0,MCRecoAssociations1)")
+               #From the common ancestor
+               .Define("MC_diTau_CommonAncestor","FCCAnalyses::ZHfunctions::Find_MC_CommonAncestor(MC_diTau_ind,Particle,Particle0)")
+               .Define("MC_diTau_CommonAncestor_FullDecayTree","FCCAnalyses::ZHfunctions::Find_MC_CommonAncestor_Daughters(MC_diTau_CommonAncestor,Particle,Particle1)")
+               .Define("MC_diTau_CommonAncestor_DecayTree","FCCAnalyses::ZHfunctions::Decay_Chain(MC_diTau_CommonAncestor_FullDecayTree)")
+               #Just the direct parents
+               .Define("MC_diTau_Mothers","FCCAnalyses::ZHfunctions::Find_MC_MothersPDG(MC_diTau_ind,Particle,Particle0,MC_PDG)")
+               .Define("MC_Tau1_Cat","FCCAnalyses::ZHfunctions::Find_Categories(MC_diTau_Mothers.at(0))")
+               .Define("MC_Tau2_Cat","FCCAnalyses::ZHfunctions::Find_Categories(MC_diTau_Mothers.at(1))")
+               .Define("MC_diTau_Cat","10*MC_Tau1_Cat + MC_Tau2_Cat")
+
 
            )
         return df2
@@ -877,6 +892,9 @@ class RDFanalysis():
                 
                 "Emiss_sighemi","Pxmiss_sighemi","Pymiss_sighemi","Pzmiss_sighemi",
                 "diTau_E_miss","diTau_px_miss","diTau_py_miss","diTau_pz_miss","mDiTau_miss",
+
+                "MC_diTau_ind","MC_diTau_CommonAncestor","MC_diTau_CommonAncestor_FullDecayTree","MC_diTau_CommonAncestor_DecayTree",
+                "MC_diTau_Mothers","MC_Tau1_Cat","MC_Tau2_Cat","MC_diTau_Cat",
 
                 "RP_e","RP_m_true","RP_m_reco","RP_px","RP_py","RP_pz","RP_Dphi","RP_Dtheta","RP_charge","RP_fromPV",
                 "RP_vert_ind","RP_vert_e","RP_vert_mass","RP_trk_d0","RP_trk_z0","RP_trk_phi","RP_trk_omega","RP_trk_tanLambda","RP_dndx","RP_mtof",
