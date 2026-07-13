@@ -1313,6 +1313,7 @@ ROOT::VecOps::RVec<int> SelectCandidates_3pi1pi_Ediff(ROOT::VecOps::RVec<ROOT::V
 //======================================================================================================================================
 
 //1pi candidates selections among those not id'd by the Tau23Pi candidates
+//STOP CHECK the actual indices not just the momenta
 ROOT::VecOps::RVec<int> SelectCandidates_3pi1pi_1pi(ROOT::VecOps::RVec<int> allind,
                                                      ROOT::VecOps::RVec<float> allpx,
                                                      ROOT::VecOps::RVec<float> px_3pi1,
@@ -1323,7 +1324,7 @@ ROOT::VecOps::RVec<int> SelectCandidates_3pi1pi_1pi(ROOT::VecOps::RVec<int> alli
     for (size_t i=0; i<allpx.size(); ++i){
         bool from3pi (false);
         for (size_t j=0; j<px_3pi1.size(); ++j){
-            if ( std::abs(allpx.at(i)-px_3pi1.at(j)) < 1e-4 && std::abs(allpx.at(i)-px_3pi2.at(j)) < 1e-4 && std::abs(allpx.at(i)-px_3pi3.at(j)) < 1e-4 ){
+            if ( std::abs(allpx.at(i)-px_3pi1.at(j)) < 1e-9 && std::abs(allpx.at(i)-px_3pi2.at(j)) < 1e-9 && std::abs(allpx.at(i)-px_3pi3.at(j)) < 1e-9 ){
                 from3pi = true;
                 break;        
             }
@@ -1333,7 +1334,33 @@ ROOT::VecOps::RVec<int> SelectCandidates_3pi1pi_1pi(ROOT::VecOps::RVec<int> alli
     return result;
 }                
 
-//------------ BKG Studies --------------------------------------------------------------------------------------------
+
+//======================================================================================================================================
+//------------ Background topologies identification  --------------------
+//======================================================================================================================================
+
+//3pi3pi case -------------------------------------------------------------------------------
+
+//Find the mc couterpart of the 1st pion of the Tau23Pi (diTau) candidates (not to be used with no candidates)
+ROOT::VecOps::RVec<int> Find_MC_3pi3pi_px(float px_1pi_plus, float px_1pi_minus, 
+                                       ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData> reco,
+                                       ROOT::VecOps::RVec<int> reco_ind,
+                                       ROOT::VecOps::RVec<int> mc_ind
+                                      ){
+    
+    ROOT::VecOps::RVec<int> MCind(2,-1);
+
+    for (size_t i=0; i<reco_ind.size(); ++i){
+        float px (reco.at(reco_ind.at(i)).momentum.x);
+        if ( std::abs(px_1pi_plus-px ) < 1e-9 ) MCind.at(0) = mc_ind.at(i); //Check that the momenta are the same
+        if ( std::abs(px_1pi_minus-px) < 1e-9 ) MCind.at(1) = mc_ind.at(i);
+    }
+
+    return MCind;
+}
+
+
+//ellell case -------------------------------------------------------------------------------
 
 //Finding the MC muons truth-matched to dimuon
 ROOT::VecOps::RVec<int> Finding_MC_dimuon(ROOT::VecOps::RVec<int> dimuon_ind,
@@ -1363,6 +1390,8 @@ ROOT::VecOps::RVec<int> Finding_MC_dimuon(ROOT::VecOps::RVec<int> dimuon_ind,
     //Add a check by checking the size of the MC_dimuon list because if truth-matching fails then it doesn't appear in the MCRecoAssociation lists, and thus not push_back'ed
     return results;
 }
+
+//General cases ----------------------------------------------------------------------------------
 
 //Explore the MC tree of the dimuon: Find the common ancestor of both muon (assume only one mother)
 int Find_MC_CommonAncestor(ROOT::VecOps::RVec<int> MC_dimuon_ind,
@@ -1514,6 +1543,7 @@ ROOT::VecOps::RVec<int> Find_MC_NoCommonAncestor_Daughters(int CA_ind,
 
 }
 
+//Get actual decays, avoid oscillations and Ks/Kl hadron.
 ROOT::VecOps::RVec<int> Decay_Chain(ROOT::VecOps::RVec<int> Daughters_ind){
     
     ROOT::VecOps::RVec<int> result;
@@ -1573,6 +1603,85 @@ ROOT::VecOps::RVec<int> Find_MuSubdecays(ROOT::VecOps::RVec<int> Decays, ROOT::V
         } while (i < Decays.size());
     }
     return results;
+}
+
+//Find the PDG of the direct mothers of the candidates
+ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> Find_MC_MothersPDG(ROOT::VecOps::RVec<int> MC_dimuon_ind,
+                                                               ROOT::VecOps::RVec<edm4hep::MCParticleData> Particle,
+                                                               ROOT::VecOps::RVec<int> Parents_ind,
+                                                               ROOT::VecOps::RVec<int> MC_PDG){
+
+
+    ROOT::VecOps::RVec<ROOT::VecOps::RVec<int>> Mothers_PDG;
+
+    if (MC_dimuon_ind.size() < 2) {
+        return {{-99999},{-99999}}; //Extended usage to events without dimuon
+    }
+    else if (MC_dimuon_ind.at(0) == -1) { //if encoded with always size 2 but with -1
+        return {{-99999},{-99999}};    
+    }
+
+
+    //Assume only one mother for all particle (actually checks it and use it as a termination condition (-1))
+    //Saves the PDG of the mothers to go directly to the category
+    ROOT::VecOps::RVec<int> Parents_Mu1;
+    ROOT::VecOps::RVec<int> Parents_Mu2;
+
+    if (Particle.at(MC_dimuon_ind[0]).parents_begin+1 == Particle.at(MC_dimuon_ind[0]).parents_end){
+        Parents_Mu1.push_back(Parents_ind.at(Particle.at(MC_dimuon_ind[0]).parents_begin)); 
+        bool SingleParent1 (true);
+        do {
+            if (Particle.at(Parents_Mu1.back()).parents_begin+1 == Particle.at(Parents_Mu1.back()).parents_end){
+                Parents_Mu1.push_back(Parents_ind.at(Particle.at(Parents_Mu1.back()).parents_begin));
+            }
+            else {
+                Parents_Mu1.push_back(-1);
+                SingleParent1 = false;
+            }
+        } while(SingleParent1);
+    }
+    else Parents_Mu1.push_back(-1);
+         
+    if (Particle.at(MC_dimuon_ind[1]).parents_begin+1 == Particle.at(MC_dimuon_ind[1]).parents_end){
+        Parents_Mu2.push_back(Parents_ind.at(Particle.at(MC_dimuon_ind[1]).parents_begin)); 
+        bool SingleParent2 (true);
+        do {
+            if (Particle.at(Parents_Mu2.back()).parents_begin+1 == Particle.at(Parents_Mu2.back()).parents_end){
+                Parents_Mu2.push_back(Parents_ind.at(Particle.at(Parents_Mu2.back()).parents_begin));
+            }
+            else {
+                Parents_Mu2.push_back(-1);
+                SingleParent2 = false;
+            }
+        } while(SingleParent2);
+    }
+    else Parents_Mu2.push_back(-1);
+    
+    ROOT::VecOps::RVec<int> temp1;
+    for(size_t i=0; i<Parents_Mu1.size(); ++i){
+        if (Parents_Mu1.at(i) == -1){
+            temp1.push_back(-99999);
+            break;
+        }
+        else {
+            temp1.push_back(MC_PDG.at(Parents_Mu1.at(i)));
+        }
+    }
+
+    ROOT::VecOps::RVec<int> temp2;
+    for(size_t i=0; i<Parents_Mu2.size(); ++i){
+        if (Parents_Mu2.at(i) == -1){
+            temp2.push_back(-99999);
+            break;
+        }
+        else {
+            temp2.push_back(MC_PDG.at(Parents_Mu2.at(i)));
+        }
+    }
+    
+    Mothers_PDG.push_back(temp1);
+    Mothers_PDG.push_back(temp2);
+    return Mothers_PDG;
 }
 
 int Find_Categories(ROOT::VecOps::RVec<int> MuFamily){
