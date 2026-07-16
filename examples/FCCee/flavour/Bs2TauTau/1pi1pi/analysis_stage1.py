@@ -29,7 +29,7 @@ processList_test = {
 }
 
 nCPUS       = 8
-runBatch    = False
+runBatch    = True
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
