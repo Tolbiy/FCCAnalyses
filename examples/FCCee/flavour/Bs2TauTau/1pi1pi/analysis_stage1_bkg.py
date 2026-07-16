@@ -3,9 +3,9 @@
 # list of samples to process
 processList_full = {
     'p8_ee_Zbb_ecm91':{'chunks':10},
-    #'p8_ee_Zcc_ecm91':{'chunks':10},
-    #'p8_ee_Zss_ecm91':{'chunks':10},
-    #'p8_ee_Zud_ecm91':{'chunks':10},
+    'p8_ee_Zcc_ecm91':{'chunks':10},
+    'p8_ee_Zss_ecm91':{'chunks':10},
+    'p8_ee_Zud_ecm91':{'chunks':10},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTauTAUHADNU':{'chunks':10},
     #'p8_ee_Zbb_ecm91_EvtGen_Bs2TauTau':{'chunks':10,'fraction':0.1},
 }
@@ -29,7 +29,7 @@ processList_test = {
 }
 
 nCPUS       = 8
-runBatch    = False
+runBatch    = True
 batchQueue  = "nextweek"
 compGroup   = "group_u_FCC.local_gen"
 
